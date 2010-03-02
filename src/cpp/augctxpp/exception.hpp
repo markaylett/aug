@@ -83,14 +83,14 @@ namespace aug {
         errinfo_error(const char* file, int line, const char* src, int num,
                       const char* format, va_list args)
         {
-            aug_vseterrinfo(&errinfo_, file, line, src, num, format, args);
+            aug_vseterrinfo_(&errinfo_, file, line, src, num, format, args);
         }
         errinfo_error(const char* file, int line, const char* src, int num,
                       const char* format, ...)
         {
             va_list args;
             va_start(args, format);
-            aug_vseterrinfo(&errinfo_, file, line, src, num, format, args);
+            aug_vseterrinfo_(&errinfo_, file, line, src, num, format, args);
             va_end(args);
         }
         const char*
@@ -110,8 +110,8 @@ namespace aug {
         aug_errinfo&
         errinfo(aug_errinfo& dst) const
         {
-            aug_seterrinfo(&dst, errinfo_.file_, errinfo_.line_,
-                           errinfo_.src_, errinfo_.num_, errinfo_.desc_);
+            aug_seterrinfo_(&dst, errinfo_.file_, errinfo_.line_,
+                            errinfo_.src_, errinfo_.num_, errinfo_.desc_);
             return dst;
         }
         const aug_errinfo&
@@ -139,14 +139,14 @@ namespace aug {
         basic_error(const char* file, int line, int num, const char* format,
                     va_list args)
         {
-            aug_vseterrinfo(cptr(*this), file, line, T(), num, format, args);
+            aug_vseterrinfo_(cptr(*this), file, line, T(), num, format, args);
         }
         basic_error(const char* file, int line, int num, const char* format,
                     ...)
         {
             va_list args;
             va_start(args, format);
-            aug_vseterrinfo(cptr(*this), file, line, T(), num, format, args);
+            aug_vseterrinfo_(cptr(*this), file, line, T(), num, format, args);
             va_end(args);
         }
     };
@@ -185,7 +185,7 @@ namespace aug {
         }
         dlfcn_error(const char* file, int line, const char* desc)
         {
-            aug_seterrinfo(cptr(*this), file, line, "dlfcn", 1, desc);
+            aug_seterrinfo_(cptr(*this), file, line, "dlfcn", 1, desc);
         }
     };
 
@@ -201,7 +201,7 @@ namespace aug {
         }
         posix_error(const char* file, int line, int err)
         {
-            aug_setposixerrinfo(cptr(*this), file, line, err);
+            aug_setposixerrinfo_(cptr(*this), file, line, err);
         }
     };
 
@@ -218,7 +218,7 @@ namespace aug {
         }
         win32_error(const char* file, int line, unsigned long err)
         {
-            aug_setwin32errinfo(cptr(*this), file, line, err);
+            aug_setwin32errinfo_(cptr(*this), file, line, err);
         }
     };
 #endif // _WIN32
@@ -320,12 +320,12 @@ namespace aug {
         e.errinfo(*aug_tlerr);                                          \
         aug_perrinfo(aug_tlx, "aug::errinfo_error", &e.errinfo());      \
     } catch (const std::exception& e) {                                 \
-        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
-                       AUG_EEXCEPT, e.what());                          \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",             \
+                        AUG_EEXCEPT, e.what());                         \
         aug_perrinfo(aug_tlx, "std::exception", NULL);                  \
     } catch (...) {                                                     \
-        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
-                       AUG_EEXCEPT, "no description available");        \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",             \
+                        AUG_EEXCEPT, "no description available");       \
         aug_perrinfo(aug_tlx, "unknown", NULL);                         \
     } do { } while (0)
 
@@ -333,11 +333,11 @@ namespace aug {
     catch (const aug::errinfo_error& e) {                               \
         e.errinfo(*aug_tlerr);                                          \
     } catch (const std::exception& e) {                                 \
-        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
-                       AUG_EEXCEPT, e.what());                          \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",             \
+                        AUG_EEXCEPT, e.what());                         \
     } catch (...) {                                                     \
-        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
-                       AUG_EEXCEPT, "no description available");        \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",             \
+                        AUG_EEXCEPT, "no description available");       \
     } do { } while (0)
 
 #endif // AUGCTXPP_EXCEPTION_HPP

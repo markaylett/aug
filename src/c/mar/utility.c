@@ -65,7 +65,7 @@ aug_confirm_(const char* prompt)
     printf("%s? (y or [n]): ", prompt);
     fflush(stdout);
 
-    switch (AUG_RESULT(aug_readline_(buf, sizeof(buf), stdin))) {
+    switch (aug_readline_(buf, sizeof(buf), stdin)) {
     case 1: /* One character. */
         break;
     default:
@@ -87,10 +87,13 @@ aug_insertstream_(aug_mar* mar, FILE* stream)
     do {
         size_t size = fread(buf, 1, sizeof(buf), stdin);
         if (size)
-            aug_verify(aug_writemar(mar, buf, (unsigned)size));
+            if (aug_writemar(mar, buf, (unsigned)size) < 0)
+                return -1;
 
-        if (ferror(stream))
-            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        if (ferror(stream)) {
+            aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+            return -1;
+        }
 
     } while (!feof(stream));
     return 0;
@@ -103,9 +106,10 @@ aug_readline_(char* buf, size_t size, FILE* stream)
     if (!p) {
 
         if (feof(stream))
-            return AUG_FAILNONE;
-
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+            aug_setexcept(aug_tlx, AUG_EXNONE);
+        else
+            aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
 
     if (!(p = strchr(buf, '\n'))) {
@@ -127,19 +131,19 @@ aug_streamset_(aug_mar* mar, FILE* stream)
 
     for (;;) {
 
-        aug_rsize rsize = aug_readline_(buf, sizeof(buf), stream);
-        if (aug_isfail(rsize)) {
+        if (aug_readline_(buf, sizeof(buf), stream) < 0) {
 
-            if (aug_isnone(rsize))
+            if (AUG_EXNONE == aug_getexcept(aug_tlx))
                 break;
 
-            return rsize;
+            return -1;
         }
 
         /* Split name/value. */
 
-        aug_verify(aug_atofield_(&field, buf));
-        aug_verify(aug_putfield(mar, &field));
+        if (aug_atofield_(&field, buf) < 0
+            || aug_putfield(mar, &field) < 0)
+            return -1;
     }
 
     return 0;
@@ -149,8 +153,10 @@ AUG_EXTERNC aug_result
 aug_writevalue_(FILE* stream, const void* value, size_t size)
 {
     if (size != fwrite(value, 1, size, stream)
-        || 1 != fwrite(&NL_, 1, 1, stream))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        || 1 != fwrite(&NL_, 1, 1, stream)) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
     return 0;
 }

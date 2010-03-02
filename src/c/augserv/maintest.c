@@ -56,12 +56,14 @@ run_(aug_task* obj)
 {
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
-    aug_verify(aug_writeevent(aug_events(), &in));
-    aug_verify(aug_readevent(aug_events(), &out));
+    if (aug_writeevent(aug_events(), &in) < 0
+        || aug_readevent(aug_events(), &out) < 0)
+        return -1;
 
     if (in.type_ != out.type_) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
-                       AUG_MSG("unexpected event type from aug_readevent()"));
+                        AUG_MSG("unexpected event type from"
+                                " aug_readevent()"));
         return -1;
     }
 

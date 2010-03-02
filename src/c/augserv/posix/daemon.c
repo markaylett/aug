@@ -213,8 +213,9 @@ aug_daemonise(const struct aug_options* options)
 
     aug_setdaemonlog(aug_tlx);
 
-    aug_verify(aug_readservconf(AUG_CONFFILE(options), options->batch_,
-                                AUG_TRUE));
+    if (aug_readservconf(AUG_CONFFILE(options), options->batch_,
+                         AUG_TRUE) < 0)
+        return -1;
 
     if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
@@ -222,11 +223,9 @@ aug_daemonise(const struct aug_options* options)
         return -1;
     }
 
-    if (aug_isfail(result = daemonise_())
-        || aug_isfail(result = lockfile_(pidfile))
-        || aug_isfail(result = closein_())
-        || aug_isfail(result = aug_initserv()))
-        return result;
+    if (daemonise_() < 0 || lockfile_(pidfile) < 0
+        || closein_() < 0 || aug_initserv() < 0)
+        return -1;
 
     result = aug_runserv();
     aug_termserv();

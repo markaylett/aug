@@ -73,7 +73,8 @@ send_(int fd, pid_t pid, int event)
 
         /* Wait for daemon process to release lock. */
 
-        aug_verify(flock_(&fl, fd, F_SETLKW, F_RDLCK));
+        if (flock_(&fl, fd, F_SETLKW, F_RDLCK) < 0)
+            return -1;
 
         /* The lock has been obtained; daemon process must have stopped. */
 
