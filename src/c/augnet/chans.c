@@ -175,7 +175,8 @@ aug_removechan(aug_chans_t chans, aug_id id)
             goto match;
     }
 
-    return AUG_FAILNONE;
+    aug_setexcept(aug_tlx, AUG_EXNONE);
+    return -1;
 
  match:
 

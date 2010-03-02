@@ -505,7 +505,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        if (aug_isfail(aug_ssetnonblock(sd, AUG_TRUE))) {
+        if (aug_ssetnonblock(sd, AUG_TRUE) < 0) {
             aug_ctxwarn(aug_tlx, "aug_ssetnonblock() failed: %s",
                         aug_tlerr->desc_);
             aug_sclose(sd);
@@ -817,7 +817,7 @@ pstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_swrite(impl->sticky_.md_, buf, size);
-    if (aug_isblock(rsize))
+    if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
 }
@@ -827,7 +827,7 @@ pstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_swritev(impl->sticky_.md_, iov, size);
-    if (aug_isblock(rsize))
+    if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
 }
@@ -867,7 +867,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 
         /* Set mask to poll for connection establishment. */
 
-        if (aug_isfail(aug_setmdeventmask(muxer, sd, AUG_MDEVENTCONN)))
+        if (aug_setmdeventmask(muxer, sd, AUG_MDEVENTCONN) < 0)
             goto fail2;
     }
 
@@ -920,7 +920,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     /* A readable event will be delivered when a new connection is
        attempted. */
 
-    if (aug_isfail(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDEX)))
+    if (aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDEX) < 0)
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct simpl_)))) {
@@ -963,8 +963,8 @@ aug_createplain(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
 
     /* Sticky event flags are used for edge-triggered interfaces. */
 
-    if (aug_isfail(aug_initsticky(&impl->sticky_, muxer, sd, wantwr
-                                  ? AUG_MDEVENTALL : AUG_MDEVENTRDEX))) {
+    if (aug_initsticky(&impl->sticky_, muxer, sd, wantwr
+                       ? AUG_MDEVENTALL : AUG_MDEVENTRDEX) < 0) {
         aug_freemem(mpool, impl);
         return NULL;
     }

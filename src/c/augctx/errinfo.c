@@ -74,7 +74,7 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGCTX_API void
-aug_clearerrinfo(struct aug_errinfo* errinfo)
+aug_clearerrinfo_(struct aug_errinfo* errinfo)
 {
     errinfo->file_[0] = '\0';
     errinfo->line_ = 0;
@@ -87,7 +87,7 @@ AUGCTX_API void
 aug_clearctxerror(aug_ctx* ctx)
 {
     aug_setexcept(ctx, AUG_EXERROR);
-    aug_clearerrinfo(aug_geterrinfo(ctx));
+    aug_clearerrinfo_(aug_geterrinfo(ctx));
 }
 
 AUGCTX_API void

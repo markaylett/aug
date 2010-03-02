@@ -98,7 +98,7 @@ fixtoui_(const char* buf, unsigned* dst, size_t size, char delim)
         if (*it == delim)
             goto found;
 
-    return AUG_ZERO;
+    return 0;
  found:
 
     /* Verify the number of digits found does not exceed the maximum number of
@@ -146,19 +146,17 @@ getsize_(const char* buf, size_t size)
        delimiter character. */
 
     if (size < HEAD_SIZE_ + sizeof('0') + sizeof(*SOH_))
-        return AUG_ZERO;
+        return 0;
 
     /* The beginning of the body length value is located immediately after the
        standard leader. */
 
-    if (AUG_RESULT(rsize = fixtoui_(buf + HEAD_SIZE_, &value, size,
-                                    *SOH_)) <= 0)
-        return rsize;
+    if ((rsize = fixtoui_(buf + HEAD_SIZE_, &value, size, *SOH_)) < 0)
+        return -1;
 
     /* Return the total number of bytes in the message. */
 
-    return HEAD_SIZE_ + AUG_RESULT(rsize) + sizeof(*SOH_)
-        + value + TAIL_SIZE_;
+    return HEAD_SIZE_ + rsize + sizeof(*SOH_) + value + TAIL_SIZE_;
 }
 
 static aug_rsize
@@ -231,8 +229,15 @@ aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size)
 
     /* Return on error or end of file. */
 
-    if (AUG_RESULT(rsize = aug_xstrread(stream->xstr_, src, size)) <= 0)
-        return rsize;
+    rsize = aug_xstrread(stream->xstr_, src, size);
+    if (rsize < 0)
+        return -1;
+
+    if (0 == rsize) {
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
+                        AUG_MSG("end of stream"));
+        return -1;
+    }
 
     /* Total number of buffered bytes. */
 
@@ -247,18 +252,18 @@ aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size)
 
     for (;;) {
 
-        if (aug_isfail(mlen = getsize_(ptr, size)))
-            return mlen;
+        if ((mlen = getsize_(ptr, size)) < 0)
+            return -1;
 
         /* Not enough of the message has been read to determine the total
            message length. */
 
-        if (0 == AUG_RESULT(mlen))
+        if (0 == mlen)
             break;
 
         /* Cache total message length. */
 
-        stream->mlen_ = AUG_RESULT(mlen);
+        stream->mlen_ = mlen;
 
     body:
         if (blen < stream->mlen_)
@@ -398,17 +403,17 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* Get sum contained within message. */
 
-    if (aug_isfail(sum1 = getsum_(buf, size)))
-        return sum1;
+    if ((sum1 = getsum_(buf, size)) < 0)
+        return -1;
 
     /* Calculate message checksum. */
 
     sum2 = aug_checksum(buf, size - TAIL_SIZE_);
 
-    if (AUG_RESULT(sum1) != sum2) {
+    if (sum1 != sum2) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("invalid checksum [%03d], expected [%03d]"),
-                       AUG_RESULT(sum1), sum2);
+                        AUG_MSG("invalid checksum [%03d], expected [%03d]"),
+                        sum1, sum2);
         return -1;
     }
 
@@ -434,18 +439,18 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
 
     /* Extract tag value from buffer. */
 
-    if (aug_isfail(digits = fixtoui_(buf, &tag, size, '=')))
-        return digits;
+    if ((digits = fixtoui_(buf, &tag, size, '=')) < 0)
+        return -1;
 
-    if (0 == AUG_RESULT(digits)) {
+    if (0 == digits) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("tag not found"));
+                        AUG_MSG("tag not found"));
         return -1;
     }
 
     field->tag_ = tag;
 
-    it = buf + AUG_RESULT(digits) + sizeof(*SOH_);
+    it = buf + digits + sizeof(*SOH_);
     field->value_ = it;
 
     /* Locate field delimiter. */
@@ -455,8 +460,8 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
             goto found;
 
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                   AUG_MSG("field [%d] delimiter not found"),
-                   (int)field->tag_);
+                    AUG_MSG("field [%d] delimiter not found"),
+                    (int)field->tag_);
     return -1;
  found:
 

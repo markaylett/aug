@@ -184,7 +184,7 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
     /* As a precaution, limit use of stack space. */
 
     if (0 == (size = AUG_MIN(writer->size_, 64)))
-        return AUG_ZERO;
+        return 0;
 
     iov = alloca(sizeof(struct iovec) * size);
 
@@ -209,11 +209,11 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
     iov->iov_base = (char*)iov->iov_base + writer->part_;
     iov->iov_len -= (int)writer->part_;
 
-    if (aug_issuccess(rsize = aug_writev(stream, iov, size))) {
+    if (0 <= (rsize = aug_writev(stream, iov, size))) {
 
         /* Pop any completed buffers from queue. */
 
-        popbufs_(writer, iov, AUG_RESULT(rsize));
+        popbufs_(writer, iov, rsize);
     }
 
     return rsize;

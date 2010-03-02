@@ -110,7 +110,7 @@ error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
         /* Set socket-level error if one exists. */
 
         struct aug_errinfo errinfo;
-        aug_setsockerrinfo(&errinfo, __FILE__, __LINE__, sd);
+        aug_setsockerrinfo_(&errinfo, __FILE__, __LINE__, sd);
 
         if (errinfo.num_) {
 
@@ -417,8 +417,8 @@ readwrite_(struct impl_* impl, unsigned short events)
             /* If system call error could not be obtained. */
 
             if (0 == impl->errinfo_.num_) {
-                aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
-                               AUG_EIO, "ssl read syscall error");
+                aug_seterrinfo_(&impl->errinfo_, __FILE__, __LINE__, "aug",
+                                AUG_EIO, "ssl read syscall error");
             }
             impl->state_ = ERROR_;
             return;
@@ -459,7 +459,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                shutdown. */
 
             if (impl->shutdown_ && bufempty_(&impl->outbuf_)
-                && aug_isfail(shutwr_(impl, &impl->errinfo_))) {
+                && shutwr_(impl, &impl->errinfo_) < 0) {
 
                 /* Save error locally. */
 
@@ -485,18 +485,18 @@ readwrite_(struct impl_* impl, unsigned short events)
 
             impl->except_ =
 #if !defined(_WIN32)
-                aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__,
-                                    errno);
+                aug_setposixerrinfo_(&impl->errinfo_, __FILE__, __LINE__,
+                                     errno);
 #else /* _WIN32 */
-                aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
-                                    WSAGetLastError());
+                aug_setwin32errinfo_(&impl->errinfo_, __FILE__, __LINE__,
+                                     WSAGetLastError());
 #endif /* _WIN32 */
 
             /* If system call error could not be obtained. */
 
             if (0 == impl->errinfo_.num_) {
-                aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
-                               AUG_EIO, "ssl write syscall error");
+                aug_seterrinfo_(&impl->errinfo_, __FILE__, __LINE__, "aug",
+                                AUG_EIO, "ssl write syscall error");
             }
             impl->state_ = ERROR_;
             break;
@@ -632,7 +632,8 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
            readable before issuing an SSL_read(). */
 
         char ch;
-        if (aug_isblock(aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK))) {
+        if (aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK) < 0
+            && AUG_EXBLOCK == aug_getexcept(aug_tlx)) {
 
             /* If the peek operation would have blocked, then clear the sticky
                bit. */
@@ -795,13 +796,14 @@ sread_(aug_stream* ob, void* buf, size_t size)
     /* Only return end once all data has been read from buffer. */
 
     if (ENDOF_ == impl->state_ && bufempty_(&impl->inbuf_))
-        return AUG_MKRESULT(0);
+        return 0;
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (bufempty_(&impl->inbuf_))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
-                                   EWOULDBLOCK);
+    if (bufempty_(&impl->inbuf_)) {
+        aug_setexcept(aug_tlx, AUG_EXBLOCK);
+        return -1;
+    }
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: chan read from input buffer: id=[%d]",
                   (int)impl->data_.id_);
@@ -834,9 +836,10 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (bufempty_(&impl->inbuf_))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
-                                   EWOULDBLOCK);
+    if (bufempty_(&impl->inbuf_)) {
+        aug_setexcept(aug_tlx, AUG_EXBLOCK);
+        return -1;
+    }
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: chan readv from input buffer: id=[%d]",
                   (int)impl->data_.id_);
@@ -854,9 +857,10 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (buffull_(&impl->outbuf_))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
-                                   EWOULDBLOCK);
+    if (buffull_(&impl->outbuf_)) {
+        aug_setexcept(aug_tlx, AUG_EXBLOCK);
+        return -1;
+    }
 
     if (impl->shutdown_) {
 #if !defined(_WIN32)
@@ -883,9 +887,10 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (buffull_(&impl->outbuf_))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
-                                   EWOULDBLOCK);
+    if (buffull_(&impl->outbuf_)) {
+        aug_setexcept(aug_tlx, AUG_EXBLOCK);
+        return -1;
+    }
 
     if (impl->shutdown_) {
 #if !defined(_WIN32)
@@ -935,7 +940,7 @@ createssl_(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
 
     /* Sticky event flags are used for edge-triggered interfaces. */
 
-    if (aug_isfail(aug_initsticky(&impl->sticky_, muxer, sd, 0))) {
+    if (aug_initsticky(&impl->sticky_, muxer, sd, 0) < 0) {
         aug_freemem(mpool, impl);
         return NULL;
     }
@@ -972,11 +977,11 @@ AUGNET_API void
 aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                   unsigned long err)
 {
-    aug_seterrinfo(errinfo, file, line, "ssl", err,
-                   "%s: %s: %s",
-                   ERR_lib_error_string(err),
-                   ERR_func_error_string(err),
-                   ERR_reason_error_string(err));
+    aug_seterrinfo_(errinfo, file, line, "ssl", err,
+                    "%s: %s: %s",
+                    ERR_lib_error_string(err),
+                    ERR_func_error_string(err),
+                    ERR_reason_error_string(err));
 
     /* Log those that are not set in errinfo record. */
 

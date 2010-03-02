@@ -138,7 +138,7 @@ word_(aug_httpparser_t parser)
     aug_result result;
     switch (parser->state_) {
     case REQUEST_:
-        if (aug_issuccess(result = request_(parser)))
+        if (0 <= (result = request_(parser)))
             parser->state_ = NAME_;
         break;
     case NAME_:
@@ -147,7 +147,7 @@ word_(aug_httpparser_t parser)
         result = -1;
         break;
     case VALUE_:
-        if (aug_issuccess(result = value_(parser)))
+        if (0 <= (result = value_(parser)))
             parser->state_ = NAME_;
         break;
     default:
@@ -165,22 +165,28 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
 
         switch (aug_appendlexer(parser->lexer_, ptr[i++])) {
         case AUG_LEXLABEL:
-            aug_verify(label_(parser));
+            if (label_(parser) < 0)
+                goto fail;
             break;
         case AUG_LEXWORD:
-            aug_verify(word_(parser));
+            if (word_(parser) < 0)
+                goto fail;
             break;
         case AUG_LEXWORD | AUG_LEXPHRASE:
-            aug_verify(word_(parser));
-            aug_verify(phrase_(parser));
+            if (word_(parser) < 0
+                || phrase_(parser) < 0)
+                goto fail;
             goto done;
         case AUG_LEXPHRASE:
-            aug_verify(phrase_(parser));
+            if (phrase_(parser) < 0)
+                goto fail;
             goto done;
         }
     }
  done:
     return i;
+ fail:
+    return -1;
 }
 
 static aug_rsize
@@ -192,7 +198,8 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
         parser->csize_ -= size;
 
-        aug_verify(aug_httpcdata(parser->handler_, buf, size));
+        if (aug_httpcdata(parser->handler_, buf, size) < 0)
+            goto fail;
 
         /* Entire buffer consumed. */
 
@@ -202,13 +209,17 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
     /* Consume enough of the buffer to fulfil content. */
 
     if ((size = parser->csize_))
-        aug_verify(aug_httpcdata(parser->handler_, buf, size));
+        if (aug_httpcdata(parser->handler_, buf, size) < 0)
+            goto fail;
 
     /* End of message (with commit). */
 
-    aug_verify(end_(parser, AUG_TRUE));
+    if (end_(parser, AUG_TRUE) < 0)
+        goto fail;
 
     return size;
+ fail:
+    return -1;
 }
 
 AUGNET_API aug_httpparser_t
@@ -261,24 +272,24 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
 
     for (;;) {
 
-        if (aug_isfail(result = header_(parser, buf, size)))
+        if ((result = header_(parser, buf, size)) < 0)
             break;
 
-        if (AUG_RESULT(result) == size)
+        if (result == size)
             return 0;
 
-        buf += AUG_RESULT(result);
-        size -= AUG_RESULT(result);
+        buf += result;
+        size -= result;
 
     body:
-        if (aug_isfail(result = body_(parser, buf, size)))
+        if ((result = body_(parser, buf, size)) < 0)
             break;
 
-        if (AUG_RESULT(result) == size)
+        if (result == size)
             return 0;
 
-        buf += AUG_RESULT(result);
-        size -= AUG_RESULT(result);
+        buf += result;
+        size -= result;
     }
 
     /* End of message (no commit). */
@@ -293,27 +304,27 @@ aug_finishhttp(aug_httpparser_t parser)
     aug_result result;
     switch (aug_finishlexer(parser->lexer_)) {
     case AUG_LEXLABEL:
-        if (aug_isfail(result = label_(parser)))
+        if ((result = label_(parser)) < 0)
             goto fail;
         break;
     case AUG_LEXWORD:
-        if (aug_isfail(result = word_(parser)))
+        if ((result = word_(parser)) < 0)
             goto fail;
         break;
     case AUG_LEXWORD | AUG_LEXPHRASE:
-        if (aug_isfail(result = word_(parser))
-            || aug_isfail(result = phrase_(parser)))
+        if ((result = word_(parser)) < 0
+            || (result = phrase_(parser)) < 0)
             goto fail;
         break;
     case AUG_LEXPHRASE:
-        if (aug_isfail(result = phrase_(parser)))
+        if ((result = phrase_(parser)) < 0)
             goto fail;
         break;
     }
 
     if (REQUEST_ != parser->state_) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("partial read of http message"));
+                        AUG_MSG("partial read of http message"));
         result = 0;
         goto fail;
     }

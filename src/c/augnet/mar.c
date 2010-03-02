@@ -107,8 +107,7 @@ field_(aug_httphandler* ob, const char* name, const char* value)
     field.value_ = value;
     field.size_ = (unsigned)strlen(value);
 
-    aug_verify(aug_putfield(parser->mar_, &field));
-    return 0;
+    return aug_putfield(parser->mar_, &field);
 }
 
 static aug_result
@@ -120,8 +119,9 @@ csize_(aug_httphandler* ob, unsigned csize)
     assert(parser->request_);
     assert(parser->mar_);
 
-    aug_verify(aug_truncatemar(parser->mar_, csize));
-    aug_verify(aug_seekmar(parser->mar_, AUG_SET, 0));
+    if (aug_truncatemar(parser->mar_, csize) < 0
+        || aug_seekmar(parser->mar_, AUG_SET, 0) < 0)
+        return -1;
 
     return 0;
 }
@@ -137,7 +137,8 @@ cdata_(aug_httphandler* ob, const void* buf, unsigned len)
 
     /* Returns aug_rsize. */
 
-    aug_verify(aug_writemar(parser->mar_, buf, len));
+    if (aug_writemar(parser->mar_, buf, len) < 0)
+        return -1;
 
     return 0;
 }

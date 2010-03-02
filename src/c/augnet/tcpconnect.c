@@ -55,7 +55,7 @@ aug_createtcpconnect(aug_mpool* mpool, const char* host, const char* serv)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (aug_isfail(aug_getaddrinfo(host, serv, &hints, &res)))
+    if (aug_getaddrinfo(host, serv, &hints, &res) < 0)
         return NULL;
 
     if (!(conn  = aug_allocmem(mpool, sizeof(struct aug_tcpconnect_)))) {
@@ -115,11 +115,9 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
            FIXME: is this aug_established() approach equally valid?
         */
 
-        aug_result result = aug_established(sd);
+        if (aug_established(sd) < 0) {
 
-        if (aug_isfail(result)) {
-
-            if (aug_isnone(result)) {
+            if (AUG_EXNONE == aug_getexcept(aug_tlx)) {
 
                 /* Not established. */
 
@@ -127,7 +125,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
                     /* Try next address. */
 
-                    if (aug_isfail(aug_sclose(sd)))
+                    if (aug_sclose(sd) < 0)
                         return AUG_BADSD;
 
                 } else {
@@ -135,7 +133,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
                     /* No more addresses: set error to connection failure
                        reason. */
 
-                    aug_setsockerrinfo(aug_tlerr, __FILE__, __LINE__, sd);
+                    aug_setsockerrinfo_(aug_tlerr, __FILE__, __LINE__, sd);
                     aug_sclose(sd); /* May set errno */
                     return AUG_BADSD;
                 }
@@ -170,14 +168,14 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
         if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
-        if (aug_isfail(aug_ssetnonblock(sd, AUG_TRUE))) {
+        if (aug_ssetnonblock(sd, AUG_TRUE) < 0) {
             aug_sclose(sd);
             return AUG_BADSD;
         }
 
         aug_getendpoint(conn->res_, ep);
 
-        if (aug_issuccess(aug_connect(sd, ep))) {
+        if (0 <= aug_connect(sd, ep)) {
 
             /* Immediate establishment. */
 
@@ -196,7 +194,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
         /* Failed for other reason. */
 
-        if (aug_isfail(aug_sclose(sd))) /* Ignore this one. */
+        if (aug_sclose(sd) < 0) /* Ignore this one. */
             return AUG_BADSD;
 
     } while ((conn->res_ = conn->res_->ai_next));
