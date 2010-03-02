@@ -297,8 +297,10 @@ aug_destroymuxer(aug_muxer_t muxer)
 AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
-    if (FD_SETSIZE <= md)
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EMFILE);
+    if (FD_SETSIZE <= md) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, EMFILE);
+        return -1;
+    }
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
@@ -351,8 +353,10 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
                      &muxer->out_.ex_, NULL);
     }
 
-    if (-1 == ret)
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (ret < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
     return ret;
 }
@@ -375,16 +379,15 @@ AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2])
 {
     aug_fd fds[2];
-    aug_result result;
 
-    if (aug_isfail(result = aug_fpipe(fds)))
-        return result;
+    if (aug_fpipe(fds) < 0)
+        return -1;
 
-    if (aug_isfail(result = aug_fsetnonblock(fds[0], AUG_TRUE))
-        || aug_isfail(result = aug_fsetnonblock(fds[1], AUG_TRUE))) {
+    if (aug_fsetnonblock(fds[0], AUG_TRUE) < 0
+        || aug_fsetnonblock(fds[1], AUG_TRUE) < 0) {
         aug_fclose(fds[0]);
         aug_fclose(fds[1]);
-        return result;
+        return -1;
     }
 
     mds[0] = fds[0];

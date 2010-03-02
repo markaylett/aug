@@ -29,9 +29,10 @@ AUGSYS_API aug_rsize
 aug_freadv(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
-    if (-1 == (ret = readv(fd, iov, size)))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
-
+    if ((ret = readv(fd, iov, size)) < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
     return ret;
 }
 

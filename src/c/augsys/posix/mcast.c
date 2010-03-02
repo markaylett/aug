@@ -41,8 +41,10 @@ getifaddr_(aug_sd sd, struct in_addr* addr, const char* ifname)
     struct ifreq ifreq;
     aug_strlcpy(ifreq.ifr_name, ifname, sizeof(ifreq.ifr_name));
 
-    if (-1 == ioctl(sd, SIOCGIFADDR, &ifreq))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (ioctl(sd, SIOCGIFADDR, &ifreq) < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
     addr->s_addr = ((struct sockaddr_in*)&ifreq.ifr_addr)->sin_addr.s_addr;
     return 0;
@@ -51,8 +53,10 @@ getifaddr_(aug_sd sd, struct in_addr* addr, const char* ifname)
 static aug_result
 getifindex_(unsigned* index, const char* ifname)
 {
-    if (!(*index = if_nametoindex(ifname)))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, ENODEV);
+    if (!(*index = if_nametoindex(ifname))) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, ENODEV);
+        return -1;
+    }
     return 0;
 }
 
@@ -71,9 +75,10 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
         un.ipv4_.imr_multiaddr.s_addr = addr->un_.ipv4_.s_addr;
 
-        if (ifname)
-            aug_verify(getifaddr_(sd, &un.ipv4_.imr_interface, ifname));
-        else
+        if (ifname) {
+            if (getifaddr_(sd, &un.ipv4_.imr_interface, ifname) < 0)
+                return -1;
+        } else
             un.ipv4_.imr_interface.s_addr = htonl(INADDR_ANY);
 
         return aug_setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &un.ipv4_,
@@ -85,9 +90,10 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
 			   sizeof(addr->un_.ipv6_));
 
-        if (ifname)
-            aug_verify(getifindex_(&un.ipv6_.ipv6mr_interface, ifname));
-        else
+        if (ifname) {
+            if (getifindex_(&un.ipv6_.ipv6mr_interface, ifname) < 0)
+                return -1;
+        } else
             un.ipv6_.ipv6mr_interface = 0;
 
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
@@ -95,7 +101,8 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    return -1;
 }
 
 AUGSYS_API aug_result
@@ -137,7 +144,8 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    return -1;
 }
 
 AUGSYS_API aug_result
@@ -151,10 +159,10 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (aug_isfail(af = aug_getfamily(sd)))
-        return af;
+    if ((af = aug_getfamily(sd)) < 0)
+        return -1;
 
-    switch (AUG_RESULT(af)) {
+    switch (af) {
     case AF_INET:
 
         aug_verify(getifaddr_(sd, &un.ipv4_, ifname));
@@ -170,7 +178,8 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    return -1;
 }
 
 AUGSYS_API aug_result
@@ -184,10 +193,10 @@ aug_setmcastloop(aug_sd sd, aug_bool on)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (aug_isfail(af = aug_getfamily(sd)))
-        return af;
+    if ((af = aug_getfamily(sd)) < 0)
+        return -1;
 
-    switch (AUG_RESULT(af)) {
+    switch (af) {
     case AF_INET:
         un.ipv4_ = on ? 1 : 0;
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_LOOP, &un.ipv4_,
@@ -200,7 +209,8 @@ aug_setmcastloop(aug_sd sd, aug_bool on)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    return -1;
 }
 
 AUGSYS_API aug_result
@@ -230,5 +240,6 @@ aug_setmcastttl(aug_sd sd, int ttl)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
+    return -1;
 }
