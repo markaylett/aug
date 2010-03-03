@@ -206,7 +206,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
 
     if (!(serv = strrchr(dst->data_, ':'))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("missing separator [%s]"), src);
+                        AUG_MSG("missing separator [%s]"), src);
         return NULL;
     }
 
@@ -218,13 +218,13 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
 
     if (!len) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("missing host part [%s]"), src);
+                        AUG_MSG("missing host part [%s]"), src);
         return NULL;
     }
 
     if ('\0' == *++serv) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("missing service part [%s]"), src);
+                        AUG_MSG("missing service part [%s]"), src);
         return NULL;
     }
 
@@ -235,7 +235,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
 
         if (']' != dst->data_[len - 1]) {
             aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                           AUG_MSG("unmatched brackets [%s]"), src);
+                            AUG_MSG("unmatched brackets [%s]"), src);
             return NULL;
         }
 

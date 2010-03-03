@@ -204,10 +204,10 @@ namespace aug {
         {
             aug_rsize rsize(aug_readmar(mar_.get(), buf,
                                         len * sizeof(char_type)));
-            if (aug_isfail(rsize))
+            if (rsize < 0)
                 return -1;
 
-            return AUG_RESULT(rsize) / sizeof(char_type);
+            return rsize / sizeof(char_type);
         }
         ssize_type
         iowrite(const char_type* buf, size_type len)
@@ -217,10 +217,10 @@ namespace aug {
 
             aug_rsize rsize(aug_writemar(mar_.get(), buf,
                                          len * sizeof(char_type)));
-            if (aug_isfail(rsize))
+            if (rsize < 0)
                 return -1;
 
-            return AUG_RESULT(rsize) / sizeof(char_type);
+            return rsize / sizeof(char_type);
         }
         void
         gsave(detail::state::which old)
@@ -358,17 +358,17 @@ namespace aug {
                 whence = 0;
             }
             aug_rsize rsize(aug_seekmar(mar_.get(), off, whence));
-            if (aug_isfail(rsize))
+            if (rsize < 0)
                 return -1;
-            return AUG_RESULT(rsize);
+            return rsize;
         }
         pos_type
         seekpos(pos_type pos, std::ios_base::openmode which)
         {
             aug_rsize rsize(aug_seekmar(mar_.get(), pos, AUG_SET));
-            if (aug_isfail(rsize))
+            if (rsize < 0)
                 return -1;
-            return AUG_RESULT(rsize);
+            return rsize;
         }
         int
         sync()
@@ -524,7 +524,7 @@ namespace aug {
             int ret(sync());
 
             if (buffer_.openmode(std::ios_base::out)
-                && aug_isfail(aug_syncmar(mar_.get())))
+                && aug_syncmar(mar_.get()) < 0)
                 ret = -1;
 
             mar_ = null;

@@ -68,8 +68,10 @@ aug_setsighandler(void (*handler)(int))
 
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
         sethandler_(&sa, handlers_[i].dfl_ ? SIG_DFL : handler);
-        if (-1 == sigaction(handlers_[i].sig_, &sa, NULL))
-            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        if (sigaction(handlers_[i].sig_, &sa, NULL) < 0) {
+            aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+            return -1;
+        }
     }
     return 0;
 }
@@ -89,12 +91,16 @@ aug_sigblock(void)
     sigdelset(&set, SIGBUS);
 
 #if ENABLE_THREADS
-    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL)))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
 #else /* !ENABLE_THREADS */
-    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (sigprocmask(SIG_SETMASK, &set, NULL) < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 #endif /* !ENABLE_THREADS */
 
     return 0;
@@ -106,11 +112,15 @@ aug_sigunblock(void)
     sigset_t set;
     sigemptyset(&set);
 #if ENABLE_THREADS
-    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL)))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 #else /* !ENABLE_THREADS */
-    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (sigprocmask(SIG_SETMASK, &set, NULL) < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 #endif /* !ENABLE_THREADS */
     return 0;
 }

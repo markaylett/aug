@@ -62,7 +62,7 @@ namespace aug {
         {
             // Restore default handlers.
 
-            if (aug_isfail(aug_setsighandler(0)))
+            if (aug_setsighandler(0) < 0)
                 perrinfo(aug_tlx, "aug_setsighandler() failed");
         }
 
@@ -82,7 +82,7 @@ namespace aug {
     public:
         ~scoped_sigblock() AUG_NOTHROW
         {
-            if (aug_isfail(aug_sigunblock()))
+            if (aug_sigunblock() < 0)
                 perrinfo(aug_tlx, "aug_sigunblock() failed");
         }
 
@@ -102,7 +102,7 @@ namespace aug {
     public:
         ~scoped_sigunblock() AUG_NOTHROW
         {
-            if (aug_isfail(aug_sigblock()))
+            if (aug_sigblock() < 0)
                 perrinfo(aug_tlx, "aug_sigblock() failed");
         }
 

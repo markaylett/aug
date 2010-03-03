@@ -69,15 +69,14 @@ namespace aug {
     settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              aug::objectref ob)
     {
-        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms, cb,
-                                              ob.get())));
+        return verify(aug_settimer(timers, ref.get(), ms, cb, ob.get()));
     }
 
     inline unsigned
     settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              const null_&)
     {
-        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms, cb, 0)));
+        return verify(aug_settimer(timers, ref.get(), ms, cb, 0));
     }
 
     template <typename T>
@@ -85,8 +84,8 @@ namespace aug {
     settimer(aug_timers_t timers, idref ref, unsigned ms, T& x)
     {
         boxptrptr ob(createboxptr(getmpool(aug_tlx), &x, 0));
-        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms,
-                                              timermemcb<T>, ob.base())));
+        return verify(aug_settimer(timers, ref.get(), ms,
+                                   timermemcb<T>, ob.base()));
     }
 
     template <typename T>
@@ -94,8 +93,8 @@ namespace aug {
     settimer(aug_timers_t timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
         boxptrptr ob(createboxptr(getmpool(aug_tlx), x));
-        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms,
-                                              timermemcb<T>, ob.base())));
+        return verify(aug_settimer(timers, ref.get(), ms,
+                                   timermemcb<T>, ob.base()));
     }
 
     inline void

@@ -48,7 +48,7 @@ aug_timegm(struct tm* tm)
 
 #if HAVE_TIMEGM
 
-    if ((time_t)-1 == (gmt = timegm(tm)))
+    if ((gmt = timegm(tm)) < 0)
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
 
@@ -64,7 +64,7 @@ aug_timegm(struct tm* tm)
     gm.tm_year = tm->tm_year;
     gm.tm_isdst = 0; /* No daylight adjustment. */
 
-    if ((time_t)-1 == (gmt = mktime(&gm))) {
+    if ((gmt = mktime(&gm)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__,
                           0 == errno ? EINVAL : errno);
         return -1;

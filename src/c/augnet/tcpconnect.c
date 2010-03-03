@@ -97,7 +97,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
     if (!conn->res_) {
         assert(AUG_BADSD == sd);
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("address-list exhausted"));
+                        AUG_MSG("address-list exhausted"));
         return AUG_BADSD;
     }
 

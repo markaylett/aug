@@ -48,7 +48,7 @@ namespace aug {
     inline unsigned
     waitmdevents(aug_muxer_t muxer, const aug_timeval& timeout)
     {
-        return AUG_RESULT(verify(aug_waitmdevents(muxer, &timeout)));
+        return verify(aug_waitmdevents(muxer, &timeout));
     }
 
     /**
@@ -58,13 +58,13 @@ namespace aug {
     inline unsigned
     waitmdevents(aug_muxer_t muxer)
     {
-        return AUG_RESULT(verify(aug_waitmdevents(muxer, 0)));
+        return verify(aug_waitmdevents(muxer, 0));
     }
 
     inline unsigned
     pollmdevents(aug_muxer_t muxer)
     {
-        return AUG_RESULT(verify(aug_pollmdevents(muxer)));
+        return verify(aug_pollmdevents(muxer));
     }
 
     inline unsigned short

@@ -59,7 +59,7 @@ handler_(const char* buf, size_t size, aug_object* ob)
         exit(1);
     }
 
-    if (aug_isfail(aug_checkfix(&fixstd, buf, size))) {
+    if (aug_checkfix(&fixstd, buf, size) < 0) {
         aug_perrinfo(aug_tlx, "aug_checkfix() failed", NULL);
         exit(1);
     }
@@ -73,14 +73,14 @@ handler_(const char* buf, size_t size, aug_object* ob)
 
         aug_rsize rsize = aug_fixfield(&field, fixstd.body_, fixstd.size_);
 
-        if (aug_isfail(rsize)) {
+        if (rsize < 0) {
             aug_perrinfo(aug_tlx, "aug_fixfield() failed", NULL);
             exit(1);
         }
 
         aug_ctxinfo(aug_tlx, "tag: %u", field.tag_);
-        fixstd.body_ += AUG_RESULT(rsize);
-        fixstd.size_ -= AUG_RESULT(rsize);
+        fixstd.body_ += rsize;
+        fixstd.size_ -= rsize;
     }
 
     fprintf(stderr, "%s\n", buf);
@@ -107,7 +107,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (aug_isfail(aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv))) {
+    if (aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0) {
         aug_perrinfo(aug_tlx, "aug_socketpair() failed", NULL);
         return 1;
     }
@@ -122,12 +122,12 @@ main(int argc, char* argv[])
 
     for (i = 0; i < TESTLEN_; ++i) {
 
-        if (aug_isfail(aug_swrite(sv[0], TEST_ + i, 1))) {
+        if (aug_swrite(sv[0], TEST_ + i, 1) < 0) {
             aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
             return 1;
         }
 
-        if (aug_isfail(aug_readfix(stream, in, AUG_BUFSIZE))) {
+        if (aug_readfix(stream, in, AUG_BUFSIZE) < 0) {
             aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
             return 1;
         }
@@ -138,17 +138,17 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (aug_isfail(aug_swrite(sv[0], TEST_, TESTLEN_))) {
+    if (aug_swrite(sv[0], TEST_, TESTLEN_) < 0) {
         aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
         return 1;
     }
 
-    if (aug_isfail(aug_swrite(sv[0], TEST_, TESTLEN_))) {
+    if (aug_swrite(sv[0], TEST_, TESTLEN_) < 0) {
         aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
         return 1;
     }
 
-    if (aug_isfail(aug_readfix(stream, in, AUG_BUFSIZE))) {
+    if (aug_readfix(stream, in, AUG_BUFSIZE) < 0) {
         aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
         return 1;
     }

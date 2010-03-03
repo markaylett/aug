@@ -162,7 +162,7 @@ aug_writersize(aug_writer_t writer)
         size_t len;
         if (!aug_getblobdata(it->blob_, &len)) {
             aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
-                           AUG_MSG("failed conversion from var to buffer"));
+                            AUG_MSG("failed conversion from var to buffer"));
             return -1;
         }
 
@@ -195,7 +195,7 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
 
         if (!(iov[i].iov_base = (void*)aug_getblobdata(it->blob_, &len))) {
             aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
-                           AUG_MSG("failed conversion from var to buffer"));
+                            AUG_MSG("failed conversion from var to buffer"));
             return -1;
         }
 

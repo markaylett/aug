@@ -52,7 +52,7 @@ aug_createhires(aug_mpool* mpool)
     hires->mpool_ = mpool;
     hires->clock_ = clock;
 
-    if (aug_isfail(aug_gettimeofday(clock, &hires->start_)))
+    if (aug_gettimeofday(clock, &hires->start_) < 0)
         goto fail2;
 
     /* Success. */
@@ -87,7 +87,7 @@ AUGUTIL_API double*
 aug_elapsed(aug_hires_t hires, double* sec)
 {
     struct aug_timeval now;
-    if (aug_isfail(aug_gettimeofday(hires->clock_, &now)))
+    if (aug_gettimeofday(hires->clock_, &now) < 0)
         return NULL;
     aug_tvsub(&now, &hires->start_);
     *sec = (double)now.tv_sec + ((double)now.tv_usec / 1000000.0);

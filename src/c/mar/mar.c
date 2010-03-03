@@ -427,12 +427,12 @@ main(int argc, char* argv[])
 
     AUG_INITLEAKDUMP();
 
-    if (-1 == atexit(exit_)) {
+    if (atexit(exit_) < 0) {
         aug_perrinfo(aug_tlx, "atexit() failed", NULL);
         goto fail;
     }
 
-    while (-1 != (ch = aug_getopt(argc, argv, OPTIONS_)))
+    while ((ch = aug_getopt(argc, argv, OPTIONS_)) < 0)
         switch (ch) {
         case 'i':
         case 'p':

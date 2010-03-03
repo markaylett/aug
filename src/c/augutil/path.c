@@ -106,7 +106,7 @@ aug_gethome(char* dst, size_t size)
 #endif /* _WIN32 */
     if (!home) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("failed to determine home directory"));
+                        AUG_MSG("failed to determine home directory"));
         return NULL;
     }
     aug_strlcpy(dst, home, size);
@@ -187,7 +187,7 @@ aug_joinpath(const char* dir, const char* path, char* dst, size_t size)
 
         if (size < dirlen + pathlen + 2) {
             aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ELIMIT,
-                           AUG_MSG("buffer size exceeded"));
+                            AUG_MSG("buffer size exceeded"));
             return NULL;
         }
 
@@ -200,7 +200,7 @@ aug_joinpath(const char* dir, const char* path, char* dst, size_t size)
     } else if (size < pathlen + 1) {
 
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ELIMIT,
-                       AUG_MSG("buffer size exceeded"));
+                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
 
@@ -220,7 +220,7 @@ aug_realpath(const char* src, char* dst, size_t size)
     /* FIXME: The following sequence attempts to provide a safe implementation
        of realpath().  Verify that this is indeed the case. */
 
-    if (-1 == (pathmax = pathconf(src, _PC_PATH_MAX))) {
+    if ((pathmax = pathconf(src, _PC_PATH_MAX)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
     }
@@ -237,7 +237,7 @@ aug_realpath(const char* src, char* dst, size_t size)
 
     if (size <= strlen(buf)) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ELIMIT,
-                       AUG_MSG("buffer size exceeded"));
+                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
 

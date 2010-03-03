@@ -30,8 +30,7 @@ static void
 test(aug_muxer_t muxer, aug_md md)
 {
     struct aug_sticky sticky;
-    aug_check(aug_issuccess(aug_initsticky(&sticky, muxer, md,
-                                           AUG_MDEVENTRDWR)));
+    aug_check(0 <= aug_initsticky(&sticky, muxer, md, AUG_MDEVENTRDWR));
 
     /* Initially, both sticky events are set and no muxer mask. */
 
@@ -40,7 +39,7 @@ test(aug_muxer_t muxer, aug_md md)
 
     /* Alter sticky mask to hide one of the sticky events. */
 
-    aug_check(aug_issuccess(aug_setsticky(&sticky, AUG_MDEVENTRD)));
+    aug_check(0 <= aug_setsticky(&sticky, AUG_MDEVENTRD));
 
     /* Only read sticky event should now be visible. */
 
@@ -49,7 +48,7 @@ test(aug_muxer_t muxer, aug_md md)
 
     /* Revert back to initial state. */
 
-    aug_check(aug_issuccess(aug_setsticky(&sticky, AUG_MDEVENTRDWR)));
+    aug_check(0 <= aug_setsticky(&sticky, AUG_MDEVENTRDWR));
 
     /* The write sticky event is externally visible again. */
 
@@ -58,7 +57,7 @@ test(aug_muxer_t muxer, aug_md md)
 
     /* Clear one of the sticky events. */
 
-    aug_check(aug_issuccess(aug_clearsticky(&sticky, AUG_MDEVENTRD)));
+    aug_check(0 <= aug_clearsticky(&sticky, AUG_MDEVENTRD));
 
     /* Now, one sticky event and no muxer mask. */
 
@@ -68,7 +67,7 @@ test(aug_muxer_t muxer, aug_md md)
     /* If the mask is reverted, the cleared sticky event should remain
        cleared. */
 
-    aug_check(aug_issuccess(aug_setsticky(&sticky, AUG_MDEVENTRDWR)));
+    aug_check(0 <= aug_setsticky(&sticky, AUG_MDEVENTRDWR));
 
     /* One sticky event and no muxer mask. */
 
@@ -77,21 +76,21 @@ test(aug_muxer_t muxer, aug_md md)
 
     /* Clear the last sticky event, this should set the muxer. */
 
-    aug_check(aug_issuccess(aug_clearsticky(&sticky, AUG_MDEVENTWR)));
+    aug_check(0 <= aug_clearsticky(&sticky, AUG_MDEVENTWR));
 
     aug_check(0 == aug_getsticky(&sticky));
     aug_check(AUG_MDEVENTRDWR == aug_getmdeventmask(muxer, md));
 
     /* If the mask is set again, the muxer should still remain set. */
 
-    aug_check(aug_issuccess(aug_setsticky(&sticky, AUG_MDEVENTWR)));
+    aug_check(0 <= aug_setsticky(&sticky, AUG_MDEVENTWR));
 
     aug_check(0 == aug_getsticky(&sticky));
     aug_check(AUG_MDEVENTWR == aug_getmdeventmask(muxer, md));
 
     /* Wait for writability. */
 
-    aug_check(aug_issuccess(aug_waitmdevents(muxer, NULL)));
+    aug_check(0 <= aug_waitmdevents(muxer, NULL));
 
     aug_check(AUG_MDEVENTWR == aug_getsticky(&sticky));
     aug_check(0 == aug_getmdeventmask(muxer, md));
@@ -113,7 +112,7 @@ main(int argc, char* argv[])
     muxer = aug_createmuxer(mpool);
     aug_release(mpool);
 
-    if (aug_isfail(aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv))) {
+    if (aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0) {
         aug_perrinfo(aug_tlx, "aug_socketpair() failed", NULL);
         aug_destroymuxer(muxer);
         return 1;

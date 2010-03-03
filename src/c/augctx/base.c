@@ -67,11 +67,11 @@ inittls_(void)
             return AUG_FALSE;
 
         init_ = AUG_TRUE;
-        goto skip;
+        goto first;
     }
 
     if (!(tls = gettls_())) {
-    skip:
+    first:
         /* First call on this thread. */
 
         if (!(tls = malloc(sizeof(struct tls_))))

@@ -120,7 +120,7 @@ out_(void* arg, int what)
             } else {
 
                 aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
-                               AUG_ENULL, AUG_MSG("empty key"));
+                                AUG_ENULL, AUG_MSG("empty key"));
                 st->result_ = -1;
             }
         }

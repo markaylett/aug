@@ -212,7 +212,7 @@ service_(DWORD argc, char** argv)
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         aug_perrinfo(aug_tlx, "getservopt() failed", NULL);
         goto done;
     }
@@ -249,7 +249,7 @@ service_(DWORD argc, char** argv)
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("unexpected command value"));
+                        AUG_MSG("unexpected command value"));
         aug_perrinfo(aug_tlx, "invalid options", NULL);
         goto done;
     }
@@ -317,7 +317,7 @@ aug_daemonise(const struct aug_options* options)
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 

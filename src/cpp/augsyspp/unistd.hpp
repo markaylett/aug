@@ -80,13 +80,13 @@ namespace aug {
     inline size_t
     read(fdref ref, void* buf, size_t size)
     {
-        return AUG_RESULT(verify(aug_fread(ref.get(), buf, size)));
+        return verify(aug_fread(ref.get(), buf, size));
     }
 
     inline size_t
     write(fdref ref, const void* buf, size_t size)
     {
-        return AUG_RESULT(verify(aug_fwrite(ref.get(), buf, size)));
+        return verify(aug_fwrite(ref.get(), buf, size));
     }
 
     /**

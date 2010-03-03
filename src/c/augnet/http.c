@@ -120,7 +120,7 @@ label_(aug_httpparser_t parser)
 
     if (REQUEST_ == parser->state_) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("missing request line"));
+                        AUG_MSG("missing request line"));
         return -1;
     }
 
@@ -143,7 +143,7 @@ word_(aug_httpparser_t parser)
         break;
     case NAME_:
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("missing field name"));
+                        AUG_MSG("missing field name"));
         result = -1;
         break;
     case VALUE_:

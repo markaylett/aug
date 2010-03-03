@@ -107,7 +107,7 @@ fixtoui_(const char* buf, unsigned* dst, size_t size, char delim)
     digits = (unsigned)(it - buf);
     if (MAX_DIGITS_ < digits) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("too many integer digits [%u]"), digits);
+                        AUG_MSG("too many integer digits [%u]"), digits);
         return -1;
     }
 
@@ -121,7 +121,7 @@ fixtoui_(const char* buf, unsigned* dst, size_t size, char delim)
 
         if (!isdigit(*it)) {
             aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                           AUG_MSG("non-digit [%c] in integer"), *it);
+                            AUG_MSG("non-digit [%c] in integer"), *it);
             return -1;
         }
 
@@ -171,8 +171,8 @@ getsum_(const char* buf, size_t size)
 
     if (!isdigit(cu) || !isdigit(ct) || !isdigit(ch)) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("non-digit in checksum [%.3s]"),
-                       buf + (size - 4));
+                        AUG_MSG("non-digit in checksum [%.3s]"),
+                        buf + (size - 4));
         return -1;
     }
 
@@ -297,8 +297,8 @@ aug_finishfix(aug_fixstream_t stream)
 
         aug_clearxstr(stream->xstr_);
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
-                       AUG_MSG("fix stream not empty, [%d] bytes"),
-                       (int)size);
+                        AUG_MSG("fix stream not empty, [%d] bytes"),
+                        (int)size);
         result = -1;
 
     } else
@@ -321,7 +321,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     if (0 != memcmp(ptr, BEGINSTRING_PREFIX_, BEGINSTRING_PREFIX_SIZE_)) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("invalid beginstring tag"));
+                        AUG_MSG("invalid beginstring tag"));
         return -1;
     }
 
@@ -340,7 +340,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     ptr += AUG_FIXVERLEN;
     if (*SOH_ != *ptr++) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("beginstring field delimiter not found"));
+                        AUG_MSG("beginstring field delimiter not found"));
         return -1;
     }
 
@@ -350,7 +350,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     if (0 != memcmp(ptr, BODYLENGTH_PREFIX_, BODYLENGTH_PREFIX_SIZE_)) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("invalid bodylength tag"));
+                        AUG_MSG("invalid bodylength tag"));
         return -1;
     }
 
@@ -383,7 +383,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     if (0 != memcmp(ptr, CHECKSUM_PREFIX_, CHECKSUM_PREFIX_SIZE_)) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("invalid checksum tag"));
+                        AUG_MSG("invalid checksum tag"));
         return -1;
     }
 
@@ -393,7 +393,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     if (*SOH_ != buf[size - 1]) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("checksum field delimiter not found"));
+                        AUG_MSG("checksum field delimiter not found"));
         return -1;
     }
 

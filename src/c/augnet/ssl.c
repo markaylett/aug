@@ -788,8 +788,8 @@ sread_(aug_stream* ob, void* buf, size_t size)
         /* Restore saved error. */
 
         aug_setctxerror(aug_tlx, impl->errinfo_.file_, impl->errinfo_.line_,
-                       impl->errinfo_.src_, impl->errinfo_.num_,
-                       impl->errinfo_.desc_);
+                        impl->errinfo_.src_, impl->errinfo_.num_,
+                        impl->errinfo_.desc_);
         return -1;
     }
 
@@ -824,8 +824,8 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
         /* Restore saved error. */
 
         aug_setctxerror(aug_tlx, impl->errinfo_.file_, impl->errinfo_.line_,
-                       impl->errinfo_.src_, impl->errinfo_.num_,
-                       impl->errinfo_.desc_);
+                        impl->errinfo_.src_, impl->errinfo_.num_,
+                        impl->errinfo_.desc_);
         return -1;
     }
 

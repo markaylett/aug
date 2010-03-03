@@ -124,7 +124,7 @@ aug_createmuxer(aug_mpool* mpool)
     muxer->pollfds_ = NULL;
     muxer->nfds_ = muxer->size_ = 0;
 
-    if (aug_isfail(resize_(muxer, INIT_SIZE_))) {
+    if (resize_(muxer, INIT_SIZE_) < 0) {
         aug_freemem(mpool, muxer);
         return NULL;
     }
@@ -149,7 +149,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid mdevent mask [%d]"), (int)mask);
+                        AUG_MSG("invalid mdevent mask [%d]"), (int)mask);
         return -1;
     }
 
@@ -171,7 +171,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
         if (muxer->nfds_ == md + 1) {
 
-            for (--md; md >= 0 && -1 == muxer->pollfds_[md].fd; --md)
+            for (--md; md >= 0 && muxer->pollfds_[md].fd < 0; --md)
                 ;
             muxer->nfds_ = md + 1;
         }
@@ -188,8 +188,10 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 
     ms = timeout ? aug_tvtoms(timeout) : -1;
 
-    if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms)))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if ((ret = poll(muxer->pollfds_, muxer->nfds_, ms)) < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
     return ret;
 }
@@ -304,7 +306,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid mdevent mask [%u]"), (unsigned)mask);
+                        AUG_MSG("invalid mdevent mask [%u]"), (unsigned)mask);
         return -1;
     }
 

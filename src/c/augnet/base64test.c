@@ -47,11 +47,11 @@ static aug_result
 testencode_(aug_base64_t encoder, const char* in, const char* out)
 {
     encoded_[0] = '\0';
-    if (aug_isfail(aug_appendbase64(encoder, in, strlen(in)))) {
+    if (aug_appendbase64(encoder, in, strlen(in)) < 0) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
         return -1;
     }
-    if (aug_isfail(aug_finishbase64(encoder))) {
+    if (aug_finishbase64(encoder) < 0) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
         return -1;
     }
@@ -66,11 +66,11 @@ static aug_result
 testdecode_(aug_base64_t decoder, const char* in, const char* out)
 {
     decoded_[0] = '\0';
-    if (aug_isfail(aug_appendbase64(decoder, in, strlen(in)))) {
+    if (aug_appendbase64(decoder, in, strlen(in)) < 0) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
         return -1;
     }
-    if (aug_isfail(aug_finishbase64(decoder))) {
+    if (aug_finishbase64(decoder) < 0) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
         return -1;
     }
@@ -105,22 +105,22 @@ main(int argc, char* argv[])
         goto fail1;
     }
 
-    if (aug_isfail(testencode_(encoder, "apples", "YXBwbGVz")))
+    if (testencode_(encoder, "apples", "YXBwbGVz") < 0)
         goto fail2;
 
-    if (aug_isfail(testdecode_(decoder, "YXBwbGVz", "apples")))
+    if (testdecode_(decoder, "YXBwbGVz", "apples") < 0)
         goto fail2;
 
-    if (aug_isfail(testencode_(encoder, "oranges", "b3Jhbmdlcw==")))
+    if (testencode_(encoder, "oranges", "b3Jhbmdlcw==") < 0)
         goto fail2;
 
-    if (aug_isfail(testdecode_(decoder, "b3Jhbmdlcw==", "oranges")))
+    if (testdecode_(decoder, "b3Jhbmdlcw==", "oranges") < 0)
         goto fail2;
 
-    if (aug_isfail(testencode_(encoder, "pears", "cGVhcnM=")))
+    if (testencode_(encoder, "pears", "cGVhcnM=") < 0)
         goto fail2;
 
-    if (aug_isfail(testdecode_(decoder, "cGVhcnM=", "pears")))
+    if (testdecode_(decoder, "cGVhcnM=", "pears") < 0)
         goto fail2;
 
     aug_destroybase64(decoder);

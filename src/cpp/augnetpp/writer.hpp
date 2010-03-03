@@ -39,7 +39,7 @@ namespace aug {
     inline size_t
     writesome(aug_writer_t writer, streamref ref)
     {
-        return AUG_RESULT(verify(aug_writesome(writer, ref.get())));
+        return verify(aug_writesome(writer, ref.get()));
     }
 
     inline bool
@@ -102,7 +102,7 @@ namespace aug {
         size_t
         size() const
         {
-            return AUG_RESULT(verify(aug_writersize(writer_)));
+            return verify(aug_writersize(writer_));
         }
     };
 

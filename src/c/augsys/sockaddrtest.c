@@ -41,7 +41,7 @@ main(int argc, char* argv[])
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (aug_isfail(aug_getaddrinfo(HOST_, SERV_, &hints, &res))) {
+    if (aug_getaddrinfo(HOST_, SERV_, &hints, &res) < 0) {
         aug_perrinfo(aug_tlx, "aug_getaddrinfo() failed", NULL);
         return 1;
     }

@@ -73,7 +73,7 @@ aug_verifypacket(const struct aug_packet* packet)
     if ('\0' == packet->node_[0]) {
 
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("empty node name"));
+                        AUG_MSG("empty node name"));
         return -1;
     }
 
@@ -108,7 +108,7 @@ aug_decodepacket(const char* buf, struct aug_packet* pkt)
 {
     if (0 != memcmp(buf + AUG_PKTMAGICOFF, MAGIC_, AUG_PKTMAGICSIZE)) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid packet header"));
+                        AUG_MSG("invalid packet header"));
         return NULL;
     }
 

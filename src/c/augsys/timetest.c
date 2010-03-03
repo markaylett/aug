@@ -46,7 +46,7 @@ test(void)
         exit(1);
     }
 
-    if (-1 == (out = aug_timegm(&tm))) {
+    if ((out = aug_timegm(&tm)) < 0) {
         aug_perrinfo(aug_tlx, "aug_timegm() failed", NULL);
         exit(1);
     }

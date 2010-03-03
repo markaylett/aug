@@ -115,7 +115,7 @@ main(int argc, char* argv[])
         r = verifyproxy(r);
         if (RESULT_ != which_)
             throw error("failed to call result template");
-        if (101 != AUG_RESULT(r))
+        if (101 != r)
             throw error("returned result differs from original");
 
         int i(101);

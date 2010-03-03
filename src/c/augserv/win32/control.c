@@ -57,7 +57,7 @@ makepath_(const char* conffile)
 
     if (!(program = aug_getservopt(AUG_OPTPROGRAM))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTPROGRAM' not set"));
+                        AUG_MSG("option 'AUG_OPTPROGRAM' not set"));
         return NULL;
     }
 
@@ -181,13 +181,13 @@ install_(SC_HANDLE scm, const struct aug_options* options)
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 
     if (!(lname = aug_getservopt(AUG_OPTLONGNAME))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
+                        AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
         return -1;
     }
 

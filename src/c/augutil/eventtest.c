@@ -48,14 +48,13 @@ main(int argc, char* argv[])
     for (in = 1; in <= 1000; ++in) {
 
         struct aug_event event;
-        aug_result result;
 
         event.type_ = in;
         event.ob_ = NULL;
 
-        if (aug_isfail(result = aug_writeevent(events, &event))) {
+        if (aug_writeevent(events, &event) < 0) {
 
-            if (aug_isblock(result))
+            if (AUG_EXBLOCK == aug_getexcept(aug_tlx))
                 break;
 
             aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
@@ -66,11 +65,10 @@ main(int argc, char* argv[])
     for (out = 1;; ++out) {
 
         struct aug_event event;
-        aug_result result = aug_readevent(events, &event);
 
-        if (aug_isfail(result)) {
+        if (aug_readevent(events, &event) < 0) {
 
-            if (aug_isblock(result))
+            if (AUG_EXBLOCK == aug_getexcept(aug_tlx))
                 break;
 
             aug_perrinfo(aug_tlx, "aug_readevent() failed", NULL);

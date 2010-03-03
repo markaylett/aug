@@ -146,14 +146,14 @@ static void
 seterrinvalid_(const char* file, int line, char ch)
 {
     aug_setctxerror(aug_tlx, file, line, "aug", AUG_EPARSE,
-                   AUG_MSG("invalid character [%c]"), ch);
+                    AUG_MSG("invalid character [%c]"), ch);
 }
 
 static void
 seterralign_(const char* file, int line)
 {
     aug_setctxerror(aug_tlx, file, line, "aug", AUG_EPARSE,
-                   AUG_MSG("misaligned base64 sequence"));
+                    AUG_MSG("misaligned base64 sequence"));
 }
 
 static aug_result

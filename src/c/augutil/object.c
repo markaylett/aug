@@ -333,7 +333,7 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
             /* End of signature, so too many arguments. */
 
             aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                           AUG_MSG("too many arguments"));
+                            AUG_MSG("too many arguments"));
             goto fail;
         case 'v':
 
@@ -408,7 +408,7 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
     /* Fallthrough: Not end of signature, so too few arguments. */
 
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                   AUG_MSG("not enough arguments"));
+                    AUG_MSG("not enough arguments"));
 
  fail:
 
@@ -416,7 +416,7 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
 
     if (type)
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("argument %d: expected %s"), i, type);
+                        AUG_MSG("argument %d: expected %s"), i, type);
 
     if (unwind) {
 

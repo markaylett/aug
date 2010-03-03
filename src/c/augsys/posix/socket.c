@@ -44,7 +44,7 @@ AUGSYS_API int
 aug_socket(int domain, int type, int protocol)
 {
     int fd = socket(domain, type, protocol);
-    if (-1 == fd) {
+    if (fd < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
@@ -57,7 +57,7 @@ aug_accept(aug_sd sd, struct aug_endpoint* ep)
 {
     int fd;
     ep->len_ = AUG_MAXADDRLEN;
-    if (-1 == (fd = accept(sd,  &ep->un_.sa_, &ep->len_)))
+    if ((fd = accept(sd,  &ep->un_.sa_, &ep->len_)) < 0)
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     return fd;
 }
@@ -266,7 +266,7 @@ aug_inetpton(int af, const char* src, struct aug_inetaddr* dst)
         return NULL;
     } else if (0 == ret) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid address: %s"), src);
+                        AUG_MSG("invalid address: %s"), src);
         return NULL;
     }
 
@@ -287,7 +287,7 @@ aug_getaddrinfo(const char* host, const char* serv,
     int ret = getaddrinfo(host, serv, hints, res);
     if (0 != ret) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "posix", ret,
-                       gai_strerror(ret));
+                        gai_strerror(ret));
         return -1;
     }
     return 0;

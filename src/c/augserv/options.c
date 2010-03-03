@@ -104,7 +104,7 @@ tocommand_(const char* s)
     }
 
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                   AUG_MSG("invalid command [%s]"), s);
+                    AUG_MSG("invalid command [%s]"), s);
     return -1;
 }
 
@@ -132,7 +132,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
             if (aug_optind == argc || !(conffile = argv[aug_optind++])) {
                 usage_();
                 aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
-                               AUG_EINVAL, AUG_MSG("missing path argument"));
+                                AUG_EINVAL, AUG_MSG("missing path argument"));
                 return -1;
             }
             if (!aug_realpath(conffile, options->conffile_,
@@ -149,8 +149,8 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         default:
             usage_();
             aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
-                           AUG_EINVAL, AUG_MSG("unknown option [%c]"),
-                           aug_optopt);
+                            AUG_EINVAL, AUG_MSG("unknown option [%c]"),
+                            aug_optopt);
             return -1;
         }
 
@@ -168,7 +168,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
     default:
         usage_();
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
-                       AUG_EINVAL, AUG_MSG("too many arguments"));
+                        AUG_EINVAL, AUG_MSG("too many arguments"));
         return -1;
     }
 

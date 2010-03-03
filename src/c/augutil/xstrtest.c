@@ -49,7 +49,7 @@ main(int argc, char* argv[])
 
     for (i = 0; i < 26; ++i) {
         aug_check(i == strlen(aug_xstr(xs)));
-        aug_check(aug_issuccess(aug_xstrcatc(xs, 'A' + i)));
+        aug_check(0 <= aug_xstrcatc(xs, 'A' + i));
     }
 
     /* Verify content. */

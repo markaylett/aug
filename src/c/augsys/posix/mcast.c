@@ -224,10 +224,10 @@ aug_setmcastttl(aug_sd sd, int ttl)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (aug_isfail(af = aug_getfamily(sd)))
-        return af;
+    if ((af = aug_getfamily(sd)) < 0)
+        return -1;
 
-    switch (AUG_RESULT(af)) {
+    switch (af) {
     case AF_INET:
         un.ipv4_ = ttl;
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_TTL, &un.ipv4_,

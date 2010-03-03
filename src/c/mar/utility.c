@@ -44,7 +44,7 @@ aug_atofield_(struct aug_field* field, char* src)
     if (NULL == value) {
 
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("empty value part"));
+                        AUG_MSG("empty value part"));
         return -1;
     }
 
@@ -115,7 +115,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
     if (!(p = strchr(buf, '\n'))) {
 
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("newline character expected"));
+                        AUG_MSG("newline character expected"));
         return -1;
     }
 

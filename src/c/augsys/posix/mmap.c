@@ -61,7 +61,7 @@ toprot_(int* to, int from)
 
  fail:
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                   AUG_MSG("invalid protection flags [%d]"), (int)from);
+                    AUG_MSG("invalid protection flags [%d]"), (int)from);
     return -1;
 }
 
@@ -73,7 +73,7 @@ verify_(size_t size, size_t offset, size_t len)
 
     if (!size || size < (offset + len)) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid file map size [%d]"), (int)size);
+                        AUG_MSG("invalid file map size [%d]"), (int)size);
         return -1;
     }
 
@@ -81,7 +81,7 @@ verify_(size_t size, size_t offset, size_t len)
 
     if (offset && (offset % aug_granularity())) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid file map offset [%d]"), (int)offset);
+                        AUG_MSG("invalid file map offset [%d]"), (int)offset);
         return -1;
     }
 
@@ -111,7 +111,7 @@ static aug_result
 destroymmap_(impl_t impl)
 {
     if (impl->mmap_.addr_
-        && -1 == munmap(impl->mmap_.addr_, impl->mmap_.len_)) {
+        && munmap(impl->mmap_.addr_, impl->mmap_.len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
@@ -166,7 +166,7 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 
     impl->mmap_.addr_ = NULL;
 
-    if (addr && -1 == munmap(addr, impl->mmap_.len_)) {
+    if (addr && munmap(addr, impl->mmap_.len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
@@ -185,7 +185,7 @@ AUGSYS_API aug_result
 aug_syncmmap(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
-    if (-1 == msync(impl->mmap_.addr_, impl->mmap_.len_, MS_SYNC)) {
+    if (msync(impl->mmap_.addr_, impl->mmap_.len_, MS_SYNC) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }

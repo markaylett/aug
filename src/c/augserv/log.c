@@ -70,9 +70,9 @@ redirectout_(int fd)
     /* Duplicate stdout descriptor so that it can be restored on failure. */
 
 #if !defined(_WIN32)
-    if (-1 == (old = dup(STDOUT_FILENO)))
+    if ((old = dup(STDOUT_FILENO)) < 0)
 #else /* _WIN32 */
-    if (-1 == (old = _dup(STDOUT_FILENO)))
+    if ((old = _dup(STDOUT_FILENO)) < 0)
 #endif /* _WIN32 */
     {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -87,18 +87,18 @@ redirectout_(int fd)
        state will remain unchanged. */
 
 #if !defined(_WIN32)
-    if (-1 == dup2(fd, STDOUT_FILENO)) {
+    if (dup2(fd, STDOUT_FILENO) < 0) {
 #else /* _WIN32 */
-    if (-1 == _dup2(fd, STDOUT_FILENO)) {
+    if (_dup2(fd, STDOUT_FILENO) < 0) {
 #endif /* _WIN32 */
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         goto done;
     }
 
 #if !defined(_WIN32)
-    if (-1 == dup2(fd, STDERR_FILENO)) {
+    if (dup2(fd, STDERR_FILENO) < 0) {
 #else /* _WIN32 */
-    if (-1 == _dup2(fd, STDERR_FILENO)) {
+    if (_dup2(fd, STDERR_FILENO) < 0) {
 #endif /* _WIN32 */
 
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -106,9 +106,9 @@ redirectout_(int fd)
         /* Restore the original descriptor. */
 
 #if !defined(_WIN32)
-        if (-1 == dup2(old, STDOUT_FILENO))
+        if (dup2(old, STDOUT_FILENO) < 0)
 #else /* _WIN32 */
-        if (-1 == _dup2(old, STDOUT_FILENO))
+        if (_dup2(old, STDOUT_FILENO) < 0)
 #endif /* _WIN32 */
             aug_ctxerror(aug_tlx, "dup2() failed");
         goto done;
@@ -148,9 +148,9 @@ aug_openlog(const char* path)
     result = redirectout_(fd);
 
 #if !defined(_WIN32)
-    if (-1 == close(fd))
+    if (close(fd) < 0)
 #else /* _WIN32 */
-    if (-1 == _close(fd))
+    if (_close(fd) < 0)
 #endif /* _WIN32 */
         aug_ctxerror(aug_tlx, "close() failed");
 
