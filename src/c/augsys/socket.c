@@ -296,10 +296,10 @@ aug_getsockerr(aug_sd sd)
 }
 
 AUGSYS_API void
-aug_setsockerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                    aug_sd sd)
+aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                   aug_sd sd)
 {
-    aug_setposixerrinfo_(errinfo, file, line, aug_getsockerr(sd));
+    aug_setposixerrinfo(errinfo, file, line, aug_getsockerr(sd));
 }
 
 AUGSYS_API void

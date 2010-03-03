@@ -166,27 +166,25 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
         switch (aug_appendlexer(parser->lexer_, ptr[i++])) {
         case AUG_LEXLABEL:
             if (label_(parser) < 0)
-                goto fail;
+                return -1;
             break;
         case AUG_LEXWORD:
             if (word_(parser) < 0)
-                goto fail;
+                return -1;
             break;
         case AUG_LEXWORD | AUG_LEXPHRASE:
             if (word_(parser) < 0
                 || phrase_(parser) < 0)
-                goto fail;
+                return -1;
             goto done;
         case AUG_LEXPHRASE:
             if (phrase_(parser) < 0)
-                goto fail;
+                return -1;
             goto done;
         }
     }
  done:
     return i;
- fail:
-    return -1;
 }
 
 static aug_rsize
@@ -199,7 +197,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
         parser->csize_ -= size;
 
         if (aug_httpcdata(parser->handler_, buf, size) < 0)
-            goto fail;
+            return -1;
 
         /* Entire buffer consumed. */
 
@@ -210,16 +208,14 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
     if ((size = parser->csize_))
         if (aug_httpcdata(parser->handler_, buf, size) < 0)
-            goto fail;
+            return -1;
 
     /* End of message (with commit). */
 
     if (end_(parser, AUG_TRUE) < 0)
-        goto fail;
+        return -1;
 
     return size;
- fail:
-    return -1;
 }
 
 AUGNET_API aug_httpparser_t

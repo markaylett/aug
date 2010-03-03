@@ -235,7 +235,7 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 
     if (addr && !UnmapViewOfFile(addr)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
-        goto fail;
+        return -1;
     }
 
     if (impl->size_ < (offset + len)) {
@@ -245,19 +245,17 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 
         if (INVALID_HANDLE_VALUE != mapping && !CloseHandle(mapping)) {
             aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
-            goto fail;
+            return -1;
         }
 
         if (aug_fsize(impl->fd_, &impl->size_) < 0)
-            goto fail;
+            return -1;
     }
 
     if (verify_(impl->size_, offset, len) < 0)
-        goto fail;
-    return createmmap_(impl, offset, len);
+        return -1;
 
- fail:
-    return -1;
+    return createmmap_(impl, offset, len);
 }
 
 AUGSYS_API aug_result

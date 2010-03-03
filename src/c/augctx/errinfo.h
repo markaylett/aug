@@ -44,7 +44,7 @@ struct aug_errinfo {
  */
 
 AUGCTX_API void
-aug_clearerrinfo_(struct aug_errinfo* errinfo);
+aug_clearerrinfo(struct aug_errinfo* errinfo);
 
 AUGCTX_API void
 aug_clearctxerror(aug_ctx* ctx);
@@ -54,8 +54,8 @@ aug_clearctxerror(aug_ctx* ctx);
  */
 
 AUGCTX_API void
-aug_vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                 const char* src, int num, const char* format, va_list args);
+aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                const char* src, int num, const char* format, va_list args);
 
 AUGCTX_API void
 aug_vsetctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
@@ -66,8 +66,8 @@ aug_vsetctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
  */
 
 AUGCTX_API void
-aug_seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                const char* src, int num, const char* format, ...);
+aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+               const char* src, int num, const char* format, ...);
 
 AUGCTX_API void
 aug_setctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
@@ -79,8 +79,8 @@ aug_setctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
  */
 
 AUGCTX_API unsigned
-aug_setposixerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                     int num);
+aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    int num);
 
 AUGCTX_API void
 aug_setposixerror(aug_ctx* ctx, const char* file, int line, int num);
@@ -94,8 +94,8 @@ aug_setposixerror(aug_ctx* ctx, const char* file, int line, int num);
  */
 
 AUGCTX_API unsigned
-aug_setwin32errinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                     unsigned long num);
+aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    unsigned long num);
 
 AUGCTX_API void
 aug_setwin32error(aug_ctx* ctx, const char* file, int line,

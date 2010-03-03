@@ -485,13 +485,9 @@ main(int argc, char* argv[])
     archivename = argv[aug_optind];
     aug_optind = 0;
 
-    if (run_(argc, argv, archivename) < 0)
-        goto fail;
-
-    return 0;
+    return run_(argc, argv, archivename) < 0 ? 1 : 0;
 
  info:
     fprintf(stderr, ": try 'mar -h' for more information\n");
- fail:
     return 1;
 }

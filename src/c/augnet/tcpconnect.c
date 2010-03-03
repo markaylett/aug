@@ -133,7 +133,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
                     /* No more addresses: set error to connection failure
                        reason. */
 
-                    aug_setsockerrinfo_(aug_tlerr, __FILE__, __LINE__, sd);
+                    aug_setsockerrinfo(aug_tlerr, __FILE__, __LINE__, sd);
                     aug_sclose(sd); /* May set errno */
                     return AUG_BADSD;
                 }

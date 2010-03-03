@@ -126,7 +126,7 @@ error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
         /* Set socket-level error if one exists. */
 
         struct aug_errinfo errinfo;
-        aug_setsockerrinfo_(&errinfo, __FILE__, __LINE__, sd);
+        aug_setsockerrinfo(&errinfo, __FILE__, __LINE__, sd);
 
         if (errinfo.num_) {
 

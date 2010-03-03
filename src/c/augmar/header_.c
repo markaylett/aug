@@ -136,8 +136,10 @@ aug_delfieldn_(aug_seq_t seq, struct aug_info_* info, unsigned n)
     unsigned offset, orig;
     char* ptr;
 
-    if (n >= info->fields_)
-        return AUG_EXNONE;
+    if (n >= info->fields_) {
+        aug_setexcept(aug_tlx, AUG_EXNONE);
+        return -1;
+    }
 
     if (aug_setregion_(seq, AUG_HEADER, info->hsize_) < 0
         || !(ptr = aug_seqaddr_(seq)))
@@ -170,8 +172,10 @@ aug_delfieldp_(aug_seq_t seq, struct aug_info_* info, const char* name)
     inout = info->fields_;
     offset = offsetp_(ptr, name, &inout);
 
-    if (inout == info->fields_)
-        return AUG_EXNONE;
+    if (inout == info->fields_) {
+        aug_setexcept(aug_tlx, AUG_EXNONE);
+        return -1;
+    }
 
     orig = fieldsize_(ptr + offset);
 
@@ -287,8 +291,10 @@ aug_putfieldn_(aug_seq_t seq, struct aug_info_* info, unsigned n,
 
     assert(seq && info);
 
-    if (n >= info->fields_)
-        return AUG_EXNONE;
+    if (n >= info->fields_) {
+        aug_setexcept(aug_tlx, AUG_EXNONE);
+        return -1;
+    }
 
     /* Add null terminator. */
 
@@ -419,7 +425,8 @@ aug_fieldntop_(aug_seq_t seq, const struct aug_info_* info, unsigned n,
 
     if (n >= info->fields_) {
         *name = NULL;
-        return AUG_EXNONE;
+        aug_setexcept(aug_tlx, AUG_EXNONE);
+        return -1;
     }
 
     if (aug_setregion_(seq, AUG_HEADER, info->hsize_) < 0
@@ -445,8 +452,10 @@ aug_fieldpton_(aug_seq_t seq, const struct aug_info_* info, const char* name)
     inout = info->fields_;
     offsetp_(ptr, name, &inout);
 
-    if (inout == info->fields_)
-        return AUG_EXNONE;
+    if (inout == info->fields_) {
+        aug_setexcept(aug_tlx, AUG_EXNONE);
+        return -1;
+    }
 
     return inout;
 }

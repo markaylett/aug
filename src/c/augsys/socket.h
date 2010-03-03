@@ -285,8 +285,8 @@ AUGSYS_API int
 aug_getsockerr(aug_sd sd);
 
 AUGSYS_API void
-aug_setsockerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                    aug_sd sd);
+aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                   aug_sd sd);
 
 AUGSYS_API void
 aug_setsockerror(aug_ctx* ctx, const char* file, int line, aug_sd sd);

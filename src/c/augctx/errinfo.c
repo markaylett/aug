@@ -74,7 +74,7 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGCTX_API void
-aug_clearerrinfo_(struct aug_errinfo* errinfo)
+aug_clearerrinfo(struct aug_errinfo* errinfo)
 {
     errinfo->file_[0] = '\0';
     errinfo->line_ = 0;
@@ -87,12 +87,12 @@ AUGCTX_API void
 aug_clearctxerror(aug_ctx* ctx)
 {
     aug_setexcept(ctx, AUG_EXERROR);
-    aug_clearerrinfo_(aug_geterrinfo(ctx));
+    aug_clearerrinfo(aug_geterrinfo(ctx));
 }
 
 AUGCTX_API void
-aug_vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                 const char* src, int num, const char* format, va_list args)
+aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                const char* src, int num, const char* format, va_list args)
 {
     vseterrinfo_(errinfo, file, line, src, num, format, args);
 }
@@ -106,8 +106,8 @@ aug_vsetctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
 }
 
 AUGCTX_API void
-aug_seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                const char* src, int num, const char* format, ...)
+aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+               const char* src, int num, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -127,8 +127,8 @@ aug_setctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
 }
 
 AUGCTX_API unsigned
-aug_setposixerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                     int num)
+aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    int num)
 {
     seterrinfo_(errinfo, file, line, "posix", num, strerror(num));
 
@@ -146,14 +146,14 @@ aug_setposixerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API void
 aug_setposixerror(aug_ctx* ctx, const char* file, int line, int num)
 {
-    aug_setexcept(ctx, aug_setposixerrinfo_(aug_geterrinfo(ctx),
-                                            file, line, num));
+    aug_setexcept(ctx, aug_setposixerrinfo(aug_geterrinfo(ctx),
+                                           file, line, num));
 }
 
 #if defined(_WIN32)
 AUGCTX_API unsigned
-aug_setwin32errinfo_(struct aug_errinfo* errinfo, const char* file, int line,
-                     unsigned long num)
+aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    unsigned long num)
 {
     char desc[AUG_MAXLINE];
     DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, num,
@@ -189,8 +189,8 @@ aug_setwin32errinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API void
 aug_setwin32error(aug_ctx* ctx, const char* file, int line, unsigned long num)
 {
-    aug_setexcept(ctx, aug_setwin32errinfo_(aug_geterrinfo(ctx),
-                                            file, line, num));
+    aug_setexcept(ctx, aug_setwin32errinfo(aug_geterrinfo(ctx),
+                                           file, line, num));
 }
 #endif /* _WIN32 */
 

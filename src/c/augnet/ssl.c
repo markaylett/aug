@@ -110,7 +110,7 @@ error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
         /* Set socket-level error if one exists. */
 
         struct aug_errinfo errinfo;
-        aug_setsockerrinfo_(&errinfo, __FILE__, __LINE__, sd);
+        aug_setsockerrinfo(&errinfo, __FILE__, __LINE__, sd);
 
         if (errinfo.num_) {
 
@@ -408,17 +408,17 @@ readwrite_(struct impl_* impl, unsigned short events)
             /* Save error locally. */
 
 #if !defined(_WIN32)
-            aug_setposixerrinfo_(&impl->errinfo_, __FILE__, __LINE__, errno);
+            aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__, errno);
 #else /* _WIN32 */
-            aug_setwin32errinfo_(&impl->errinfo_, __FILE__, __LINE__,
-                                 WSAGetLastError());
+            aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
+                                WSAGetLastError());
 #endif /* _WIN32 */
 
             /* If system call error could not be obtained. */
 
             if (0 == impl->errinfo_.num_) {
-                aug_seterrinfo_(&impl->errinfo_, __FILE__, __LINE__, "aug",
-                                AUG_EIO, "ssl read syscall error");
+                aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
+                               AUG_EIO, "ssl read syscall error");
             }
             impl->state_ = ERROR_;
             return;
@@ -485,18 +485,18 @@ readwrite_(struct impl_* impl, unsigned short events)
 
             impl->except_ =
 #if !defined(_WIN32)
-                aug_setposixerrinfo_(&impl->errinfo_, __FILE__, __LINE__,
-                                     errno);
+                aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__,
+                                    errno);
 #else /* _WIN32 */
-                aug_setwin32errinfo_(&impl->errinfo_, __FILE__, __LINE__,
-                                     WSAGetLastError());
+                aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
+                                    WSAGetLastError());
 #endif /* _WIN32 */
 
             /* If system call error could not be obtained. */
 
             if (0 == impl->errinfo_.num_) {
-                aug_seterrinfo_(&impl->errinfo_, __FILE__, __LINE__, "aug",
-                                AUG_EIO, "ssl write syscall error");
+                aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
+                               AUG_EIO, "ssl write syscall error");
             }
             impl->state_ = ERROR_;
             break;
@@ -961,7 +961,7 @@ createssl_(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
     clearbuf_(&impl->outbuf_);
     impl->state_ = HANDSHAKE_;
     impl->except_ = 0;
-    aug_clearerrinfo_(&impl->errinfo_);
+    aug_clearerrinfo(&impl->errinfo_);
     impl->shutdown_ = AUG_FALSE;
 
     /* Initiate handshake mask. */
@@ -977,11 +977,11 @@ AUGNET_API void
 aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                   unsigned long err)
 {
-    aug_seterrinfo_(errinfo, file, line, "ssl", err,
-                    "%s: %s: %s",
-                    ERR_lib_error_string(err),
-                    ERR_func_error_string(err),
-                    ERR_reason_error_string(err));
+    aug_seterrinfo(errinfo, file, line, "ssl", err,
+                   "%s: %s: %s",
+                   ERR_lib_error_string(err),
+                   ERR_func_error_string(err),
+                   ERR_reason_error_string(err));
 
     /* Log those that are not set in errinfo record. */
 

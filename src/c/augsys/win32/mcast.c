@@ -179,7 +179,7 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
             struct in_addr ifaddr;
             if (getifaddr_(&ifaddr, ifname) < 0)
-                goto fail;
+                return -1;
 
             un.ipv4_.imr_interface.s_addr = ifaddr.s_addr;
         } else
@@ -197,7 +197,7 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
             DWORD i;
             if (getifindex_(&i, ifname) < 0)
-                goto fail;
+                return -1;
 
 			un.ipv6_.ipv6mr_interface = i;
         } else
@@ -209,7 +209,6 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
     }
 
     aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEAFNOSUPPORT);
- fail:
     return -1;
 }
 
@@ -232,7 +231,7 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
             struct in_addr ifaddr;
             if (getifaddr_(&ifaddr, ifname) < 0)
-                goto fail;
+                return -1;
 
             un.ipv4_.imr_interface.s_addr = ifaddr.s_addr;
         } else
@@ -250,7 +249,7 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
             DWORD i;
             if (getifindex_(&i, ifname) < 0)
-                goto fail;
+                return -1;
 
 			un.ipv6_.ipv6mr_interface = i;
         } else
@@ -262,7 +261,6 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
     }
 
     aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEAFNOSUPPORT);
- fail:
     return -1;
 }
 
@@ -278,27 +276,26 @@ aug_setmcastif(aug_sd sd, const char* ifname)
     } un;
 
     if ((af = aug_getfamily(sd)) < 0)
-        goto fail;
+        return -1;
 
     switch (af) {
     case AF_INET:
 
         if (getifaddr_(&un.ipv4_, ifname) < 0)
-            goto fail;
+            return -1;
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
                               sizeof(un.ipv4_));
 #if HAVE_IPV6
     case AF_INET6:
 
         if (getifindex_(&un.ipv6_, ifname) < 0)
-            goto fail;
+            return -1;
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                               &un.ipv6_, sizeof(un.ipv6_));
 #endif /* HAVE_IPV6 */
     }
 
     aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEAFNOSUPPORT);
- fail:
     return -1;
 }
 
@@ -308,7 +305,7 @@ aug_setmcastloop(aug_sd sd, aug_bool on)
     int opt = on ? 1 : 0;
     aug_rint af = aug_getfamily(sd);
     if (af < 0)
-        goto fail;
+        return -1;
 
     /* On Windows, both the IPV4 and IPV6 options expect a DWORD. */
 
@@ -324,7 +321,6 @@ aug_setmcastloop(aug_sd sd, aug_bool on)
     }
 
     aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEAFNOSUPPORT);
- fail:
     return -1;
 }
 
@@ -333,7 +329,7 @@ aug_setmcastttl(aug_sd sd, int ttl)
 {
     aug_rint af = aug_getfamily(sd);
     if (af < 0)
-        goto fail;
+        return -1;
 
     /* On Windows, both the IPV4 and IPV6 options expect a DWORD. */
 
@@ -349,6 +345,5 @@ aug_setmcastttl(aug_sd sd, int ttl)
     }
 
     aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEAFNOSUPPORT);
- fail:
     return -1;
 }

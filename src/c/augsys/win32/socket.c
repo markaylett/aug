@@ -316,8 +316,8 @@ aug_swritev(aug_sd sd, const struct iovec* iov, int size)
         buf = _alloca(sizeof(WSABUF) * size);
 #if defined(_MSC_VER)
 	} __except (STATUS_STACK_OVERFLOW == GetExceptionCode()) {
-		aug_setwin32errinfo(aug_tlx, __FILE__, __LINE__,
-                            ERROR_NOT_ENOUGH_MEMORY);
+		aug_setwin32error(aug_tlx, __FILE__, __LINE__,
+                          ERROR_NOT_ENOUGH_MEMORY);
         return -1;
 	}
 #endif /* _MSC_VER */
