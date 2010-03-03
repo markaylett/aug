@@ -417,7 +417,7 @@ namespace test {
                 run();
                 return 0;
             } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
+            return -1;
         }
     };
 
@@ -447,7 +447,7 @@ namespace test {
             test::readconf(conffile, batch, daemon);
             return 0;
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     aug_task*

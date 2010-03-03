@@ -331,6 +331,7 @@ namespace aug {
 
 #define AUG_SETERRINFOCATCH                                             \
     catch (const aug::errinfo_error& e) {                               \
+        aug_setexcept(aug_tlx, AUG_EXERROR);                            \
         e.errinfo(*aug_tlerr);                                          \
     } catch (const std::exception& e) {                                 \
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",             \

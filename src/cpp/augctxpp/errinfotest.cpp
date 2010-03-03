@@ -35,14 +35,14 @@ namespace {
 
     class test : public ref_base, public mpool_ops {
         stream<test> stream_;
-        err<test> err_;
+        blob<test> blob_;
         ~test() AUG_NOTHROW
         {
         }
         test()
         {
             stream_.reset(this);
-            err_.reset(this);
+            blob_.reset(this);
         }
     public:
         objectptr
@@ -50,13 +50,15 @@ namespace {
         {
             if (equalid<aug_object>(id) || equalid<aug_stream>(id))
                 return object_retain<aug_object>(stream_);
-            else if (equalid<aug_err>(id))
-                return object_retain<aug_object>(err_);
+            else if (equalid<aug_blob>(id))
+                return object_retain<aug_object>(blob_);
             return null;
         }
         aug_result
         shutdown_() AUG_NOTHROW
         {
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
+                            "shutdown failed");
             return -1;
         }
         aug_rsize
@@ -79,6 +81,21 @@ namespace {
         {
             return size;
         }
+        const char*
+        getblobtype_() AUG_NOTHROW
+        {
+            return "text/plain";
+        }
+        const void*
+        getblobdata_(size_t& size) AUG_NOTHROW
+        {
+            return "test";
+        }
+        size_t
+        getblobsize_() AUG_NOTHROW
+        {
+            return 4;
+        }
         static streamptr
         create()
         {
@@ -99,7 +116,7 @@ main(int argc, char* argv[])
             shutdown(ptr);
             aug_check(!"exception not thrown");
         } catch (const errinfo_error& e) {
-            aug_check(0 == strcmp(e.what(), "some error"));
+            aug_check(0 == strcmp(e.what(), "shutdown failed"));
         }
         return 0;
 

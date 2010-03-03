@@ -153,8 +153,9 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
         return -1;
     }
 
-    if (muxer->size_ <= md)
-        aug_verify(resize_(muxer, AUG_MAX(md + 1, muxer->size_ * 2)));
+    if (muxer->size_ <= md
+        && resize_(muxer, AUG_MAX(md + 1, muxer->size_ * 2)) < 0)
+        return -1;
 
     ptr = muxer->pollfds_ + md;
     if (mask) {

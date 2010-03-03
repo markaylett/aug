@@ -208,7 +208,7 @@ namespace test {
                 run();
                 return 0;
             } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
+            return -1;
         }
 
         void
@@ -260,7 +260,7 @@ namespace test {
             return 0;
 
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     aug_task*

@@ -182,25 +182,25 @@ stream_shutdown_(aug_stream* ob)
 static aug_rsize
 stream_read_(aug_stream* ob, void* buf, size_t size)
 {
-    return AUG_ZERO;
+    return 0;
 }
 
 static aug_rsize
 stream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
-    return AUG_ZERO;
+    return 0;
 }
 
 static aug_rsize
 stream_write_(aug_stream* ob, const void* buf, size_t size)
 {
-    return AUG_ZERO;
+    return 0;
 }
 
 static aug_rsize
 stream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
-    return AUG_ZERO;
+    return 0;
 }
 
 static const struct aug_streamvtbl streamvtbl_ = {

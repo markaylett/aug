@@ -114,8 +114,9 @@ aug_control(const struct aug_options* options, int event)
     int fd;
     aug_result result;
 
-    aug_verify(aug_readservconf(AUG_CONFFILE(options), options->batch_,
-                                AUG_TRUE));
+    if (aug_readservconf(AUG_CONFFILE(options), options->batch_,
+                         AUG_TRUE) < 0)
+        return -1;
 
     if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
