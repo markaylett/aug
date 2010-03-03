@@ -70,9 +70,6 @@ static aug_log log_ = { &vtbl_, NULL };
 int
 main(int argc, char* argv[])
 {
-    if (!aug_autotlx())
-        return 1;
-
     aug_setlog(aug_tlx, &log_);
     aug_setloglevel(aug_tlx, AUG_LOGINFO);
 

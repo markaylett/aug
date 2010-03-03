@@ -27,8 +27,6 @@
 int
 main(int argc, char* argv[])
 {
-    aug_autotlx();
-
     aug_setposixerror(aug_tlx, __FILE__, 101, EINVAL);
 
     if (0 != strcmp(aug_tlerr->file_, __FILE__)) {

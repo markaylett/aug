@@ -185,7 +185,7 @@ aug_gettlx(void)
 {
     struct tls_* tls = gettls_();
     if (!tls) {
-        /* Lazy. */
+        /* Lazy initialisation. */
         aug_check(aug_autotlx());
         tls = gettls_();
         aug_check(tls);
@@ -201,7 +201,7 @@ aug_tlx_(void)
 {
     struct tls_* tls = gettls_();
     if (!tls) {
-        /* Lazy. */
+        /* Lazy initialisation. */
         aug_check(aug_autotlx());
         tls = gettls_();
         aug_check(tls);
@@ -215,8 +215,8 @@ aug_tlerr_(void)
 {
     struct tls_* tls = gettls_();
     if (!tls) {
-        /* Lazy. */
-        aug_check(AUG_TRUE == aug_autotlx());
+        /* Lazy initialisation. */
+        aug_check(aug_autotlx());
         tls = gettls_();
         aug_check(tls);
     }

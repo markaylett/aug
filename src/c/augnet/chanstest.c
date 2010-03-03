@@ -407,7 +407,8 @@ main(int argc, char* argv[])
 
     /* No longer exists. */
 
-    aug_check(aug_isnone(aug_removechan(chans, 2)));
+    aug_check(aug_removechan(chans, 2) < 0);
+    aug_check(AUG_EXNONE == aug_getexcept(aug_tlx));
 
     /* Remove during loop. */
 
