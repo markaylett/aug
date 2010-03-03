@@ -93,7 +93,7 @@ namespace aug {
     established(sdref ref)
     {
         aug_result result(aug_established(ref.get()));
-        if (result < 0 && AUG_EXNONE == gextexcept(aug_tlx))
+        if (result < 0 && AUG_EXNONE == getexcept(aug_tlx))
             return false;
         verify(result); // Possible error.
         return true;
