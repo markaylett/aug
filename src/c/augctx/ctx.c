@@ -47,8 +47,7 @@ struct impl_ {
     aug_mpool* mpool_;
     aug_clock* clock_;
     aug_log* log_;
-    unsigned loglevel_;
-    unsigned except_;
+    unsigned loglevel_, except_, exmask_;
     struct aug_errinfo errinfo_;
 };
 
@@ -117,6 +116,13 @@ setexcept_(aug_ctx* obj, unsigned except)
     impl->except_ = except;
 }
 
+static void
+setexmask_(aug_ctx* obj, unsigned exmask)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
+    impl->exmask_ = exmask;
+}
+
 static aug_mpool*
 getmpool_(aug_ctx* obj)
 {
@@ -155,6 +161,13 @@ getexcept_(aug_ctx* obj)
     return impl->except_;
 }
 
+static unsigned
+getexmask_(aug_ctx* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
+    return impl->exmask_;
+}
+
 static struct aug_errinfo*
 geterrinfo_(aug_ctx* obj)
 {
@@ -169,18 +182,20 @@ static const struct aug_ctxvtbl vtbl_ = {
     setlog_,
     setloglevel_,
     setexcept_,
+    setexmask_,
     getmpool_,
     getclock_,
     getlog_,
     getloglevel_,
     getexcept_,
+    getexmask_,
     geterrinfo_
 };
 
-static aug_result
+static aug_bool
 vctxlog_(aug_ctx* ctx, unsigned level, const char* format, va_list args)
 {
-    aug_result result = 0;
+    aug_bool result = 0;
     assert(ctx);
     if (level <= aug_getloglevel(ctx)) {
         aug_log* log = aug_getlog(ctx);
@@ -225,6 +240,7 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log,
     impl->log_ = log;
     impl->loglevel_ = loglevel;
     impl->except_ = 0;
+    impl->exmask_ = AUG_EXALL;
     memset(&impl->errinfo_, 0, sizeof(impl->errinfo_));
 
     aug_retain(mpool);
@@ -258,16 +274,16 @@ aug_createbasicctx(aug_mpool* mpool)
     return ctx;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_vctxlog(aug_ctx* ctx, unsigned level, const char* format, va_list args)
 {
     return vctxlog_(ctx, level, format, args);
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxlog(aug_ctx* ctx, unsigned level, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, level, format, args);
@@ -275,10 +291,10 @@ aug_ctxlog(aug_ctx* ctx, unsigned level, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxcrit(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGCRIT, format, args);
@@ -286,10 +302,10 @@ aug_ctxcrit(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxerror(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGERROR, format, args);
@@ -297,10 +313,10 @@ aug_ctxerror(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxwarn(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGWARN, format, args);
@@ -308,10 +324,10 @@ aug_ctxwarn(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxnotice(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGNOTICE, format, args);
@@ -319,10 +335,10 @@ aug_ctxnotice(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxinfo(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGINFO, format, args);
@@ -330,10 +346,10 @@ aug_ctxinfo(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug0(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGDEBUG0, format, args);
@@ -341,10 +357,10 @@ aug_ctxdebug0(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug1(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGDEBUG0 + 1, format, args);
@@ -352,10 +368,10 @@ aug_ctxdebug1(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug2(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGDEBUG0 + 2, format, args);
@@ -363,10 +379,10 @@ aug_ctxdebug2(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug3(aug_ctx* ctx, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = vctxlog_(ctx, AUG_LOGDEBUG0 + 3, format, args);
@@ -374,7 +390,7 @@ aug_ctxdebug3(aug_ctx* ctx, const char* format, ...)
     return result;
 }
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_perrinfo(aug_ctx* ctx, const char* s, const struct aug_errinfo* errinfo)
 {
     const char* file;
@@ -383,7 +399,7 @@ aug_perrinfo(aug_ctx* ctx, const char* s, const struct aug_errinfo* errinfo)
 
     if (0 == errinfo->num_) {
         aug_ctxerror(ctx, "%s: no description available", s);
-        return 0;
+        return AUG_FALSE;
     }
 
     for (file = errinfo->file_; ; ++file)

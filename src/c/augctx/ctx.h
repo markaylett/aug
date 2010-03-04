@@ -49,10 +49,10 @@ aug_createbasicctx(aug_mpool* mpool);
  * @{
  */
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_vctxlog(aug_ctx* ctx, unsigned level, const char* format, va_list args);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxlog(aug_ctx* ctx, unsigned level, const char* format, ...);
 
 /** @} */
@@ -66,19 +66,19 @@ aug_ctxlog(aug_ctx* ctx, unsigned level, const char* format, ...);
  * @{
  */
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxcrit(aug_ctx* ctx, const char* format, ...);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxerror(aug_ctx* ctx, const char* format, ...);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxwarn(aug_ctx* ctx, const char* format, ...);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxnotice(aug_ctx* ctx, const char* format, ...);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxinfo(aug_ctx* ctx, const char* format, ...);
 
 /** @} */
@@ -87,16 +87,16 @@ aug_ctxinfo(aug_ctx* ctx, const char* format, ...);
  * Greater debug levels are supported by calling aug_ctxlog() directly.
  */
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug0(aug_ctx* ctx, const char* format, ...);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug1(aug_ctx* ctx, const char* format, ...);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug2(aug_ctx* ctx, const char* format, ...);
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_ctxdebug3(aug_ctx* ctx, const char* format, ...);
 
 #if !defined(NDEBUG)
@@ -111,7 +111,7 @@ aug_ctxdebug3(aug_ctx* ctx, const char* format, ...);
 # define AUG_CTXDEBUG3 1 ? (void)0 : (void)aug_ctxdebug3
 #endif /* NDEBUG */
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_perrinfo(aug_ctx* ctx, const char* s, const struct aug_errinfo* errinfo);
 
 #endif /* AUGCTX_CTX_H */

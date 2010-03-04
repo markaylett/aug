@@ -258,17 +258,28 @@ namespace aug {
     inline void
     throwexcept()
     {
-        switch (getexcept(aug_tlx)) {
+        ctxref ref(aug_tlx);
+        switch (getexcept(ref)) {
         case AUG_EXERROR:
-            throwerror();
+            if (getexmask(ref) & AUG_EXERROR)
+                throwerror();
+            break;
         case AUG_EXNONE:
-            throw none_exception();
+            if (getexmask(ref) & AUG_EXNONE)
+                throw none_exception();
+            break;
         case AUG_EXINTR:
-            throw intr_exception();
+            if (getexmask(ref) & AUG_EXINTR)
+                throw intr_exception();
+            break;
         case AUG_EXBLOCK:
-            throw block_exception();
+            if (getexmask(ref) & AUG_EXBLOCK)
+                throw block_exception();
+            break;
         case AUG_EXTIMEOUT:
-            throw timeout_exception();
+            if (getexmask(ref) & AUG_EXTIMEOUT)
+                throw timeout_exception();
+            break;
         };
     }
 

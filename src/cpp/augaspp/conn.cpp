@@ -78,7 +78,7 @@ namespace {
         unsigned ms(diffms(since, now));
 
         if (AUG_WRMAXWAIT < ms)
-            throw aug_error(__FILE__, __LINE__, AUG_ETIMEOUT,
+            throw aug_error(__FILE__, __LINE__, AUG_EIO,
                             "write wait exceeded: pending=[%u], since=[%u]",
                             static_cast<unsigned>(size), ms);
 
@@ -110,7 +110,7 @@ namespace {
             return;
 
         if (AUG_WRMAXTIME < estms)
-            throw aug_error(__FILE__, __LINE__, AUG_ETIMEOUT,
+            throw aug_error(__FILE__, __LINE__, AUG_EIO,
                             "write time exceeded: perms=[%u], estms=[%u]",
                             perms, estms);
 

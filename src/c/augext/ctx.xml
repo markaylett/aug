@@ -44,6 +44,10 @@
       <param name="except" type="unsigned"/>
     </method>
 
+    <method name="setexmask" type="void" qname="setexmask">
+      <param name="exmask" type="unsigned"/>
+    </method>
+
     <method name="getmpool" type="aug_mpool" object="true" qname="getmpool"/>
 
     <method name="getclock" type="aug_clock" object="true" qname="getclock"/>
@@ -53,6 +57,8 @@
     <method name="getloglevel" type="unsigned" qname="getloglevel"/>
 
     <method name="getexcept" type="unsigned" qname="getexcept"/>
+
+    <method name="getexmask" type="unsigned" qname="getexmask"/>
 
     <method name="geterrinfo" type="struct aug_errinfo&" qname="geterrinfo"/>
 

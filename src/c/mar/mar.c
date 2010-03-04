@@ -429,7 +429,7 @@ main(int argc, char* argv[])
 
     if (atexit(exit_) < 0) {
         aug_perrinfo(aug_tlx, "atexit() failed", NULL);
-        goto fail;
+        return 1;
     }
 
     while ((ch = aug_getopt(argc, argv, OPTIONS_)) < 0)
