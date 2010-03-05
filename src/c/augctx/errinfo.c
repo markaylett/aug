@@ -86,7 +86,7 @@ aug_clearerrinfo(struct aug_errinfo* errinfo)
 AUGCTX_API void
 aug_clearctxerror(aug_ctx* ctx)
 {
-    aug_setexcept(ctx, AUG_EXERROR);
+    aug_setexcept(ctx, 0);
     aug_clearerrinfo(aug_geterrinfo(ctx));
 }
 

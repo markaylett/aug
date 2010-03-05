@@ -32,7 +32,7 @@ struct aug_options;
 /**
  * Called from aug_main().
  *
- * @return On Windows, #AUG_FAILNONE if the service has not been installed.
+ * @return On Windows, #AUG_EXNONE if the service has not been installed.
  */
 
 AUGSERV_API aug_result

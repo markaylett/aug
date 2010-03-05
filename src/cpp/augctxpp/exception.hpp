@@ -260,9 +260,8 @@ namespace aug {
     {
         switch (except) {
         case AUG_EXERROR:
-            if (mask & AUG_EXERROR)
-                throwerror();
-            break;
+            // Always throw errors.
+            throwerror();
         case AUG_EXNONE:
             if (mask & AUG_EXNONE)
                 throw none_exception();
