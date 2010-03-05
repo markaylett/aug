@@ -36,7 +36,7 @@ namespace aug {
         verify(aug_appendwriter(writer, ref.get()));
     }
 
-    inline size_t
+    inline aug_rsize
     writesome(aug_writer_t writer, streamref ref)
     {
         return verify(aug_writesome(writer, ref.get()));
@@ -99,7 +99,7 @@ namespace aug {
             return aug::empty(writer_);
         }
 
-        size_t
+        aug_rsize
         size() const
         {
             return verify(aug_writersize(writer_));

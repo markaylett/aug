@@ -56,7 +56,7 @@ namespace aug {
     {
         autofd fd(aug_fopen(path, flags), close);
         if (null == fd)
-            throwerror();
+            throwexcept();
         return fd;
     }
 
@@ -65,7 +65,7 @@ namespace aug {
     {
         autofd fd(aug_fopen(path, flags, mode), close);
         if (null == fd)
-            throwerror();
+            throwexcept();
         return fd;
     }
 
@@ -77,13 +77,13 @@ namespace aug {
         return autofds(fds[0], fds[1], close);
     }
 
-    inline size_t
+    inline aug_rsize
     read(fdref ref, void* buf, size_t size)
     {
         return verify(aug_fread(ref.get(), buf, size));
     }
 
-    inline size_t
+    inline aug_rsize
     write(fdref ref, const void* buf, size_t size)
     {
         return verify(aug_fwrite(ref.get(), buf, size));

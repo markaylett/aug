@@ -58,7 +58,7 @@ namespace aug {
     {
         autosd sd(aug_socket(domain, type, protocol), close);
         if (null == sd)
-            throwerror();
+            throwexcept();
         return sd;
     }
 
@@ -67,7 +67,7 @@ namespace aug {
     {
         autosd sd(aug_accept(ref.get(), &ep), close);
         if (null == sd)
-            throwerror();
+            throwexcept();
         return sd;
     }
 
@@ -101,51 +101,51 @@ namespace aug {
         verify(aug_listen(ref.get(), backlog));
     }
 
-    inline size_t
+    inline aug_rsize
     recv(sdref ref, void* buf, size_t len, int flags)
     {
         return verify(aug_recv(ref.get(), buf, len, flags));
     }
 
-    inline size_t
+    inline aug_rsize
     recvfrom(sdref ref, void* buf, size_t len, int flags,
              aug_endpoint& ep)
     {
         return verify(aug_recvfrom(ref.get(), buf, len, flags, &ep));
     }
 
-    inline size_t
+    inline aug_rsize
     send(sdref ref, const void* buf, size_t len, int flags)
     {
         return verify(aug_send(ref.get(), buf, len, flags));
     }
 
-    inline size_t
+    inline aug_rsize
     sendto(sdref ref, const void* buf, size_t len, int flags,
            const aug_endpoint& ep)
     {
         return verify(aug_sendto(ref.get(), buf, len, flags, &ep));
     }
 
-    inline size_t
+    inline aug_rsize
     read(sdref ref, void* buf, size_t len)
     {
         return verify(aug_sread(ref.get(), buf, len));
     }
 
-    inline size_t
+    inline aug_rsize
     readv(sdref ref, const iovec* iov, int size)
     {
         return verify(aug_sreadv(ref.get(), iov, size));
     }
 
-    inline size_t
+    inline aug_rsize
     write(sdref ref, const void* buf, size_t len)
     {
         return verify(aug_swrite(ref.get(), buf, len));
     }
 
-    inline size_t
+    inline aug_rsize
     writev(sdref ref, const iovec* iov, int size)
     {
         return verify(aug_swritev(ref.get(), iov, size));
@@ -206,7 +206,7 @@ namespace aug {
     {
         if (!aug_inetpton(AF_INET, src, &dst)
             && !aug_inetpton(AF_INET6, src, &dst))
-            throwerror();
+            throwexcept();
         return dst;
     }
 

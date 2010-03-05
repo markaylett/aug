@@ -39,7 +39,7 @@ namespace aug {
     {
         autosd sd(aug_tcpclient(host, serv, &ep), close);
         if (null == sd)
-            throwerror();
+            throwexcept();
 
         return sd;
     }
@@ -49,7 +49,7 @@ namespace aug {
     {
         autosd sd(aug_tcpserver(host, serv, &ep), close);
         if (null == sd)
-            throwerror();
+            throwexcept();
 
         return sd;
     }
@@ -61,7 +61,7 @@ namespace aug {
         autosd sd(aug_udpclient(host, serv, &ep,
                                 connect ? AUG_TRUE : AUG_FALSE), close);
         if (null == sd)
-            throwerror();
+            throwexcept();
 
         return sd;
     }
@@ -71,7 +71,7 @@ namespace aug {
     {
         autosd sd(aug_udpserver(host, serv, &ep), close);
         if (null == sd)
-            throwerror();
+            throwexcept();
 
         return sd;
     }

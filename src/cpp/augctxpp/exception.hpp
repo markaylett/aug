@@ -256,31 +256,43 @@ namespace aug {
     }
 
     inline void
-    throwexcept()
+    throwexcept(unsigned mask, unsigned except)
     {
-        ctxref ref(aug_tlx);
-        switch (getexcept(ref)) {
+        switch (except) {
         case AUG_EXERROR:
-            if (getexmask(ref) & AUG_EXERROR)
+            if (mask & AUG_EXERROR)
                 throwerror();
             break;
         case AUG_EXNONE:
-            if (getexmask(ref) & AUG_EXNONE)
+            if (mask & AUG_EXNONE)
                 throw none_exception();
             break;
         case AUG_EXINTR:
-            if (getexmask(ref) & AUG_EXINTR)
+            if (mask & AUG_EXINTR)
                 throw intr_exception();
             break;
         case AUG_EXBLOCK:
-            if (getexmask(ref) & AUG_EXBLOCK)
+            if (mask & AUG_EXBLOCK)
                 throw block_exception();
             break;
         case AUG_EXTIMEOUT:
-            if (getexmask(ref) & AUG_EXTIMEOUT)
+            if (mask & AUG_EXTIMEOUT)
                 throw timeout_exception();
             break;
         };
+    }
+
+    inline void
+    throwexcept(unsigned mask)
+    {
+        throwexcept(mask, getexcept(aug_tlx));
+    }
+
+    inline void
+    throwexcept()
+    {
+        ctxref ref(aug_tlx);
+        throwexcept(getexmask(ref), getexcept(ref));
     }
 
     namespace detail {
@@ -292,6 +304,11 @@ namespace aug {
             {
                 return result < 0;
             }
+            static void
+            throwexcept()
+            {
+                throwexcept();
+            }
         };
 
         template <typename T>
@@ -300,6 +317,12 @@ namespace aug {
             isexcept(T* result)
             {
                 return 0 == result;
+            }
+            static void
+            throwexcept()
+            {
+                // Always throw to avoid de-referencing pointer type.
+                throwexcept(AUG_EXALL);
             }
         };
 
@@ -310,6 +333,11 @@ namespace aug {
             {
                 return !result;
             }
+            static void
+            throwexcept()
+            {
+                throwexcept();
+            }
        };
     }
 
@@ -318,7 +346,7 @@ namespace aug {
     verify(T result)
     {
         if (detail::result_traits<T>::isexcept(result))
-            throwexcept();
+            detail::result_traits<T>::throwexcept();
         return result;
     }
 }
