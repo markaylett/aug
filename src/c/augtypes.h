@@ -160,24 +160,27 @@ typedef ssize_t aug_rsize;
  * @{
  */
 
-#define AUG_EXERROR   0x01
+#define AUG_EXERROR 0x01
 
 /**
- * Empty or missing.
+ * Empty or missing entry.
  */
 
-#define AUG_EXNONE    0x02 /* ENOENT */
-#define AUG_EXINTR    0x04 /* EINTR, WSAEINTR */
+#define AUG_EXNONE 0x02 /* ENOENT */
+
+/**
+ * Interrupted system call.
+ */
+
+#define AUG_EXINTR  0x04 /* EINTR, WSAEINTR */
 
 /**
  * Blocked, busy or pending.
  */
 
-#define AUG_EXBLOCK   0x08 /* EWOULDBLOCK, WSAEWOULDBLOCK */
-#define AUG_EXTIMEOUT 0x10
+#define AUG_EXBLOCK 0x08 /* EAGAIN, EWOULDBLOCK, WSAEWOULDBLOCK */
 
-#define AUG_EXALL     (AUG_EXERROR | AUG_EXNONE | AUG_EXINTR | AUG_EXBLOCK \
-                       | AUG_EXTIMEOUT)
+#define AUG_EXALL   (AUG_EXERROR | AUG_EXNONE | AUG_EXINTR | AUG_EXBLOCK)
 
 /** @} */
 

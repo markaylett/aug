@@ -57,14 +57,6 @@ namespace aug {
         }
     };
 
-    struct timeout_exception : std::exception {
-        const char*
-        what() const throw() // required by gcc.
-        {
-            return "aug::timeout_exception";
-        }
-    };
-
     class errinfo_error : public std::exception {
     public:
         typedef aug_errinfo ctype;
@@ -273,10 +265,6 @@ namespace aug {
         case AUG_EXBLOCK:
             if (mask & AUG_EXBLOCK)
                 throw block_exception();
-            break;
-        case AUG_EXTIMEOUT:
-            if (mask & AUG_EXTIMEOUT)
-                throw timeout_exception();
             break;
         };
     }

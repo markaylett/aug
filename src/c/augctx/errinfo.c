@@ -137,6 +137,8 @@ aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     switch (num) {
     case EINTR:
         return AUG_EXINTR;
+    case ENOENT:
+        return AUG_EXNONE;
     case EWOULDBLOCK:
         return AUG_EXBLOCK;
     }
@@ -177,10 +179,12 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
 
     /* Map to exception code. */
 
-    switch (num) {
-    case WSAEINTR:
+    switch (aug_win32posix(num)) {
+    case EINTR:
         return AUG_EXINTR;
-    case WSAEWOULDBLOCK:
+    case ENOENT:
+        return AUG_EXNONE;
+    case EWOULDBLOCK:
         return AUG_EXBLOCK;
     }
     return AUG_EXERROR;
