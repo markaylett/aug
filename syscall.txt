@@ -1,0 +1,59 @@
+accept: aug_accept
+access: aug_control
+bind: aug_bind, aug_socketpair
+chdir: aug_chdir
+close: aug_openlog
+connect
+creat
+delete_module
+dup
+dup2
+execve
+fchdir
+fchmod
+fchown
+fcntl
+fork
+fstat
+fstatfs
+ftruncate
+getdents
+lchown
+link
+lstat
+madvise
+mincore
+mkdir
+mknod
+mlock
+mlockall
+mmap
+mount
+mprotect
+mremap
+msgget
+msgop
+munmap
+nanosleep
+open
+packet
+pause
+poll
+pselect
+query_module
+read
+readdir
+readlink
+readv
+recv
+recvfrom
+recvmsg
+rename
+rmdir
+select
+send
+sendmsg
+sigaction
+vfork
+wait4
+writev

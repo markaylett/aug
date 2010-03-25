@@ -9,4 +9,5 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	config.pl \
+	syscall.txt \
 	TODO
