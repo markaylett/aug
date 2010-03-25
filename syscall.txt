@@ -1,59 +1,65 @@
-accept: aug_accept
-access: aug_control
-bind: aug_bind, aug_socketpair
-chdir: aug_chdir
-close: aug_openlog
+  EAGAIN:
+
+  [accept]
+  [connect]
+  [fcntl]
+  [ftruncate]
+  [mmap]
+  [munmap]
+  [read]
+  [readv]
+  [recv]
+  [recvfrom]
+  [send]
+  [writev]
+
+  EINTR:
+
+  [accept]
+  [chdir]
+  [close]
+  [connect]
+  [dup2]
+  [fcntl]
+  [fstat]
+  [ftruncate]
+  [poll]
+  [read]
+  [readv]
+  [recv]
+  [recvfrom]
+  [select]
+  [send]
+  [sigaction]
+
+  NOENT:
+
+  [access]
+  [bind]
+  [chdir]
+  [fstat]
+  [open]
+
+syscall,EAGAIN,EINTR,NOENT,affected
+accept,yes,yes,no
+access,no,no,yes
+bind
+chdir
+close
 connect
-creat
-delete_module
-dup
 dup2
-execve
-fchdir
-fchmod
-fchown
 fcntl
-fork
 fstat
-fstatfs
 ftruncate
-getdents
-lchown
-link
-lstat
-madvise
-mincore
-mkdir
-mknod
-mlock
-mlockall
 mmap
-mount
-mprotect
-mremap
-msgget
-msgop
 munmap
-nanosleep
 open
-packet
-pause
 poll
-pselect
-query_module
 read
-readdir
-readlink
 readv
 recv
 recvfrom
-recvmsg
-rename
-rmdir
 select
 send
-sendmsg
 sigaction
-vfork
-wait4
 writev

@@ -47,6 +47,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
+    /* SYSCALL: fcntl */
     if (fcntl(fd, cmd, fl) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -126,12 +127,14 @@ aug_control(const struct aug_options* options, int event)
 
     /* Check for existence of file. */
 
+    /* SYSCALL: access */
     if (access(pidfile, F_OK) < 0) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
                         AUG_MSG("pidfile does not exist: %s"), pidfile);
         return -1;
     }
 
+    /* SYSCALL: open */
 	if ((fd = open(pidfile, O_RDONLY)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -175,6 +178,7 @@ aug_control(const struct aug_options* options, int event)
         result = -1;
     }
 
+    /* SYSCALL: close */
     close(fd);
     return result;
 }

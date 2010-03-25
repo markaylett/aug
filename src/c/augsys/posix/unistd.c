@@ -31,6 +31,7 @@
 AUGSYS_API aug_result
 aug_fclose(aug_fd fd)
 {
+    /* SYSCALL: close */
     if (close(fd) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -41,6 +42,7 @@ aug_fclose(aug_fd fd)
 AUGSYS_API aug_result
 aug_fsetnonblock(aug_fd fd, aug_bool on)
 {
+    /* SYSCALL: fcntl */
     int flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -52,6 +54,7 @@ aug_fsetnonblock(aug_fd fd, aug_bool on)
     else
         flags &= ~O_NONBLOCK;
 
+    /* SYSCALL: fcntl */
     if (fcntl(fd, F_SETFL, flags) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -71,6 +74,7 @@ aug_vfopen(const char* path, int flags, va_list args)
     else
         mode = 0;
 
+    /* SYSCALL: open */
     if ((fd = open(path, flags, mode)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -103,6 +107,7 @@ AUGSYS_API aug_rsize
 aug_fread(aug_fd fd, void* buf, size_t size)
 {
     ssize_t ret;
+    /* SYSCALL: read */
     if ((ret = read(fd, buf, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -134,6 +139,7 @@ aug_fsync(aug_fd fd)
 AUGSYS_API aug_result
 aug_ftruncate(aug_fd fd, off_t size)
 {
+    /* SYSCALL: ftruncate */
     if (ftruncate(fd, size) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -145,6 +151,7 @@ AUGSYS_API aug_result
 aug_fsize(aug_fd fd, size_t* size)
 {
     struct stat s;
+    /* SYSCALL: fstat */
     if (fstat(fd, &s) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

@@ -189,6 +189,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 
     ms = timeout ? aug_tvtoms(timeout) : -1;
 
+    /* SYSCALL: poll */
     if ((ret = poll(muxer->pollfds_, muxer->nfds_, ms)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -347,11 +348,13 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
         tv.tv_sec = timeout->tv_sec;
         tv.tv_usec = timeout->tv_usec;
 
+        /* SYSCALL: select */
         ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_, &muxer->out_.wr_,
                      &muxer->out_.ex_, &tv);
 
     } else {
 
+        /* SYSCALL: select */
         ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_, &muxer->out_.wr_,
                      &muxer->out_.ex_, NULL);
     }

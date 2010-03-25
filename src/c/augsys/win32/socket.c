@@ -42,6 +42,7 @@ streampair_(int protocol, aug_sd sv[2])
 	addr.sin_port = 0;
 	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
+    /* SYSCALL: bind */
 	if (SOCKET_ERROR == bind(l, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail2;
 
@@ -55,10 +56,12 @@ streampair_(int protocol, aug_sd sv[2])
 	if (INVALID_SOCKET == (c = socket(AF_INET, SOCK_STREAM, protocol)))
 		goto fail2;
 
+    /* SYSCALL: connect */
 	if (SOCKET_ERROR == connect(c, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail3;
 
 	len = sizeof(addr);
+    /* SYSCALL: accept */
 	if (INVALID_SOCKET == (s = accept(l, (struct sockaddr*)&addr, &len)))
 		goto fail3;
 
@@ -90,6 +93,7 @@ dgrampair_(int protocol, aug_sd sv[2])
 	addr.sin_port = 0;
 	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
+    /* SYSCALL: bind */
 	if (SOCKET_ERROR == bind(s, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail2;
 
@@ -100,6 +104,7 @@ dgrampair_(int protocol, aug_sd sv[2])
 	if (INVALID_SOCKET == (c = socket(AF_INET, SOCK_DGRAM, protocol)))
 		goto fail2;
 
+    /* SYSCALL: connect */
 	if (SOCKET_ERROR == connect(c, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail3;
 
@@ -153,6 +158,7 @@ aug_accept(aug_sd sd, struct aug_endpoint* ep)
 {
     SOCKET h;
     ep->len_ = AUG_MAXADDRLEN;
+    /* SYSCALL: accept */
     if (INVALID_SOCKET == (h = accept(sd, &ep->un_.sa_, &ep->len_)))
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
     return h;
@@ -161,6 +167,7 @@ aug_accept(aug_sd sd, struct aug_endpoint* ep)
 AUGSYS_API aug_result
 aug_bind(aug_sd sd, const struct aug_endpoint* ep)
 {
+    /* SYSCALL: bind */
     if (SOCKET_ERROR == bind(sd, &ep->un_.sa_, ep->len_)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
         return -1;
@@ -171,6 +178,7 @@ aug_bind(aug_sd sd, const struct aug_endpoint* ep)
 AUGSYS_API aug_result
 aug_connect(aug_sd sd, const struct aug_endpoint* ep)
 {
+    /* SYSCALL: connect */
     if (SOCKET_ERROR == connect(sd, &ep->un_.sa_, ep->len_)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
         return -1;
@@ -213,6 +221,7 @@ aug_listen(aug_sd sd, int backlog)
 AUGSYS_API aug_rsize
 aug_recv(aug_sd sd, void* buf, size_t len, int flags)
 {
+    /* SYSCALL: recv */
     ssize_t ret = recv(sd, buf, (int)len, flags);
     if (SOCKET_ERROR == ret) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
@@ -228,6 +237,7 @@ aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
     ssize_t ret;
     ep->len_ = AUG_MAXADDRLEN;
 
+    /* SYSCALL: recvfrom */
     ret = recvfrom(sd, buf, (int)len, flags, &ep->un_.sa_, &ep->len_);
     if (SOCKET_ERROR == ret) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
@@ -239,6 +249,7 @@ aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
 AUGSYS_API aug_rsize
 aug_send(aug_sd sd, const void* buf, size_t len, int flags)
 {
+    /* SYSCALL: send */
     ssize_t ret = send(sd, buf, (int)len, flags);
     if (SOCKET_ERROR == ret) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());

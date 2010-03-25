@@ -47,6 +47,7 @@ static void
 closeall_(int next)
 {
     int limit = getdtablesize();
+    /* SYSCALL: close */
     for (; next <= limit; ++next)
         close(next);
 }
@@ -143,6 +144,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
+    /* SYSCALL: fcntl */
     if (fcntl(fd, cmd, fl) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -157,6 +159,7 @@ lockfile_(const char* path)
     struct flock fl;
     int fd;
 
+    /* SYSCALL: open */
     if ((fd = open(path, O_CREAT | O_WRONLY, 0640)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -179,6 +182,7 @@ lockfile_(const char* path)
 
     /* Truncate any existing pid value. */
 
+    /* SYSCALL: ftruncate */
     if (ftruncate(fd, 0) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         goto fail;
@@ -192,6 +196,7 @@ lockfile_(const char* path)
     return 0;
 
  fail:
+    /* SYSCALL: close */
     close(fd);
     return -1;
 }
@@ -207,12 +212,14 @@ closein_(void)
         return -1;
     }
 
+    /* SYSCALL: dup2 */
     if (dup2(fd, STDIN_FILENO) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         result = -1;
     } else
         result = 0;
 
+    /* SYSCALL: close */
     close(fd);
     return result;
 }

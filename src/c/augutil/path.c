@@ -70,6 +70,7 @@ aug_basename(const char* path)
 AUGUTIL_API aug_result
 aug_chdir(const char* path)
 {
+    /* SYSCALL: chdir */
 #if !defined(_WIN32)
     if (chdir(path) < 0)
 #else /* _WIN32 */

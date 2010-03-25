@@ -70,12 +70,14 @@ setpath_(void)
 
     /* Path may be relative to run directory. */
 
+    /* SYSCALL: chdir */
     if ((s = mod_getenv("rundir", NULL)))
         chdir(s);
 
     s = mod_getenv("module.augpy.pythonpath", "python");
     mod_writelog(MOD_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
-    chdir(s);
+    /* SYSCALL: chdir */
+    chdir(os);
 
     if ((sys = PyImport_ImportModule("sys"))) {
 
@@ -104,6 +106,7 @@ setpath_(void)
 
     /* Restore previous working directory. */
 
+    /* SYSCALL: chdir */
     chdir(prev);
 }
 
