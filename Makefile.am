@@ -9,5 +9,5 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	config.pl \
-	syscall.txt \
+	syscall.csv \
 	TODO

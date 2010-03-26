@@ -54,6 +54,8 @@ AUG_RCSID("$Id$");
 # define STDERR_FILENO 2
 #endif /* !STDERR_FILENO */
 
+/* SYSCALL: dup */
+/* SYSCALL: dup2 */
 static aug_result
 redirectout_(int fd)
 {
@@ -69,6 +71,7 @@ redirectout_(int fd)
 
     /* Duplicate stdout descriptor so that it can be restored on failure. */
 
+    /* SYSCALL: dup */
 #if !defined(_WIN32)
     if ((old = dup(STDOUT_FILENO)) < 0)
 #else /* _WIN32 */
@@ -133,6 +136,9 @@ redirectout_(int fd)
     return result;
 }
 
+/* SYSCALL: dup */
+/* SYSCALL: dup2 */
+/* SYSCALL: open */
 AUGSERV_API aug_result
 aug_openlog(const char* path)
 {
@@ -150,6 +156,8 @@ aug_openlog(const char* path)
         return -1;
     }
 
+    /* SYSCALL: dup */
+    /* SYSCALL: dup2 */
     result = redirectout_(fd);
 
     /* SYSCALL: close */

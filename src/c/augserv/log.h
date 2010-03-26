@@ -31,8 +31,9 @@
  * Re-direct standard file handles to specified log.
  */
 
-/* SYSCALL: close */
-
+/* SYSCALL: dup */
+/* SYSCALL: dup2 */
+/* SYSCALL: open */
 AUGSERV_API aug_result
 aug_openlog(const char* path);
 

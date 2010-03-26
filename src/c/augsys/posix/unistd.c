@@ -96,6 +96,7 @@ aug_fopen(const char* path, int flags, ...)
 AUGSYS_API aug_result
 aug_fpipe(aug_fd fds[2])
 {
+    /* SYSCALL: pipe */
     if (pipe(fds) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -119,6 +120,7 @@ AUGSYS_API aug_rsize
 aug_fwrite(aug_fd fd, const void* buf, size_t size)
 {
     ssize_t ret;
+    /* SYSCALL: write */
     if ((ret = write(fd, buf, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -129,6 +131,7 @@ aug_fwrite(aug_fd fd, const void* buf, size_t size)
 AUGSYS_API aug_result
 aug_fsync(aug_fd fd)
 {
+    /* SYSCALL: fsync */
     if (fsync(fd) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -164,5 +167,6 @@ aug_fsize(aug_fd fd, size_t* size)
 AUGSYS_API void
 aug_msleep(unsigned ms)
 {
+    /* SYSCALL: usleep */
     usleep(ms * 1000);
 }

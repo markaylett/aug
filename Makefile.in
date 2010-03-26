@@ -223,7 +223,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	config.pl \
-	syscall.txt \
+	syscall.csv \
 	TODO
 
 all: all-recursive

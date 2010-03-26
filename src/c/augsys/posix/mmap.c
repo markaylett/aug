@@ -188,6 +188,7 @@ AUGSYS_API aug_result
 aug_syncmmap(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
+    /* SIGCALL: msync: */
     if (msync(impl->mmap_.addr_, impl->mmap_.len_, MS_SYNC) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

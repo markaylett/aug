@@ -35,6 +35,9 @@ struct aug_options;
  * @return On Windows, #AUG_EXNONE if the service has not been installed.
  */
 
+/* SYSCALL: fcntl */
+/* SYSCALL: ftruncate */
+/* SYSCALL: open */
 AUGSERV_API aug_result
 aug_daemonise(const struct aug_options* options);
 

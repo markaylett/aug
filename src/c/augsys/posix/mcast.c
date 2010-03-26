@@ -41,6 +41,7 @@ getifaddr_(aug_sd sd, struct in_addr* addr, const char* ifname)
     struct ifreq ifreq;
     aug_strlcpy(ifreq.ifr_name, ifname, sizeof(ifreq.ifr_name));
 
+    /* SIGCALL: ioctl: */
     if (ioctl(sd, SIOCGIFADDR, &ifreq) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

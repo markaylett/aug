@@ -98,6 +98,7 @@ aug_sigblock(void)
     }
 
 #else /* !ENABLE_THREADS */
+    /* SIGCALL: sigprocmask: */
     if (sigprocmask(SIG_SETMASK, &set, NULL) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -118,6 +119,7 @@ aug_sigunblock(void)
         return -1;
     }
 #else /* !ENABLE_THREADS */
+    /* SIGCALL: sigprocmask: */
     if (sigprocmask(SIG_SETMASK, &set, NULL) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
