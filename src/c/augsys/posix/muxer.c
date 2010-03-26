@@ -181,7 +181,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 }
 
 AUGSYS_API aug_rint
-aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
+aug_waitmdevents_i(aug_muxer_t muxer, const struct aug_timeval* timeout)
 {
     int ms, ret;
 
@@ -189,7 +189,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 
     ms = timeout ? aug_tvtoms(timeout) : -1;
 
-    /* SYSCALL: poll */
+    /* SYSCALL: poll: EINTR */
     if ((ret = poll(muxer->pollfds_, muxer->nfds_, ms)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -336,7 +336,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 }
 
 AUGSYS_API aug_rint
-aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
+aug_waitmdevents_i(aug_muxer_t muxer, const struct aug_timeval* timeout)
 {
     int ret;
 
@@ -348,13 +348,13 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
         tv.tv_sec = timeout->tv_sec;
         tv.tv_usec = timeout->tv_usec;
 
-        /* SYSCALL: select */
+        /* SYSCALL: select: EINTR */
         ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_, &muxer->out_.wr_,
                      &muxer->out_.ex_, &tv);
 
     } else {
 
-        /* SYSCALL: select */
+        /* SYSCALL: select: EINTR */
         ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_, &muxer->out_.wr_,
                      &muxer->out_.ex_, NULL);
     }

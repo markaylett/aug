@@ -126,12 +126,8 @@ aug_ssetnonblock(aug_sd sd, aug_bool on);
 AUGSYS_API aug_sd
 aug_socket(int domain, int type, int protocol);
 
-/* SYSCALL: accept */
-
 AUGSYS_API aug_sd
 aug_accept(aug_sd sd, struct aug_endpoint* ep);
-
-/* SYSCALL: bind */
 
 AUGSYS_API aug_result
 aug_bind(aug_sd sd, const struct aug_endpoint* ep);
@@ -207,8 +203,6 @@ aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
 
 AUGSYS_API aug_result
 aug_sshutdown(aug_sd sd, int how);
-
-/* SYSCALL: bind */
 
 AUGSYS_API aug_result
 aug_socketpair(int domain, int type, int protocol, aug_sd sv[2]);

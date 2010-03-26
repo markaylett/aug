@@ -43,7 +43,6 @@ aug_ssetnonblock(aug_sd sd, aug_bool on)
 AUGSYS_API int
 aug_socket(int domain, int type, int protocol)
 {
-    /* SYSCALL: socket */
     int fd = socket(domain, type, protocol);
     if (fd < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -54,20 +53,20 @@ aug_socket(int domain, int type, int protocol)
 }
 
 AUGSYS_API aug_sd
-aug_accept(aug_sd sd, struct aug_endpoint* ep)
+aug_accept_ai(aug_sd sd, struct aug_endpoint* ep)
 {
     int fd;
     ep->len_ = AUG_MAXADDRLEN;
-    /* SYSCALL: accept */
+    /* SYSCALL: accept: EAGAIN, EINTR */
     if ((fd = accept(sd,  &ep->un_.sa_, &ep->len_)) < 0)
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     return fd;
 }
 
 AUGSYS_API aug_result
-aug_bind(aug_sd sd, const struct aug_endpoint* ep)
+aug_bind_n(aug_sd sd, const struct aug_endpoint* ep)
 {
-    /* SYSCALL: bind */
+    /* SYSCALL: bind: ENOENT */
     if (bind(sd, &ep->un_.sa_, ep->len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -76,9 +75,9 @@ aug_bind(aug_sd sd, const struct aug_endpoint* ep)
 }
 
 AUGSYS_API aug_result
-aug_connect(aug_sd sd, const struct aug_endpoint* ep)
+aug_connect_ai(aug_sd sd, const struct aug_endpoint* ep)
 {
-    /* SYSCALL: connect */
+    /* SYSCALL: connect: EAGAIN, EINTR */
     if (connect(sd, &ep->un_.sa_, ep->len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -90,7 +89,6 @@ AUGSYS_API struct aug_endpoint*
 aug_getpeername(aug_sd sd, struct aug_endpoint* ep)
 {
     ep->len_ = AUG_MAXADDRLEN;
-    /* SYSCALL: getpeername */
     if (getpeername(sd, &ep->un_.sa_, &ep->len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
@@ -102,7 +100,6 @@ AUGSYS_API struct aug_endpoint*
 aug_getsockname(aug_sd sd, struct aug_endpoint* ep)
 {
     ep->len_ = AUG_MAXADDRLEN;
-    /* SYSCALL: getsockname */
     if (getsockname(sd, &ep->un_.sa_, &ep->len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
@@ -113,7 +110,6 @@ aug_getsockname(aug_sd sd, struct aug_endpoint* ep)
 AUGSYS_API aug_result
 aug_listen(aug_sd sd, int backlog)
 {
-    /* SYSCALL: listen */
     if (listen(sd, backlog) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -122,9 +118,9 @@ aug_listen(aug_sd sd, int backlog)
 }
 
 AUGSYS_API aug_rsize
-aug_recv(aug_sd sd, void* buf, size_t len, int flags)
+aug_recv_ai(aug_sd sd, void* buf, size_t len, int flags)
 {
-    /* SYSCALL: recv */
+    /* SYSCALL: recv: EAGAIN, EINTR */
     ssize_t ret = recv(sd, buf, len, flags);
     if (ret < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -134,12 +130,12 @@ aug_recv(aug_sd sd, void* buf, size_t len, int flags)
 }
 
 AUGSYS_API aug_rsize
-aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
-             struct aug_endpoint* ep)
+aug_recvfrom_ai(aug_sd sd, void* buf, size_t len, int flags,
+                struct aug_endpoint* ep)
 {
     ssize_t ret;
     ep->len_ = AUG_MAXADDRLEN;
-    /* SYSCALL: recvfrom */
+    /* SYSCALL: recvfrom: EAGAIN, EINTR */
     if ((ret = recvfrom(sd, buf, len, flags, &ep->un_.sa_, &ep->len_)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -148,9 +144,9 @@ aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
 }
 
 AUGSYS_API aug_rsize
-aug_send(aug_sd sd, const void* buf, size_t len, int flags)
+aug_send_ai(aug_sd sd, const void* buf, size_t len, int flags)
 {
-    /* SYSCALL: send */
+    /* SYSCALL: send: EAGAIN, EINTR */
     ssize_t ret = send(sd, buf, len, flags);
     if (ret < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);

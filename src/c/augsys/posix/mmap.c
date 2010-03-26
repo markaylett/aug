@@ -89,14 +89,14 @@ verify_(size_t size, size_t offset, size_t len)
 }
 
 static aug_result
-createmmap_(impl_t impl, size_t offset, size_t len)
+createmmap_a_(impl_t impl, size_t offset, size_t len)
 {
     void* addr;
 
     if (!len)
         len = impl->size_ - offset;
 
-    /* SYSCALL: mmap */
+    /* SYSCALL: mmap: EAGAIN */
     if (MAP_FAILED == (addr = mmap(NULL, len, impl->prot_, MAP_SHARED,
                                    impl->fd_, (off_t)offset))) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -109,9 +109,9 @@ createmmap_(impl_t impl, size_t offset, size_t len)
 }
 
 static aug_result
-destroymmap_(impl_t impl)
+destroymmap_a_(impl_t impl)
 {
-    /* SYSCALL: munmap */
+    /* SYSCALL: munmap: EAGAIN */
     if (impl->mmap_.addr_
         && munmap(impl->mmap_.addr_, impl->mmap_.len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -122,18 +122,18 @@ destroymmap_(impl_t impl)
 }
 
 AUGSYS_API void
-aug_destroymmap(struct aug_mmap* mm)
+aug_destroymmap_a(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     aug_mpool* mpool = impl->mpool_;
-    destroymmap_(impl);
+    destroymmap_a_(impl);
     aug_freemem(mpool, impl);
     aug_release(mpool);
 }
 
 AUGSYS_API struct aug_mmap*
-aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
-               int flags)
+aug_createmmap_a(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+                 int flags)
 {
     impl_t impl;
     int prot;
@@ -152,7 +152,7 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     impl->prot_ = prot;
     impl->size_ = size;
 
-    if (createmmap_(impl, offset, len) < 0) {
+    if (createmmap_a_(impl, offset, len) < 0) {
         aug_freemem(mpool, impl);
         return NULL;
     }
@@ -161,7 +161,7 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
 }
 
 AUGSYS_API aug_result
-aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
+aug_remmap_a(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;
@@ -181,7 +181,7 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
     if (verify_(impl->size_, offset, len) < 0)
         return -1;
 
-    return createmmap_(impl, offset, len);
+    return createmmap_a_(impl, offset, len);
 }
 
 AUGSYS_API aug_result
