@@ -398,7 +398,7 @@ aug_sshutdown(aug_sd sd, int how)
 }
 
 AUGSYS_API aug_result
-aug_socketpair(int domain, int type, int protocol, aug_sd sv[2])
+aug_socketpair_AIN(int domain, int type, int protocol, aug_sd sv[2])
 {
     if (AF_UNIX != domain) {
         SETAFNOSUPPORT_();

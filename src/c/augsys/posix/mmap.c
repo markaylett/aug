@@ -122,17 +122,17 @@ destroymmap_A_(impl_t impl)
 }
 
 AUGSYS_API void
-aug_destroymmap_a(struct aug_mmap* mm)
+aug_destroymmap_A(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     aug_mpool* mpool = impl->mpool_;
-    destroymmap_a_(impl);
+    destroymmap_A_(impl);
     aug_freemem(mpool, impl);
     aug_release(mpool);
 }
 
 AUGSYS_API struct aug_mmap*
-aug_createmmap_a(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+aug_createmmap_A(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
                  int flags)
 {
     impl_t impl;
@@ -152,7 +152,7 @@ aug_createmmap_a(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     impl->prot_ = prot;
     impl->size_ = size;
 
-    if (createmmap_a_(impl, offset, len) < 0) {
+    if (createmmap_A_(impl, offset, len) < 0) {
         aug_freemem(mpool, impl);
         return NULL;
     }
@@ -168,7 +168,7 @@ aug_remmap_A(struct aug_mmap* mm, size_t offset, size_t len)
 
     impl->mmap_.addr_ = NULL;
 
-    /* SYSCALL: munmap: EINTR */
+    /* SYSCALL: munmap: EAGAIN */
     if (addr && munmap(addr, impl->mmap_.len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

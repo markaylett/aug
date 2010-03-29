@@ -205,7 +205,7 @@ AUGSYS_API aug_result
 aug_sshutdown(aug_sd sd, int how);
 
 AUGSYS_API aug_result
-aug_socketpair(int domain, int type, int protocol, aug_sd sv[2]);
+aug_socketpair_AIN(int domain, int type, int protocol, aug_sd sv[2]);
 
 AUGSYS_API char*
 aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len);

@@ -51,6 +51,7 @@ getifaddr_(aug_sd sd, struct in_addr* addr, const char* ifname)
     return 0;
 }
 
+#if 0
 static aug_result
 getifindex_(unsigned* index, const char* ifname)
 {
@@ -60,6 +61,7 @@ getifindex_(unsigned* index, const char* ifname)
     }
     return 0;
 }
+#endif
 
 AUGSYS_API aug_result
 aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
