@@ -26,10 +26,10 @@
 #include <errno.h>
 
 AUGSYS_API aug_rsize
-aug_freadv(aug_fd fd, const struct iovec* iov, int size)
+aug_freadv_AI(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
-    /* SYSCALL: readv */
+    /* SYSCALL: readv: EAGAIN, EINTR */
     if ((ret = readv(fd, iov, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -38,10 +38,10 @@ aug_freadv(aug_fd fd, const struct iovec* iov, int size)
 }
 
 AUGSYS_API aug_rsize
-aug_fwritev(aug_fd fd, const struct iovec* iov, int size)
+aug_fwritev_AI(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
-    /* SYSCALL: writev */
+    /* SYSCALL: writev: EAGAIN, EINTR */
     if ((ret = writev(fd, iov, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

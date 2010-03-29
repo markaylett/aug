@@ -107,7 +107,7 @@ namespace {
         // lstat() is used so that the link, rather than the file it
         // references, is stat()-ed.
 
-        /* SYSCALL: lstat */
+        /* SYSCALL: lstat: ENOENT */
 		if (::lstat(path, &sb) < 0) {
             if (ENOENT != errno)
                 throw posix_error(__FILE__, __LINE__, errno);

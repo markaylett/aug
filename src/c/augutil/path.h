@@ -38,8 +38,6 @@
 AUGUTIL_API const char*
 aug_basename(const char* path);
 
-/* SYSCALL: chdir */
-
 AUGUTIL_API aug_result
 aug_chdir(const char* path);
 

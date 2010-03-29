@@ -68,9 +68,9 @@ aug_basename(const char* path)
 }
 
 AUGUTIL_API aug_result
-aug_chdir(const char* path)
+aug_chdir_IN(const char* path)
 {
-    /* SYSCALL: chdir */
+    /* SYSCALL: chdir: EINTR, ENOENT */
 #if !defined(_WIN32)
     if (chdir(path) < 0)
 #else /* _WIN32 */
@@ -86,7 +86,6 @@ aug_chdir(const char* path)
 AUGUTIL_API char*
 aug_getcwd(char* dst, size_t size)
 {
-    /* SYSCALL: getcwd */
 #if !defined(_WIN32)
     if (!getcwd(dst, size)) {
 #else /* _WIN32 */
@@ -213,7 +212,7 @@ aug_joinpath(const char* dir, const char* path, char* dst, size_t size)
 }
 
 AUGUTIL_API char*
-aug_realpath(const char* src, char* dst, size_t size)
+aug_realpath_N(const char* src, char* dst, size_t size)
 {
 #if !defined(_WIN32)
     int pathmax;
@@ -222,7 +221,6 @@ aug_realpath(const char* src, char* dst, size_t size)
     /* FIXME: The following sequence attempts to provide a safe implementation
        of realpath().  Verify that this is indeed the case. */
 
-    /* SYSCALL: pathconf */
     if ((pathmax = pathconf(src, _PC_PATH_MAX)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
@@ -233,7 +231,7 @@ aug_realpath(const char* src, char* dst, size_t size)
         return NULL;
     }
 
-    /* SYSCALL: realpath */
+    /* SYSCALL: realpath: ENOENT */
     if (!realpath(src, buf)) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;

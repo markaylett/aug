@@ -37,9 +37,8 @@
 #include <strings.h>        /* bzero() */
 #include <unistd.h>
 
-/* SYSCALL: fcntl */
 static aug_result
-flock_(struct flock* fl, int fd, int cmd, int type)
+flock_AI_(struct flock* fl, int fd, int cmd, int type)
 {
     bzero(fl, sizeof(*fl));
 
@@ -48,7 +47,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
-    /* SYSCALL: fcntl */
+    /* SYSCALL: fcntl: EAGAIN, EINTR */
     if (fcntl(fd, cmd, fl) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -57,8 +56,6 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     return 0;
 }
 
-/* SYSCALL: fcntl */
-/* SYSCALL: kill */
 static aug_result
 send_(int fd, pid_t pid, int event)
 {
@@ -66,21 +63,18 @@ send_(int fd, pid_t pid, int event)
 
     switch (event) {
     case AUG_EVENTRECONF:
-        /* SYSCALL: kill */
         if (kill(pid, SIGHUP) < 0) {
             aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
             return -1;
         }
         break;
     case AUG_EVENTSTATUS:
-        /* SYSCALL: kill */
         if (kill(pid, SIGUSR1) < 0) {
             aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
             return -1;
         }
         break;
     case AUG_EVENTSTOP:
-        /* SYSCALL: kill */
         if (kill(pid, SIGTERM) < 0) {
             aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
             return -1;
@@ -88,7 +82,6 @@ send_(int fd, pid_t pid, int event)
 
         /* Wait for daemon process to release lock. */
 
-        /* SYSCALL: fcntl */
         if (flock_(&fl, fd, F_SETLKW, F_RDLCK) < 0)
             return -1;
 
@@ -114,13 +107,8 @@ aug_start(const struct aug_options* options)
     return -1;
 }
 
-/* SYSCALL: access */
-/* SYSCALL: fcntl */
-/* SYSCALL: kill */
-/* SYSCALL: open */
-/* SYSCALL: unlink */
 AUGSERV_API aug_result
-aug_control(const struct aug_options* options, int event)
+aug_control_N(const struct aug_options* options, int event)
 {
     const char* pidfile;
     struct flock fl;
@@ -139,14 +127,14 @@ aug_control(const struct aug_options* options, int event)
 
     /* Check for existence of file. */
 
-    /* SYSCALL: access */
+    /* SYSCALL: access: ENOENT */
     if (access(pidfile, F_OK) < 0) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
                         AUG_MSG("pidfile does not exist: %s"), pidfile);
         return -1;
     }
 
-    /* SYSCALL: open */
+    /* SYSCALL: open: ENOENT */
 	if ((fd = open(pidfile, O_RDONLY)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -154,13 +142,11 @@ aug_control(const struct aug_options* options, int event)
 
     /* Attempt to obtain shared lock. */
 
-    /* SYSCALL: fcntl */
     if (flock_(&fl, fd, F_SETLK, F_RDLCK) < 0) {
 
         /* As expected, the daemon process has an exclusive lock on the pid
            file.  Use F_GETLK to obtain the pid of the daemon process. */
 
-        /* SYSCALL: fcntl */
         if (0 <= flock_(&fl, fd, F_GETLK, F_RDLCK)) {
 
             /* Although a lock-manager allows locking over NFS, the returned
@@ -175,8 +161,6 @@ aug_control(const struct aug_options* options, int event)
                 result = -1;
 
             } else {
-                /* SYSCALL: fcntl */
-                /* SYSCALL: kill */
                 result = send_(fd, fl.l_pid, event);
             }
         } else
@@ -187,7 +171,7 @@ aug_control(const struct aug_options* options, int event)
         /* The lock was obtained, therefore, the daemon process cannot be
            running. */
 
-        /* SYSCALL: unlink */
+        /* SYSCALL: unlink: ENOENT */
         if (unlink(pidfile) < 0)
             aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         else
@@ -196,7 +180,7 @@ aug_control(const struct aug_options* options, int event)
         result = -1;
     }
 
-    /* SYSCALL: close */
+    /* SYSCALL: close: EINTR */
     close(fd);
     return result;
 }

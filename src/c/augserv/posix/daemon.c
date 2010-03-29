@@ -47,15 +47,15 @@ static void
 closeall_(int next)
 {
     int limit = getdtablesize();
-    /* SYSCALL: close */
+    /* SYSCALL: close: EINTR */
     for (; next <= limit; ++next)
         close(next);
 }
 
 static aug_result
-daemonise_(void)
+daemonise_A_(void)
 {
-    /* SYSCALL: fork */
+    /* SYSCALL: fork: EAGAIN */
     switch (fork()) {
     case 0:
         break;
@@ -65,14 +65,12 @@ daemonise_(void)
     default:
         /* Use system version of exit to avoid flushing standard
            streams. */
-        /* SYSCALL: _exit */
         _exit(0);
     }
 
     /* Detach from controlling terminal by making process a session
        leader. */
 
-    /* SYSCALL: setsid */
     if (setsid() < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -81,7 +79,7 @@ daemonise_(void)
     /* Forking again ensures that the daemon process is not a session leader,
        and therefore cannot regain access to a controlling terminal. */
 
-    /* SYSCALL: fork */
+    /* SYSCALL: fork: EAGAIN */
     switch (fork()) {
     case 0:
         break;
@@ -90,14 +88,12 @@ daemonise_(void)
         return -1;
     default:
         /* Use system version of exit to avoid flushing standard streams. */
-        /* SYSCALL: _exit */
         _exit(0);
     }
 
     /* Restrict file creation mode. */
     /* No need to check the return value: it is the previous value of the file
        mode mask. This function is always successful */
-    /* SYSCALL: umask */
     umask(0027);
 
     /* Leave both the standard file descriptors (3), and the signal pipe
@@ -114,9 +110,8 @@ digits_(unsigned long n)
 }
 
 static aug_result
-writepid_(int fd)
+writepid_AI_(int fd)
 {
-    /* SYSCALL: getpid */
     pid_t pid = getpid();
     size_t len = digits_(pid) + 1; /* One for newline. */
     char* str = alloca(sizeof(char) * (len + 1));
@@ -133,7 +128,7 @@ writepid_(int fd)
         return -1;
     }
 
-    /* SYSCALL: write */
+    /* SYSCALL: write: EAGAIN, EINTR */
     if (len != write(fd, str, len) || fsync(fd) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -142,9 +137,8 @@ writepid_(int fd)
     return 0;
 }
 
-/* SYSCALL: fcntl */
 static aug_result
-flock_(struct flock* fl, int fd, int cmd, int type)
+flock_AI_(struct flock* fl, int fd, int cmd, int type)
 {
     bzero(fl, sizeof(*fl));
 
@@ -153,7 +147,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
-    /* SYSCALL: fcntl */
+    /* SYSCALL: fcntl: EAGAIN, EINTR */
     if (fcntl(fd, cmd, fl) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -162,16 +156,13 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     return 0;
 }
 
-/* SYSCALL: fcntl */
-/* SYSCALL: ftruncate */
-/* SYSCALL: open */
 static aug_result
-lockfile_(const char* path)
+lockfile_AIN_(const char* path)
 {
     struct flock fl;
     int fd;
 
-    /* SYSCALL: open */
+    /* SYSCALL: open: ENOENT */
     if ((fd = open(path, O_CREAT | O_WRONLY, 0640)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -179,7 +170,6 @@ lockfile_(const char* path)
 
     /* Attempt to obtain exclusive lock. */
 
-    /* SYSCALL: fcntl */
     if (flock_(&fl, fd, F_SETLK, F_WRLCK) < 0) {
 
         if (AUG_EXBLOCK == aug_getexcept(aug_tlx)) {
@@ -195,7 +185,7 @@ lockfile_(const char* path)
 
     /* Truncate any existing pid value. */
 
-    /* SYSCALL: ftruncate */
+    /* SYSCALL: ftruncate: EAGAIN, EINTR */
     if (ftruncate(fd, 0) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         goto fail;
@@ -209,40 +199,35 @@ lockfile_(const char* path)
     return 0;
 
  fail:
-    /* SYSCALL: close */
+    /* SYSCALL: close: EINTR */
     close(fd);
     return -1;
 }
 
-/* SYSCALL: dup2 */
-/* SYSCALL: open */
 static aug_result
-closein_(void)
+closein_IN_(void)
 {
     int fd;
     aug_result result;
 
-    /* SYSCALL: open */
+    /* SYSCALL: open: ENOENT */
 	if ((fd = open("/dev/null", O_RDONLY)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
 
-    /* SYSCALL: dup2 */
+    /* SYSCALL: dup2: EINTR */
     if (dup2(fd, STDIN_FILENO) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         result = -1;
     } else
         result = 0;
 
-    /* SYSCALL: close */
+    /* SYSCALL: close: EINTR */
     close(fd);
     return result;
 }
 
-/* SYSCALL: fcntl */
-/* SYSCALL: ftruncate */
-/* SYSCALL: open */
 AUGSERV_API aug_result
 aug_daemonise(const struct aug_options* options)
 {
@@ -263,10 +248,6 @@ aug_daemonise(const struct aug_options* options)
         return -1;
     }
 
-    /* SYSCALL: dup2 */
-    /* SYSCALL: fcntl */
-    /* SYSCALL: ftruncate */
-    /* SYSCALL: open */
     if (daemonise_() < 0 || lockfile_(pidfile) < 0
         || closein_() < 0 || aug_initserv() < 0)
         return -1;

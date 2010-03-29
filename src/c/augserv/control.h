@@ -34,9 +34,6 @@ struct aug_options;
 AUGSERV_API aug_result
 aug_start(const struct aug_options* options);
 
-/* SYSCALL: access */
-/* SYSCALL: fcntl */
-/* SYSCALL: open */
 AUGSERV_API aug_result
 aug_control(const struct aug_options* options, int event);
 

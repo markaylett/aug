@@ -89,7 +89,7 @@ verify_(size_t size, size_t offset, size_t len)
 }
 
 static aug_result
-createmmap_a_(impl_t impl, size_t offset, size_t len)
+createmmap_A_(impl_t impl, size_t offset, size_t len)
 {
     void* addr;
 
@@ -109,7 +109,7 @@ createmmap_a_(impl_t impl, size_t offset, size_t len)
 }
 
 static aug_result
-destroymmap_a_(impl_t impl)
+destroymmap_A_(impl_t impl)
 {
     /* SYSCALL: munmap: EAGAIN */
     if (impl->mmap_.addr_
@@ -161,14 +161,14 @@ aug_createmmap_a(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
 }
 
 AUGSYS_API aug_result
-aug_remmap_a(struct aug_mmap* mm, size_t offset, size_t len)
+aug_remmap_A(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;
 
     impl->mmap_.addr_ = NULL;
 
-    /* SYSCALL: munmap */
+    /* SYSCALL: munmap: EINTR */
     if (addr && munmap(addr, impl->mmap_.len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -181,14 +181,13 @@ aug_remmap_a(struct aug_mmap* mm, size_t offset, size_t len)
     if (verify_(impl->size_, offset, len) < 0)
         return -1;
 
-    return createmmap_a_(impl, offset, len);
+    return createmmap_A_(impl, offset, len);
 }
 
 AUGSYS_API aug_result
 aug_syncmmap(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
-    /* SIGCALL: msync: */
     if (msync(impl->mmap_.addr_, impl->mmap_.len_, MS_SYNC) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

@@ -54,10 +54,8 @@ AUG_RCSID("$Id$");
 # define STDERR_FILENO 2
 #endif /* !STDERR_FILENO */
 
-/* SYSCALL: dup */
-/* SYSCALL: dup2 */
 static aug_result
-redirectout_(int fd)
+redirectout_I_(int fd)
 {
     int old;
     aug_result result;
@@ -71,7 +69,7 @@ redirectout_(int fd)
 
     /* Duplicate stdout descriptor so that it can be restored on failure. */
 
-    /* SYSCALL: dup */
+    /* SYSCALL: dup: EINTR */
 #if !defined(_WIN32)
     if ((old = dup(STDOUT_FILENO)) < 0)
 #else /* _WIN32 */
@@ -89,7 +87,7 @@ redirectout_(int fd)
     /* Assumption: If dup2 fails for any reason, the original descriptor's
        state will remain unchanged. */
 
-    /* SYSCALL: dup2 */
+    /* SYSCALL: dup2: EINTR */
 #if !defined(_WIN32)
     if (dup2(fd, STDOUT_FILENO) < 0) {
 #else /* _WIN32 */
@@ -99,7 +97,7 @@ redirectout_(int fd)
         goto done;
     }
 
-    /* SYSCALL: dup2 */
+    /* SYSCALL: dup2: EINTR */
 #if !defined(_WIN32)
     if (dup2(fd, STDERR_FILENO) < 0) {
 #else /* _WIN32 */
@@ -110,7 +108,7 @@ redirectout_(int fd)
 
         /* Restore the original descriptor. */
 
-    /* SYSCALL: dup2 */
+    /* SYSCALL: dup2: EINTR */
 #if !defined(_WIN32)
         if (dup2(old, STDOUT_FILENO) < 0)
 #else /* _WIN32 */
@@ -125,7 +123,7 @@ redirectout_(int fd)
     result = 0;
 
  done:
-    /* SYSCALL: close */
+    /* SYSCALL: close: EINTR */
 #if !defined(_WIN32)
     if (close(old) < 0)
 #else /* _WIN32 */
@@ -136,16 +134,13 @@ redirectout_(int fd)
     return result;
 }
 
-/* SYSCALL: dup */
-/* SYSCALL: dup2 */
-/* SYSCALL: open */
 AUGSERV_API aug_result
-aug_openlog(const char* path)
+aug_openlog_IN(const char* path)
 {
     int fd;
     aug_result result;
 
-    /* SYSCALL: open */
+    /* SYSCALL: open: ENOENT */
 #if !defined(_WIN32)
     if ((fd = open(path,
 #else /* _WIN32 */
@@ -156,11 +151,11 @@ aug_openlog(const char* path)
         return -1;
     }
 
-    /* SYSCALL: dup */
-    /* SYSCALL: dup2 */
+    /* SYSCALL: dup: EINTR */
+    /* SYSCALL: dup2: EINTR */
     result = redirectout_(fd);
 
-    /* SYSCALL: close */
+    /* SYSCALL: close: EINTR */
 #if !defined(_WIN32)
     if (close(fd) < 0)
 #else /* _WIN32 */

@@ -271,7 +271,7 @@ main(int argc, char* argv[])
 
         // If not creating, then ensure existing file is readable.
 
-        /* SYSCALL: access */
+        /* SYSCALL: access: ENOENT */
         if (!create && access(path, R_OK) < 0) {
             cerr << "Could not open passwd file " << path
                  << " for reading.\n";

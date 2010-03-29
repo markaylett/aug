@@ -655,13 +655,13 @@ setpath_(void)
 
     /* Path may be relative to run directory. */
 
-    /* SYSCALL: chdir */
+    /* SYSCALL: chdir: EINTR, ENOENT */
     if ((s = mod_getenv("rundir", NULL)))
         chdir(s);
 
     s = mod_getenv("module.augrb.rubypath", "ruby");
     mod_writelog(MOD_LOGDEBUG, "module.augrb.rubypath=[%s]", s);
-    /* SYSCALL: chdir */
+    /* SYSCALL: chdir: EINTR, ENOENT */
     chdir(s);
 
     /* Append current directory. */
@@ -671,7 +671,7 @@ setpath_(void)
 
     /* Restore previous working directory. */
 
-    /* SYSCALL: chdir */
+    /* SYSCALL: chdir: EINTR, ENOENT */
     chdir(prev);
 }
 

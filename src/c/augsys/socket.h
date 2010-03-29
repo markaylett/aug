@@ -127,10 +127,10 @@ AUGSYS_API aug_sd
 aug_socket(int domain, int type, int protocol);
 
 AUGSYS_API aug_sd
-aug_accept(aug_sd sd, struct aug_endpoint* ep);
+aug_accept_AI(aug_sd sd, struct aug_endpoint* ep);
 
 AUGSYS_API aug_result
-aug_bind(aug_sd sd, const struct aug_endpoint* ep);
+aug_bind_N(aug_sd sd, const struct aug_endpoint* ep);
 
 /**
  * Remember that, for non-blocking sockets, connect() may fail with
@@ -139,7 +139,7 @@ aug_bind(aug_sd sd, const struct aug_endpoint* ep);
  */
 
 AUGSYS_API aug_result
-aug_connect(aug_sd sd, const struct aug_endpoint* ep);
+aug_connect_AI(aug_sd sd, const struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
 aug_getpeername(aug_sd sd, struct aug_endpoint* ep);
@@ -151,18 +151,18 @@ AUGSYS_API aug_result
 aug_listen(aug_sd sd, int backlog);
 
 AUGSYS_API aug_rsize
-aug_recv(aug_sd sd, void* buf, size_t len, int flags);
+aug_recv_AI(aug_sd sd, void* buf, size_t len, int flags);
 
 AUGSYS_API aug_rsize
-aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
-             struct aug_endpoint* ep);
+aug_recvfrom_AI(aug_sd sd, void* buf, size_t len, int flags,
+                struct aug_endpoint* ep);
 
 AUGSYS_API aug_rsize
-aug_send(aug_sd sd, const void* buf, size_t len, int flags);
+aug_send_AI(aug_sd sd, const void* buf, size_t len, int flags);
 
 AUGSYS_API aug_rsize
-aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
-           const struct aug_endpoint* ep);
+aug_sendto_AI(aug_sd sd, const void* buf, size_t len, int flags,
+              const struct aug_endpoint* ep);
 
 AUGSYS_API aug_rsize
 aug_sread(aug_sd sd, void* buf, size_t len);
