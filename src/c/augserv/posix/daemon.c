@@ -229,7 +229,7 @@ closein_IN_(void)
 }
 
 AUGSERV_API aug_result
-aug_daemonise(const struct aug_options* options)
+aug_daemonise_AIN_(const struct aug_options* options)
 {
     const char* pidfile;
     aug_result result;
@@ -248,8 +248,8 @@ aug_daemonise(const struct aug_options* options)
         return -1;
     }
 
-    if (daemonise_() < 0 || lockfile_(pidfile) < 0
-        || closein_() < 0 || aug_initserv() < 0)
+    if (daemonise_A_() < 0 || lockfile_AIN_(pidfile) < 0
+        || closein_IN_() < 0 || aug_initserv() < 0)
         return -1;
 
     result = aug_runserv();

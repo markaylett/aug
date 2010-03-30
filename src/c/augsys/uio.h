@@ -38,10 +38,10 @@ struct iovec {
 #endif /* _WIN32 */
 
 AUGSYS_API aug_rsize
-aug_freadv(aug_fd fd, const struct iovec* iov, int size);
+aug_freadv_AI(aug_fd fd, const struct iovec* iov, int size);
 
 AUGSYS_API aug_rsize
-aug_fwritev(aug_fd fd, const struct iovec* iov, int size);
+aug_fwritev_AI(aug_fd fd, const struct iovec* iov, int size);
 
 /**
  * Sum of all iov_len values.

@@ -151,9 +151,7 @@ aug_openlog_IN(const char* path)
         return -1;
     }
 
-    /* SYSCALL: dup: EINTR */
-    /* SYSCALL: dup2: EINTR */
-    result = redirectout_(fd);
+    result = redirectout_I_(fd);
 
     /* SYSCALL: close: EINTR */
 #if !defined(_WIN32)

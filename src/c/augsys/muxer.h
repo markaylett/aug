@@ -114,7 +114,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
  */
 
 AUGSYS_API aug_rint
-aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout);
+aug_waitmdevents_I(aug_muxer_t muxer, const struct aug_timeval* timeout);
 
 /**
  * Poll events without waiting.

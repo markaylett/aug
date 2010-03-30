@@ -35,7 +35,7 @@ AUGSERV_API aug_result
 aug_start(const struct aug_options* options);
 
 AUGSERV_API aug_result
-aug_control(const struct aug_options* options, int event);
+aug_control_AIN(const struct aug_options* options, int event);
 
 AUGSERV_API aug_result
 aug_install(const struct aug_options* options);

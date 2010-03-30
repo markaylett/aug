@@ -51,25 +51,25 @@
  */
 
 AUGSYS_API aug_result
-aug_fclose(aug_fd fd);
+aug_fclose_I(aug_fd fd);
 
 AUGSYS_API aug_result
-aug_fsetnonblock(aug_fd fd, aug_bool on);
+aug_fsetnonblock_AI(aug_fd fd, aug_bool on);
 
 AUGSYS_API aug_fd
-aug_vfopen(const char* path, int flags, va_list args);
+aug_vfopen_N(const char* path, int flags, va_list args);
 
 AUGSYS_API aug_fd
-aug_fopen(const char* path, int flags, ...);
+aug_fopen_N(const char* path, int flags, ...);
 
 AUGSYS_API aug_result
 aug_fpipe(aug_fd fds[2]);
 
 AUGSYS_API aug_rsize
-aug_fread(aug_fd fd, void* buf, size_t size);
+aug_fread_AI(aug_fd fd, void* buf, size_t size);
 
 AUGSYS_API aug_rsize
-aug_fwrite(aug_fd fd, const void* buf, size_t size);
+aug_fwrite_AI(aug_fd fd, const void* buf, size_t size);
 
 AUGSYS_API aug_result
 aug_fsync(aug_fd fd);
@@ -80,12 +80,12 @@ aug_fsync(aug_fd fd);
  */
 
 AUGSYS_API aug_result
-aug_ftruncate(aug_fd fd, off_t size);
+aug_ftruncate_AI(aug_fd fd, off_t size);
 
 AUGSYS_API aug_result
-aug_fsize(aug_fd fd, size_t* size);
+aug_fsize_IN(aug_fd fd, size_t* size);
 
 AUGSYS_API void
-aug_msleep(unsigned ms);
+aug_msleep_I(unsigned ms);
 
 #endif /* AUGSYS_UNISTD_H */

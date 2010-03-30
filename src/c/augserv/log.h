@@ -32,7 +32,7 @@
  */
 
 AUGSERV_API aug_result
-aug_openlog(const char* path);
+aug_openlog_IN(const char* path);
 
 AUGSERV_API aug_result
 aug_setservlogger(const char* sname);

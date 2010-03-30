@@ -57,7 +57,7 @@ flock_AI_(struct flock* fl, int fd, int cmd, int type)
 }
 
 static aug_result
-send_(int fd, pid_t pid, int event)
+send_AI_(int fd, pid_t pid, int event)
 {
     struct flock fl;
 
@@ -82,7 +82,7 @@ send_(int fd, pid_t pid, int event)
 
         /* Wait for daemon process to release lock. */
 
-        if (flock_(&fl, fd, F_SETLKW, F_RDLCK) < 0)
+        if (flock_AI_(&fl, fd, F_SETLKW, F_RDLCK) < 0)
             return -1;
 
         /* The lock has been obtained; daemon process must have stopped. */
@@ -108,7 +108,7 @@ aug_start(const struct aug_options* options)
 }
 
 AUGSERV_API aug_result
-aug_control_N(const struct aug_options* options, int event)
+aug_control_AIN(const struct aug_options* options, int event)
 {
     const char* pidfile;
     struct flock fl;
@@ -142,12 +142,12 @@ aug_control_N(const struct aug_options* options, int event)
 
     /* Attempt to obtain shared lock. */
 
-    if (flock_(&fl, fd, F_SETLK, F_RDLCK) < 0) {
+    if (flock_AI_(&fl, fd, F_SETLK, F_RDLCK) < 0) {
 
         /* As expected, the daemon process has an exclusive lock on the pid
            file.  Use F_GETLK to obtain the pid of the daemon process. */
 
-        if (0 <= flock_(&fl, fd, F_GETLK, F_RDLCK)) {
+        if (0 <= flock_AI_(&fl, fd, F_GETLK, F_RDLCK)) {
 
             /* Although a lock-manager allows locking over NFS, the returned
                pid is probably zero because it could be the pid of a process
