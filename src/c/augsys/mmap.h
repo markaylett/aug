@@ -48,8 +48,8 @@ AUGSYS_API void
 aug_destroymmap_A(struct aug_mmap* mm);
 
 AUGSYS_API struct aug_mmap*
-aug_createmmap_A(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
-                 int flags);
+aug_createmmap_AIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+                   int flags);
 
 AUGSYS_API aug_result
 aug_remmap_A(struct aug_mmap* mm, size_t offset, size_t len);

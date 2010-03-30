@@ -52,12 +52,12 @@ struct impl_ {
 };
 
 static aug_result
-close_(struct impl_* impl)
+close_I_(struct impl_* impl)
 {
 #if !defined(_WIN32)
     aug_setmdeventmask(impl->muxer_, impl->fd_, 0);
 #endif /* !_WIN32 */
-    return aug_fclose(impl->fd_);
+    return aug_fclose_I(impl->fd_);
 }
 
 static void*
@@ -87,7 +87,7 @@ release_(struct impl_* impl)
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
         if (AUG_BADFD != impl->fd_)
-            close_(impl);
+            close_I_(impl);
         aug_freemem(mpool, impl);
         aug_release(mpool);
     }
@@ -115,10 +115,10 @@ chan_release_(aug_chan* ob)
 }
 
 static aug_result
-chan_close_(aug_chan* ob)
+chan_close_I_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    aug_result result = close_(impl);
+    aug_result result = close_I_(impl);
     impl->fd_ = AUG_BADFD;
     return result;
 }
@@ -211,7 +211,7 @@ static const struct aug_chanvtbl chanvtbl_ = {
     chan_cast_,
     chan_retain_,
     chan_release_,
-    chan_close_,
+    chan_close_I_,
     chan_process_,
     chan_setwantwr_,
     chan_getid_,
@@ -247,31 +247,31 @@ stream_shutdown_(aug_stream* ob)
 }
 
 static aug_rsize
-stream_read_(aug_stream* ob, void* buf, size_t size)
+stream_read_AI_(aug_stream* ob, void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
-    return aug_fread(impl->fd_, buf, size);
+    return aug_fread_AI(impl->fd_, buf, size);
 }
 
 static aug_rsize
-stream_readv_(aug_stream* ob, const struct iovec* iov, int size)
+stream_readv_AI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
-    return aug_freadv(impl->fd_, iov, size);
+    return aug_freadv_AI(impl->fd_, iov, size);
 }
 
 static aug_rsize
-stream_write_(aug_stream* ob, const void* buf, size_t size)
+stream_write_AI_(aug_stream* ob, const void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
-    return aug_fwrite(impl->fd_, buf, size);
+    return aug_fwrite_AI(impl->fd_, buf, size);
 }
 
 static aug_rsize
-stream_writev_(aug_stream* ob, const struct iovec* iov, int size)
+stream_writev_AI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
-    return aug_fwritev(impl->fd_, iov, size);
+    return aug_fwritev_AI(impl->fd_, iov, size);
 }
 
 static const struct aug_streamvtbl streamvtbl_ = {
@@ -279,10 +279,10 @@ static const struct aug_streamvtbl streamvtbl_ = {
     stream_retain_,
     stream_release_,
     stream_shutdown_,
-    stream_read_,
-    stream_readv_,
-    stream_write_,
-    stream_writev_
+    stream_read_AI_,
+    stream_readv_AI_,
+    stream_write_AI_,
+    stream_writev_AI_
 };
 
 AUGSYS_API aug_chan*

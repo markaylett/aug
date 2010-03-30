@@ -29,15 +29,15 @@
 #include <string.h>     /* memcpy() */
 
 AUGSYS_API aug_result
-aug_sclose(aug_sd sd)
+aug_sclose_I(aug_sd sd)
 {
-    return aug_fclose(sd);
+    return aug_fclose_I(sd);
 }
 
 AUGSYS_API aug_result
-aug_ssetnonblock(aug_sd sd, aug_bool on)
+aug_ssetnonblock_AI(aug_sd sd, aug_bool on)
 {
-    return aug_fsetnonblock(sd, on);
+    return aug_fsetnonblock_AI(sd, on);
 }
 
 AUGSYS_API int
@@ -169,27 +169,27 @@ aug_sendto_AI(aug_sd sd, const void* buf, size_t len, int flags,
 }
 
 AUGSYS_API aug_rsize
-aug_sread(aug_sd sd, void* buf, size_t len)
+aug_sread_AI(aug_sd sd, void* buf, size_t len)
 {
-    return aug_fread(sd, buf, len);
+    return aug_fread_AI(sd, buf, len);
 }
 
 AUGSYS_API aug_rsize
-aug_sreadv(aug_sd sd, const struct iovec* iov, int size)
+aug_sreadv_AI(aug_sd sd, const struct iovec* iov, int size)
 {
-    return aug_freadv(sd, iov, size);
+    return aug_freadv_AI(sd, iov, size);
 }
 
 AUGSYS_API aug_rsize
-aug_swrite(aug_sd sd, const void* buf, size_t len)
+aug_swrite_AI(aug_sd sd, const void* buf, size_t len)
 {
-    return aug_fwrite(sd, buf, len);
+    return aug_fwrite_AI(sd, buf, len);
 }
 
 AUGSYS_API aug_rsize
-aug_swritev(aug_sd sd, const struct iovec* iov, int size)
+aug_swritev_AI(aug_sd sd, const struct iovec* iov, int size)
 {
-    return aug_fwritev(sd, iov, size);
+    return aug_fwritev_AI(sd, iov, size);
 }
 
 AUGSYS_API aug_result

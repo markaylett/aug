@@ -33,22 +33,22 @@ struct iovec;
 
     <method name="shutdown" type="aug_result" qname="shutdown"/>
 
-    <method name="read" type="aug_rsize" qname="read">
+    <method name="read_AI" type="aug_rsize" qname="read_AI">
       <param name="buf" type="void*"/>
       <param name="size" type="size_t"/>
     </method>
 
-    <method name="readv" type="aug_rsize" qname="readv">
+    <method name="readv_AI" type="aug_rsize" qname="readv_AI">
       <param name="iov" type="const struct iovec*"/>
       <param name="size" type="int"/>
     </method>
 
-    <method name="write" type="aug_rsize" qname="write">
+    <method name="write_AI" type="aug_rsize" qname="write_AI">
       <param name="buf" type="const void*"/>
       <param name="size" type="size_t"/>
     </method>
 
-    <method name="writev" type="aug_rsize" qname="writev">
+    <method name="writev_AI" type="aug_rsize" qname="writev_AI">
       <param name="iov" type="const struct iovec*"/>
       <param name="size" type="int"/>
     </method>

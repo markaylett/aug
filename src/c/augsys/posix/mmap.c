@@ -132,7 +132,7 @@ aug_destroymmap_A(struct aug_mmap* mm)
 }
 
 AUGSYS_API struct aug_mmap*
-aug_createmmap_A(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+aug_createmmap_AIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
                  int flags)
 {
     impl_t impl;
@@ -140,7 +140,7 @@ aug_createmmap_A(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     size_t size;
 
     if (toprot_(&prot, flags) < 0
-        || aug_fsize(fd, &size) < 0
+        || aug_fsize_IN(fd, &size) < 0
         || verify_(size, offset, len) < 0
         || !(impl = aug_allocmem(mpool, sizeof(struct impl_))))
         return NULL;
@@ -175,7 +175,7 @@ aug_remmap_A(struct aug_mmap* mm, size_t offset, size_t len)
     }
 
     if (impl->size_ < (offset + len)
-        && aug_fsize(impl->fd_, &impl->size_) < 0)
+        && aug_fsize_IN(impl->fd_, &impl->size_) < 0)
         return -1;
 
     if (verify_(impl->size_, offset, len) < 0)

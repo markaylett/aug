@@ -356,7 +356,7 @@ getcount_(aug_mar* obj)
 }
 
 static aug_result
-insert_(aug_mar* obj, const char* path)
+insert_AIN_(aug_mar* obj, const char* path)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     aug_mpool* mpool;
@@ -365,7 +365,7 @@ insert_(aug_mar* obj, const char* path)
     unsigned size;
 
     mpool = aug_seqmpool_(impl->seq_);
-    mfile = aug_openmfile_(mpool, path, AUG_RDONLY, 0, 0);
+    mfile = aug_openmfile_IN_(mpool, path, AUG_RDONLY, 0, 0);
     aug_release(mpool);
 
     if (!mfile)
@@ -375,12 +375,12 @@ insert_(aug_mar* obj, const char* path)
 
         if (!(addr = aug_mapmfile_(mfile, size))
             || aug_setcontent(obj, addr, size) < 0) {
-            aug_closemfile_(mfile);
+            aug_closemfile_AI_(mfile);
             return -1;
         }
     }
 
-    return aug_closemfile_(mfile);
+    return aug_closemfile_AI_(mfile);
 }
 
 static aug_rsize
@@ -484,7 +484,7 @@ write_(aug_mar* obj, const void* buf, unsigned len)
 }
 
 static aug_result
-extract_(aug_mar* obj, const char* path)
+extract_AIN_(aug_mar* obj, const char* path)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     aug_mpool* mpool;
@@ -505,8 +505,8 @@ extract_(aug_mar* obj, const char* path)
         return -1;
 
     mpool = aug_seqmpool_(impl->seq_);
-    mfile = aug_openmfile_(mpool, path, AUG_WRONLY | AUG_CREAT | AUG_TRUNC,
-                           0666, 0);
+    mfile = aug_openmfile_IN_(mpool, path, AUG_WRONLY | AUG_CREAT | AUG_TRUNC,
+                              0666, 0);
     aug_release(mpool);
 
     if (!mfile)
@@ -520,10 +520,10 @@ extract_(aug_mar* obj, const char* path)
         memcpy(dst, src, size);
     }
 
-    return aug_closemfile_(mfile);
+    return aug_closemfile_AI_(mfile);
 
  fail:
-    aug_closemfile_(mfile);
+    aug_closemfile_AI_(mfile);
     return -1;
 }
 
@@ -564,13 +564,13 @@ static const struct aug_marvtbl marvtbl_ = {
     ntop_,
     pton_,
     getcount_,
-    insert_,
+    insert_AIN_,
     seek_,
     setcontent_,
     sync_,
     truncate_,
     write_,
-    extract_,
+    extract_AIN_,
     read_,
 };
 

@@ -33,11 +33,11 @@
 typedef struct aug_mfile_* aug_mfile_t;
 
 AUG_EXTERNC aug_result
-aug_closemfile_(aug_mfile_t mfile);
+aug_closemfile_AI_(aug_mfile_t mfile);
 
 AUG_EXTERNC aug_mfile_t
-aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
-               unsigned tail);
+aug_openmfile_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
+                  unsigned tail);
 
 AUG_EXTERNC void*
 aug_mapmfile_(aug_mfile_t mfile, unsigned size);

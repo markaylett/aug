@@ -83,12 +83,12 @@ aug_vfopen_N(const char* path, int flags, va_list args)
 }
 
 AUGSYS_API aug_fd
-aug_fopen(const char* path, int flags, ...)
+aug_fopen_N(const char* path, int flags, ...)
 {
     aug_fd fd;
     va_list args;
     va_start(args, flags);
-    fd = aug_vfopen(path, flags, args);
+    fd = aug_vfopen_N(path, flags, args);
     va_end(args);
     return fd;
 }

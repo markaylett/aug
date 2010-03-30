@@ -118,10 +118,10 @@ struct aug_inetaddr {
 };
 
 AUGSYS_API aug_result
-aug_sclose(aug_sd sd);
+aug_sclose_I(aug_sd sd);
 
 AUGSYS_API aug_result
-aug_ssetnonblock(aug_sd sd, aug_bool on);
+aug_ssetnonblock_AI(aug_sd sd, aug_bool on);
 
 AUGSYS_API aug_sd
 aug_socket(int domain, int type, int protocol);

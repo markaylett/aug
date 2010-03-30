@@ -389,10 +389,10 @@ aug_muxerpipe(aug_md mds[2])
     if (aug_fpipe(fds) < 0)
         return -1;
 
-    if (aug_fsetnonblock(fds[0], AUG_TRUE) < 0
-        || aug_fsetnonblock(fds[1], AUG_TRUE) < 0) {
-        aug_fclose(fds[0]);
-        aug_fclose(fds[1]);
+    if (aug_fsetnonblock_AI(fds[0], AUG_TRUE) < 0
+        || aug_fsetnonblock_AI(fds[1], AUG_TRUE) < 0) {
+        aug_fclose_I(fds[0]);
+        aug_fclose_I(fds[1]);
         return -1;
     }
 

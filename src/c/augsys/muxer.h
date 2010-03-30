@@ -121,7 +121,7 @@ aug_waitmdevents_I(aug_muxer_t muxer, const struct aug_timeval* timeout);
  */
 
 AUGSYS_API aug_rint
-aug_pollmdevents(aug_muxer_t muxer);
+aug_pollmdevents_I(aug_muxer_t muxer);
 
 /**
  * Get event mask associated with descriptor.

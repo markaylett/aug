@@ -196,7 +196,7 @@
 
     </method>
 
-    <method name="insert" type="aug_result" qname="insertmar">
+    <method name="insert_AIN" type="aug_result" qname="insertmar_AIN">
 
       Insert file into body content of message archive.
 
@@ -266,7 +266,7 @@
       <param name="len" type="unsigned"/>
     </method>
 
-    <method name="extract" type="aug_result" qname="extractmar">
+    <method name="extract_AIN" type="aug_result" qname="extractmar_AIN">
 
       Extract content from message archive into file.
 

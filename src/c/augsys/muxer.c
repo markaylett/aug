@@ -46,9 +46,9 @@ static const struct aug_timeval NOWAIT_ = { 0, 0 };
 #endif /* _WIN32 */
 
 AUGSYS_API aug_rint
-aug_pollmdevents(aug_muxer_t muxer)
+aug_pollmdevents_I(aug_muxer_t muxer)
 {
-    return aug_waitmdevents(muxer, &NOWAIT_);
+    return aug_waitmdevents_I(muxer, &NOWAIT_);
 }
 
 AUGSYS_API const char*
