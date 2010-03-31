@@ -35,7 +35,7 @@
 
     </method>
 
-    <method name="clear" type="aug_rint" qname="clearfields">
+    <method name="clear_AIN" type="aug_rint" qname="clearfields_AIN">
 
       Clear all fields within message archive.
 
@@ -43,7 +43,7 @@
 
     </method>
 
-    <method name="deln" type="aug_result" qname="delfieldn">
+    <method name="deln_AIN" type="aug_result" qname="delfieldn_AIN">
 
       Delete field (by ordinal) within message archive.
 
@@ -55,7 +55,7 @@
       <param name="n" type="unsigned"/>
     </method>
 
-    <method name="delp" type="aug_rint" qname="delfieldp">
+    <method name="delp_AIN" type="aug_rint" qname="delfieldp_AIN">
 
       Delete field (by name) within message archive.
 
@@ -113,7 +113,7 @@
       <param name="field" type="struct aug_field&"/>
     </method>
 
-    <method name="putn" type="aug_result" qname="putfieldn">
+    <method name="putn_AIN" type="aug_result" qname="putfieldn_AIN">
 
       Set field value (by ordinal) within message archive.
 
@@ -131,7 +131,7 @@
       <param name="size" type="unsigned"/>
     </method>
 
-    <method name="putp" type="aug_rint" qname="putfieldp">
+    <method name="putp_AIN" type="aug_rint" qname="putfieldp_AIN">
 
       Set field value (by name) within message archive.
 
@@ -149,7 +149,7 @@
       <param name="size" type="unsigned"/>
     </method>
 
-    <method name="put" type="aug_rint" qname="putfield">
+    <method name="put_AIN" type="aug_rint" qname="putfield_AIN">
 
       Set field within message archive.
 
@@ -222,7 +222,7 @@
       <param name="whence" type="int"/>
     </method>
 
-    <method name="setcontent" type="aug_result" qname="setcontent">
+    <method name="setcontent_AIN" type="aug_result" qname="setcontent_AIN">
 
       Set content within message archive.
 
@@ -240,7 +240,7 @@
       Flush message archive buffers.
     </method>
 
-    <method name="truncate" type="aug_result" qname="truncatemar">
+    <method name="truncate_AIN" type="aug_result" qname="truncatemar_AIN">
 
       Truncate content within message archive.
 
@@ -251,7 +251,7 @@
       <param name="size" type="unsigned"/>
     </method>
 
-    <method name="write" type="aug_rsize" qname="writemar">
+    <method name="write_AIN" type="aug_rsize" qname="writemar_AIN">
 
       Write content to message archive.
 

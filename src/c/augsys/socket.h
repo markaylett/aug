@@ -165,16 +165,16 @@ aug_sendto_AI(aug_sd sd, const void* buf, size_t len, int flags,
               const struct aug_endpoint* ep);
 
 AUGSYS_API aug_rsize
-aug_sread(aug_sd sd, void* buf, size_t len);
+aug_sread_AI(aug_sd sd, void* buf, size_t len);
 
 AUGSYS_API aug_rsize
-aug_sreadv(aug_sd sd, const struct iovec* iov, int size);
+aug_sreadv_AI(aug_sd sd, const struct iovec* iov, int size);
 
 AUGSYS_API aug_rsize
-aug_swrite(aug_sd sd, const void* buf, size_t len);
+aug_swrite_AI(aug_sd sd, const void* buf, size_t len);
 
 AUGSYS_API aug_rsize
-aug_swritev(aug_sd sd, const struct iovec* iov, int size);
+aug_swritev_AI(aug_sd sd, const struct iovec* iov, int size);
 
 /**
  * The Windows version of this function will return the posix-mapped errno for

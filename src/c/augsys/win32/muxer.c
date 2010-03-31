@@ -152,7 +152,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 }
 
 AUGSYS_API aug_rint
-aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
+aug_waitmdevents_I(aug_muxer_t muxer, const struct aug_timeval* timeout)
 {
     int ret;
 
@@ -201,17 +201,17 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md)
 }
 
 AUGSYS_API aug_result
-aug_muxerpipe(aug_md mds[2])
+aug_muxerpipe_AIN(aug_md mds[2])
 {
     aug_md sds[2];
 
-    if (aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sds) < 0)
+    if (aug_socketpair_AIN(AF_UNIX, SOCK_STREAM, 0, sds) < 0)
         return -1;
 
-    if (aug_ssetnonblock(sds[0], AUG_TRUE) < 0
-        || aug_ssetnonblock(sds[1], AUG_TRUE) < 0) {
-        aug_sclose(sds[0]);
-        aug_sclose(sds[1]);
+    if (aug_ssetnonblock_AI(sds[0], AUG_TRUE) < 0
+        || aug_ssetnonblock_AI(sds[1], AUG_TRUE) < 0) {
+        aug_sclose_I(sds[0]);
+        aug_sclose_I(sds[1]);
         return -1;
     }
 

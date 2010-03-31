@@ -29,7 +29,7 @@
 #include <malloc.h>     /* _alloca() */
 
 static aug_result
-streampair_AIN(int protocol, aug_sd sv[2])
+streampair_AIN_(int protocol, aug_sd sv[2])
 {
 	socklen_t len;
 	SOCKADDR_IN addr = { 0 };
@@ -80,7 +80,7 @@ streampair_AIN(int protocol, aug_sd sv[2])
 }
 
 static aug_result
-dgrampair_AIN(int protocol, aug_sd sv[2])
+dgrampair_AIN_(int protocol, aug_sd sv[2])
 {
 	socklen_t len;
 	SOCKADDR_IN addr = { 0 };
@@ -122,7 +122,7 @@ dgrampair_AIN(int protocol, aug_sd sv[2])
 }
 
 AUGSYS_API aug_result
-aug_sclose(aug_sd sd)
+aug_sclose_I(aug_sd sd)
 {
     if (SOCKET_ERROR == closesocket(sd)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
@@ -132,7 +132,7 @@ aug_sclose(aug_sd sd)
 }
 
 AUGSYS_API aug_result
-aug_ssetnonblock(aug_sd sd, aug_bool on)
+aug_ssetnonblock_AI(aug_sd sd, aug_bool on)
 {
     unsigned long arg = on ? 1 : 0;
 
@@ -259,8 +259,8 @@ aug_send_AI(aug_sd sd, const void* buf, size_t len, int flags)
 }
 
 AUGSYS_API aug_rsize
-aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
-           const struct aug_endpoint* ep)
+aug_sendto_AI(aug_sd sd, const void* buf, size_t len, int flags,
+              const struct aug_endpoint* ep)
 {
     ssize_t ret = sendto(sd, buf, (int)len, flags, &ep->un_.sa_, ep->len_);
     if (SOCKET_ERROR == ret) {
@@ -271,13 +271,13 @@ aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
 }
 
 AUGSYS_API aug_rsize
-aug_sread(aug_sd sd, void* buf, size_t len)
+aug_sread_AI(aug_sd sd, void* buf, size_t len)
 {
-    return aug_recv(sd, buf, len, 0);
+    return aug_recv_AI(sd, buf, len, 0);
 }
 
 AUGSYS_API aug_rsize
-aug_sreadv(aug_sd sd, const struct iovec* iov, int size)
+aug_sreadv_AI(aug_sd sd, const struct iovec* iov, int size)
 {
     WSABUF* buf;
     int i;
@@ -309,13 +309,13 @@ aug_sreadv(aug_sd sd, const struct iovec* iov, int size)
 }
 
 AUGSYS_API aug_rsize
-aug_swrite(aug_sd sd, const void* buf, size_t len)
+aug_swrite_AI(aug_sd sd, const void* buf, size_t len)
 {
-    return aug_send(sd, buf, len, 0);
+    return aug_send_AI(sd, buf, len, 0);
 }
 
 AUGSYS_API aug_rsize
-aug_swritev(aug_sd sd, const struct iovec* iov, int size)
+aug_swritev_AI(aug_sd sd, const struct iovec* iov, int size)
 {
     WSABUF* buf;
     int i;
@@ -407,9 +407,9 @@ aug_socketpair_AIN(int domain, int type, int protocol, aug_sd sv[2])
 
 	switch (type) {
 	case SOCK_STREAM:
-		return streampair_(protocol, sv);
+		return streampair_AIN_(protocol, sv);
 	case SOCK_DGRAM:
-		return dgrampair_(protocol, sv);
+		return dgrampair_AIN_(protocol, sv);
 	}
 
     aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAESOCKTNOSUPPORT);

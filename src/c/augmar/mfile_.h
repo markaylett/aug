@@ -40,7 +40,7 @@ aug_openmfile_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
                   unsigned tail);
 
 AUG_EXTERNC void*
-aug_mapmfile_(aug_mfile_t mfile, unsigned size);
+aug_mapmfile_AIN_(aug_mfile_t mfile, unsigned size);
 
 AUG_EXTERNC aug_result
 aug_syncmfile_(aug_mfile_t mfile);

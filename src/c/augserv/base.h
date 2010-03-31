@@ -45,7 +45,7 @@ AUGSERV_API aug_result
 aug_readservconf(const char* conffile, aug_bool batch, aug_bool daemon);
 
 AUGSERV_API aug_result
-aug_initserv(void);
+aug_initserv_AIN(void);
 
 AUGSERV_API aug_result
 aug_runserv(void);

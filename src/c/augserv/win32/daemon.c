@@ -182,7 +182,7 @@ handler_(DWORD code)
         break;
     }
 
-    if (aug_writeevent(aug_events(), &event) < 0
+    if (aug_writeevent_A(aug_events(), &event) < 0
         && AUG_EXBLOCK != aug_getexcept(aug_tlx))
         abort();
 }
@@ -268,9 +268,9 @@ service_(DWORD argc, char** argv)
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (aug_initserv() < 0) {
+    if (aug_initserv_AIN() < 0) {
 
-        aug_perrinfo(aug_tlx, "aug_initserv() failed", NULL);
+        aug_perrinfo(aug_tlx, "aug_initserv_AIN() failed", NULL);
         setstatus_(SERVICE_STOPPED);
         goto done;
     }
@@ -285,8 +285,8 @@ service_(DWORD argc, char** argv)
     setstatus_(SERVICE_STOPPED);
 
     /* This function will be called on the Service Manager's thread.  Given
-       that aug_initserv() and aug_runserv() have been called on this thread,
-       aug_termserv() is also called from this thread and not the main
+       that aug_initserv_AIN() and aug_runserv() have been called on this
+       thread, aug_termserv() is also called from this thread and not the main
        thread. */
 
     aug_termserv();

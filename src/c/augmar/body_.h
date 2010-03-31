@@ -28,15 +28,15 @@
 struct aug_info_;
 
 AUG_EXTERNC aug_result
-aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* cdata,
-                unsigned size);
+aug_setcontent_AIN_(aug_seq_t seq, struct aug_info_* info, const void* cdata,
+                    unsigned size);
 
 AUG_EXTERNC aug_result
-aug_truncate_(aug_seq_t seq, struct aug_info_* info, unsigned size);
+aug_truncate_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned size);
 
 AUG_EXTERNC aug_rsize
-aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
-           const void* buf, unsigned len);
+aug_write_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
+               const void* buf, unsigned len);
 
 AUG_EXTERNC const void*
 aug_getcontent_(aug_seq_t seq, const struct aug_info_* info);

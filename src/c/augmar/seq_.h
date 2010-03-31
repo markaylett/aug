@@ -42,11 +42,11 @@ AUG_EXTERNC aug_seq_t
 aug_createseq_(aug_mpool* mpool, unsigned tail);
 
 AUG_EXTERNC aug_seq_t
-aug_openseq_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
-             unsigned tail);
+aug_openseq_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
+                unsigned tail);
 
 AUG_EXTERNC void*
-aug_resizeseq_(aug_seq_t seq, unsigned size);
+aug_resizeseq_AIN_(aug_seq_t seq, unsigned size);
 
 AUG_EXTERNC aug_result
 aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len);

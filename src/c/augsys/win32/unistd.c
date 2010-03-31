@@ -85,7 +85,7 @@ create_(int flags)
 }
 
 AUGSYS_API aug_result
-aug_fclose(aug_fd fd)
+aug_fclose_I(aug_fd fd)
 {
     if (!CloseHandle(fd)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
@@ -95,7 +95,7 @@ aug_fclose(aug_fd fd)
 }
 
 AUGSYS_API aug_result
-aug_fsetnonblock(aug_fd fd, aug_bool on)
+aug_fsetnonblock_AI(aug_fd fd, aug_bool on)
 {
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                     AUG_MSG("aug_fsetnonblock() not supported"));
@@ -103,7 +103,7 @@ aug_fsetnonblock(aug_fd fd, aug_bool on)
 }
 
 AUGSYS_API aug_fd
-aug_vfopen(const char* path, int flags, va_list args)
+aug_vfopen_N(const char* path, int flags, va_list args)
 {
     DWORD access, attr;
     SECURITY_ATTRIBUTES sa;
@@ -136,12 +136,12 @@ aug_vfopen(const char* path, int flags, va_list args)
 }
 
 AUGSYS_API aug_fd
-aug_fopen(const char* path, int flags, ...)
+aug_fopen_N(const char* path, int flags, ...)
 {
     aug_fd fd;
     va_list args;
     va_start(args, flags);
-    fd = aug_vfopen(path, flags, args);
+    fd = aug_vfopen_N(path, flags, args);
     va_end(args);
     return fd;
 }
@@ -168,7 +168,7 @@ aug_fpipe(aug_fd fds[2])
 }
 
 AUGSYS_API aug_rsize
-aug_fread(aug_fd fd, void* buf, size_t size)
+aug_fread_AI(aug_fd fd, void* buf, size_t size)
 {
     DWORD ret;
     if (!ReadFile(fd, buf, (DWORD)size, &ret, NULL)) {
@@ -179,7 +179,7 @@ aug_fread(aug_fd fd, void* buf, size_t size)
 }
 
 AUGSYS_API aug_rsize
-aug_fwrite(aug_fd fd, const void* buf, size_t size)
+aug_fwrite_AI(aug_fd fd, const void* buf, size_t size)
 {
     DWORD ret;
     if (!WriteFile(fd, buf, (DWORD)size, &ret, NULL)) {
@@ -200,7 +200,7 @@ aug_fsync(aug_fd fd)
 }
 
 AUGSYS_API aug_result
-aug_ftruncate(aug_fd fd, off_t size)
+aug_ftruncate_AI(aug_fd fd, off_t size)
 {
     LARGE_INTEGER li, orig;
     aug_result result;
@@ -237,7 +237,7 @@ aug_ftruncate(aug_fd fd, off_t size)
 }
 
 AUGSYS_API aug_result
-aug_fsize(aug_fd fd, size_t* size)
+aug_fsize_IN(aug_fd fd, size_t* size)
 {
     LARGE_INTEGER li;
 
@@ -251,7 +251,7 @@ aug_fsize(aug_fd fd, size_t* size)
 }
 
 AUGSYS_API void
-aug_msleep(unsigned ms)
+aug_msleep_I(unsigned ms)
 {
     Sleep(ms);
 }

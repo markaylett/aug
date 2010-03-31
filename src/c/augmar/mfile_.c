@@ -152,7 +152,7 @@ aug_openmfile_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
 }
 
 AUG_EXTERNC void*
-aug_mapmfile_(aug_mfile_t mfile, unsigned size)
+aug_mapmfile_AIN_(aug_mfile_t mfile, unsigned size)
 {
     assert(mfile);
 
@@ -176,7 +176,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
         }
 
         resvd = reserve_(size);
-        if (aug_ftruncate(mfile->fd_, resvd - mfile->size_) < 0)
+        if (aug_ftruncate_AI(mfile->fd_, resvd - mfile->size_) < 0)
             return NULL;
 
         mfile->resvd_ = resvd;
@@ -184,16 +184,16 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
     if (mfile->mmap_) {
 
-        if (aug_remmap(mfile->mmap_, 0, size) < 0) {
+        if (aug_remmap_AIN(mfile->mmap_, 0, size) < 0) {
 
-            aug_destroymmap(mfile->mmap_);
+            aug_destroymmap_A(mfile->mmap_);
             mfile->mmap_ = NULL;
             return NULL;
         }
     } else {
 
-        mfile->mmap_ = aug_createmmap(mfile->mpool_, mfile->fd_, 0, size,
-                                      mfile->flags_);
+        mfile->mmap_ = aug_createmmap_AIN(mfile->mpool_, mfile->fd_, 0, size,
+                                          mfile->flags_);
         if (!mfile->mmap_)
             return NULL;
     }

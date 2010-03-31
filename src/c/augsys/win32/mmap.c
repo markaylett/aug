@@ -20,7 +20,7 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "augsys/unistd.h" /* aug_fsize() */
+#include "augsys/unistd.h" /* aug_fsize_IN() */
 #include "augsys/windows.h"
 
 #include "augctx/base.h"
@@ -176,7 +176,7 @@ destroymmap_(impl_t impl)
 }
 
 AUGSYS_API void
-aug_destroymmap(struct aug_mmap* mm)
+aug_destroymmap_A(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     aug_mpool* mpool = impl->mpool_;
@@ -186,8 +186,8 @@ aug_destroymmap(struct aug_mmap* mm)
 }
 
 AUGSYS_API struct aug_mmap*
-aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
-               int flags)
+aug_createmmap_AIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+                   int flags)
 {
     impl_t impl;
     DWORD prot, access;
@@ -199,7 +199,7 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     if (toaccess_(&access, flags) < 0)
         return NULL;
 
-    if (aug_fsize(fd, &size) < 0)
+    if (aug_fsize_IN(fd, &size) < 0)
         return NULL;
 
     if (verify_(size, offset, len) < 0)
@@ -226,7 +226,7 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
 }
 
 AUGSYS_API aug_result
-aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
+aug_remmap_AIN(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;
@@ -248,7 +248,7 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
             return -1;
         }
 
-        if (aug_fsize(impl->fd_, &impl->size_) < 0)
+        if (aug_fsize_IN(impl->fd_, &impl->size_) < 0)
             return -1;
     }
 

@@ -58,7 +58,7 @@ struct aug_event {
 typedef struct aug_events_* aug_events_t;
 
 AUGUTIL_API aug_events_t
-aug_createevents(aug_mpool* mpool);
+aug_createevents_AIN(aug_mpool* mpool);
 
 AUGUTIL_API void
 aug_destroyevents(aug_events_t events);
@@ -84,7 +84,7 @@ aug_readevent(aug_events_t events, struct aug_event* event);
  */
 
 AUGUTIL_API aug_result
-aug_writeevent(aug_events_t events, const struct aug_event* event);
+aug_writeevent_A(aug_events_t events, const struct aug_event* event);
 
 AUGUTIL_API aug_md
 aug_eventsmd(aug_events_t events);

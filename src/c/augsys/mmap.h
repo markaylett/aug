@@ -52,7 +52,7 @@ aug_createmmap_AIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
                    int flags);
 
 AUGSYS_API aug_result
-aug_remmap_A(struct aug_mmap* mm, size_t offset, size_t len);
+aug_remmap_AIN(struct aug_mmap* mm, size_t offset, size_t len);
 
 AUGSYS_API aug_result
 aug_syncmmap(const struct aug_mmap* mm);

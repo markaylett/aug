@@ -26,17 +26,17 @@
 #include "augtypes.h"
 
 AUGSYS_API aug_rsize
-aug_freadv(aug_fd fd, const struct iovec* iov, int size)
+aug_freadv_AI(aug_fd fd, const struct iovec* iov, int size)
 {
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
-                    AUG_ESUPPORT, AUG_MSG("aug_freadv() not supported"));
+                    AUG_ESUPPORT, AUG_MSG("aug_freadv_AI() not supported"));
     return -1;
 }
 
 AUGSYS_API aug_rsize
-aug_fwritev(aug_fd fd, const struct iovec* iov, int size)
+aug_fwritev_AI(aug_fd fd, const struct iovec* iov, int size)
 {
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
-                    AUG_ESUPPORT, AUG_MSG("aug_fwritev() not supported"));
+                    AUG_ESUPPORT, AUG_MSG("aug_fwritev_AI() not supported"));
     return -1;
 }

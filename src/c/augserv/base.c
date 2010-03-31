@@ -79,7 +79,8 @@ static void
 sighandler_(int sig)
 {
     struct aug_event event;
-    aug_result result = aug_writeevent(events_, aug_sigtoevent(sig, &event));
+    aug_result result = aug_writeevent_A(events_,
+                                         aug_sigtoevent(sig, &event));
 
     /* The signal is ignored if the write fails with EAGAIN/EWOULDBLOCK.  This
        could happen if the event pipe is full.  What else can one do? */
@@ -93,7 +94,7 @@ static BOOL WINAPI
 ctrlhandler_(DWORD ctrl)
 {
     struct aug_event event = { AUG_EVENTSTOP, NULL };
-    aug_result result = aug_writeevent(events_, &event);
+    aug_result result = aug_writeevent_A(events_, &event);
 
     if (result < 0 && AUG_EXBLOCK != aug_getexcept(aug_tlx))
         abort();
@@ -103,14 +104,14 @@ ctrlhandler_(DWORD ctrl)
 #endif /* _WIN32 */
 
 static aug_result
-createevents_(void)
+createevents_AIN(void)
 {
     aug_mpool* mpool;
 
     assert(!events_);
 
     mpool = aug_getmpool(aug_tlx);
-    events_ = aug_createevents(mpool);
+    events_ = aug_createevents_AIN(mpool);
     aug_release(mpool);
 
     if (!events_)
@@ -148,12 +149,12 @@ aug_readservconf(const char* conffile, aug_bool batch, aug_bool daemon)
 }
 
 AUGSERV_API aug_result
-aug_initserv(void)
+aug_initserv_AIN(void)
 {
     assert(serv_.create_);
     assert(!task_);
 
-    if (createevents_() < 0)
+    if (createevents_AIN() < 0)
         return -1;
 
     /* Flush pending writes to main memory: when init_() is called, the

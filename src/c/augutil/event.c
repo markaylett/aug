@@ -117,7 +117,7 @@ flush_(aug_md md, unsigned wakeups)
     aug_rsize rsize;
 
     for (;;) {
-        if ((rsize = aug_mread(md, buf, (size_t)wakeups) < 0))
+        if ((rsize = aug_mread_AI(md, buf, (size_t)wakeups) < 0))
             switch (aug_getexcept(aug_tlx)) {
             case AUG_EXINTR:
                 /* Continue if interrupted. */
@@ -141,12 +141,12 @@ flush_(aug_md md, unsigned wakeups)
 }
 
 static aug_result
-wakeup_(aug_md md)
+wakeup_A(aug_md md)
 {
     const char ch = 1;
     aug_rsize rsize;
 
-    while ((rsize = aug_mwrite(md, &ch, 1)) < 0
+    while ((rsize = aug_mwrite_AI(md, &ch, 1)) < 0
            && AUG_EXINTR == aug_getexcept(aug_tlx))
         ;
 
@@ -162,7 +162,7 @@ struct aug_events_ {
 };
 
 static aug_result
-pushcasptr_(aug_events_t events, struct link_* link)
+pushcasptr_A(aug_events_t events, struct link_* link)
 {
     struct link_* next;
     do {
@@ -177,7 +177,7 @@ pushcasptr_(aug_events_t events, struct link_* link)
         return 0;
 
     /* Wakeup marker was set, so wakeup consumer. */
-    return wakeup_(events->mds_[1]);
+    return wakeup_A(events->mds_[1]);
 }
 
 static aug_result
@@ -229,14 +229,14 @@ loadcasptr_(aug_events_t events, struct link_** head)
 }
 
 AUGUTIL_API aug_events_t
-aug_createevents(aug_mpool* mpool)
+aug_createevents_AIN(aug_mpool* mpool)
 {
     aug_events_t events = aug_allocmem(mpool, sizeof(struct aug_events_));
     if (!events)
         return NULL;
 
     events->mpool_ = mpool;
-    if (aug_muxerpipe(events->mds_) < 0) {
+    if (aug_muxerpipe_AIN(events->mds_) < 0) {
         aug_freemem(mpool, events);
         return NULL;
     }
@@ -264,8 +264,8 @@ aug_destroyevents(aug_events_t events)
     while ((link = poplink_((struct link_**)&events->shared_)))
         destroylink_(link);
 
-    if (aug_mclose(events->mds_[0]) < 0
-        || aug_mclose(events->mds_[1]) < 0)
+    if (aug_mclose_I(events->mds_[0]) < 0
+        || aug_mclose_I(events->mds_[1]) < 0)
         aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
 
     aug_freemem(mpool, events);
@@ -309,10 +309,10 @@ aug_readevent(aug_events_t events, struct aug_event* event)
 }
 
 AUGUTIL_API aug_result
-aug_writeevent(aug_events_t events, const struct aug_event* event)
+aug_writeevent_A(aug_events_t events, const struct aug_event* event)
 {
     struct link_* next = createlink_(event->type_, event->ob_);
-    return next ? pushcasptr_(events, next) : -1;
+    return next ? pushcasptr_A(events, next) : -1;
 }
 
 AUGUTIL_API aug_md

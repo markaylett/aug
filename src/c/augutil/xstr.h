@@ -101,7 +101,7 @@ AUGUTIL_API aug_result
 aug_xstrcpyc(aug_xstr_t xstr, char ch);
 
 AUGUTIL_API aug_rsize
-aug_xstrread(aug_xstr_t xstr, aug_stream* src, size_t size);
+aug_xstrread_AI(aug_xstr_t xstr, aug_stream* src, size_t size);
 
 AUGUTIL_API size_t
 aug_xstrlen(aug_xstr_t xstr);
