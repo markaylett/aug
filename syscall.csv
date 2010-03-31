@@ -1,3 +1,4 @@
+"aug_[[:lower:]]+_[[:upper:]]+"
 syscall,EAGAIN,EINTR,ENOENT,affected
 accept,yes,yes,no,
 access,no,no,yes,aug_control

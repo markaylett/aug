@@ -161,7 +161,7 @@ aug_control_AIN(const struct aug_options* options, int event)
                 result = -1;
 
             } else {
-                result = send_(fd, fl.l_pid, event);
+                result = send_AI_(fd, fl.l_pid, event);
             }
         } else
             result -1;

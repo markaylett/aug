@@ -170,7 +170,7 @@ lockfile_AIN_(const char* path)
 
     /* Attempt to obtain exclusive lock. */
 
-    if (flock_(&fl, fd, F_SETLK, F_WRLCK) < 0) {
+    if (flock_AI_(&fl, fd, F_SETLK, F_WRLCK) < 0) {
 
         if (AUG_EXBLOCK == aug_getexcept(aug_tlx)) {
 
@@ -191,7 +191,7 @@ lockfile_AIN_(const char* path)
         goto fail;
     }
 
-    if (writepid_(fd) < 0)
+    if (writepid_AI_(fd) < 0)
         goto fail;
 
     /* Success: do not close the file - this would release the lock. */
@@ -249,7 +249,7 @@ aug_daemonise_AIN_(const struct aug_options* options)
     }
 
     if (daemonise_A_() < 0 || lockfile_AIN_(pidfile) < 0
-        || closein_IN_() < 0 || aug_initserv() < 0)
+        || closein_IN_() < 0 || aug_initserv_AIN() < 0)
         return -1;
 
     result = aug_runserv();

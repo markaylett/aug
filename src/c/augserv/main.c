@@ -63,7 +63,7 @@ foreground_(const struct aug_options* options)
                          AUG_FALSE) < 0)
         die_("aug_readservconf() failed");
 
-    if (aug_initserv() < 0)
+    if (aug_initserv_AIN() < 0)
         die_("aug_initserv() failed");
 
     result = aug_runserv();
@@ -75,12 +75,12 @@ foreground_(const struct aug_options* options)
 static aug_bool
 daemonise_(const struct aug_options* options)
 {
-    if (aug_daemonise(options) < 0) {
+    if (aug_daemonise_AIN(options) < 0) {
 
         if (AUG_EXNONE == aug_getexcept(aug_tlx))
             return AUG_FALSE; /* Want foreground. */
 
-        die_("aug_daemonise() failed");
+        die_("aug_daemonise_AIN() failed");
     }
 
     return AUG_TRUE;
