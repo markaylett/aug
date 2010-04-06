@@ -294,7 +294,7 @@ namespace aug {
             static void
             throwexcept()
             {
-                throwexcept();
+                aug::throwexcept();
             }
         };
 
@@ -309,7 +309,7 @@ namespace aug {
             throwexcept()
             {
                 // Always throw to avoid de-referencing pointer type.
-                throwexcept(AUG_EXALL);
+                aug::throwexcept(AUG_EXALL);
             }
         };
 
@@ -323,7 +323,7 @@ namespace aug {
             static void
             throwexcept()
             {
-                throwexcept();
+                aug::throwexcept();
             }
        };
     }

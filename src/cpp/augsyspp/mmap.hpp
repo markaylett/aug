@@ -33,9 +33,9 @@
 namespace aug {
 
     inline void
-    remmap(aug_mmap& mm, size_t offset, size_t len)
+    remmap_BIN(aug_mmap& mm, size_t offset, size_t len)
     {
-        verify(aug_remmap(&mm, offset, len));
+        verify(aug_remmap_BIN(&mm, offset, len));
     }
 
     inline void
@@ -50,26 +50,27 @@ namespace aug {
         return aug_mmapsize(&mm);
     }
 
-    class mmap : public mpool_ops {
+    class mmap_BIN : public mpool_ops {
     public:
         typedef aug_mmap ctype;
     private:
         aug_mmap* const mmap_;
 
-        mmap(const mmap&);
+        mmap_BIN(const mmap_BIN&);
 
-        mmap&
-        operator =(const mmap&);
+        mmap_BIN&
+        operator =(const mmap_BIN&);
 
     public:
-        ~mmap() AUG_NOTHROW
+        ~mmap_BIN() AUG_NOTHROW
         {
-            aug_destroymmap(mmap_);
+            aug_destroymmap_B(mmap_);
         }
 
-        mmap(mpoolref mpool, fdref ref, size_t offset, size_t len, int flags)
-            : mmap_(aug_createmmap(mpool.get(), ref.get(), offset, len,
-                                   flags))
+        mmap_BIN(mpoolref mpool, fdref ref, size_t offset, size_t len,
+                 int flags)
+            : mmap_(aug_createmmap_BIN(mpool.get(), ref.get(), offset, len,
+                                       flags))
         {
             verify(mmap_);
         }

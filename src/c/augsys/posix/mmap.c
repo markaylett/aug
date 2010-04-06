@@ -89,7 +89,7 @@ verify_(size_t size, size_t offset, size_t len)
 }
 
 static aug_result
-createmmap_A_(impl_t impl, size_t offset, size_t len)
+createmmap_B_(impl_t impl, size_t offset, size_t len)
 {
     void* addr;
 
@@ -109,7 +109,7 @@ createmmap_A_(impl_t impl, size_t offset, size_t len)
 }
 
 static aug_result
-destroymmap_A_(impl_t impl)
+destroymmap_B_(impl_t impl)
 {
     /* SYSCALL: munmap: EAGAIN */
     if (impl->mmap_.addr_

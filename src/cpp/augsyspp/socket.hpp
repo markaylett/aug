@@ -48,9 +48,9 @@ namespace aug {
      */
 
     inline void
-    setnonblock(sdref ref, bool on)
+    setnonblock_BI(sdref ref, bool on)
     {
-        verify(aug_ssetnonblock(ref.get(), on ? 1 : 0));
+        verify(aug_ssetnonblock_BI(ref.get(), on ? 1 : 0));
     }
 
     inline autosd
@@ -63,24 +63,24 @@ namespace aug {
     }
 
     inline autosd
-    accept(sdref ref, aug_endpoint& ep)
+    accept_BI(sdref ref, aug_endpoint& ep)
     {
-        autosd sd(aug_accept(ref.get(), &ep), close);
+        autosd sd(aug_accept_BI(ref.get(), &ep), close);
         if (null == sd)
             throwexcept();
         return sd;
     }
 
     inline void
-    bind(sdref ref, const aug_endpoint& ep)
+    bind_N(sdref ref, const aug_endpoint& ep)
     {
-        verify(aug_bind(ref.get(), &ep));
+        verify(aug_bind_N(ref.get(), &ep));
     }
 
     inline void
-    connect(sdref ref, const aug_endpoint& ep)
+    connect_BI(sdref ref, const aug_endpoint& ep)
     {
-        verify(aug_connect(ref.get(), &ep));
+        verify(aug_connect_BI(ref.get(), &ep));
     }
 
     inline aug_endpoint&
@@ -102,53 +102,53 @@ namespace aug {
     }
 
     inline aug_rsize
-    recv(sdref ref, void* buf, size_t len, int flags)
+    recv_BI(sdref ref, void* buf, size_t len, int flags)
     {
-        return verify(aug_recv(ref.get(), buf, len, flags));
+        return verify(aug_recv_BI(ref.get(), buf, len, flags));
     }
 
     inline aug_rsize
-    recvfrom(sdref ref, void* buf, size_t len, int flags,
-             aug_endpoint& ep)
+    recvfrom_BI(sdref ref, void* buf, size_t len, int flags,
+                aug_endpoint& ep)
     {
-        return verify(aug_recvfrom(ref.get(), buf, len, flags, &ep));
+        return verify(aug_recvfrom_BI(ref.get(), buf, len, flags, &ep));
     }
 
     inline aug_rsize
-    send(sdref ref, const void* buf, size_t len, int flags)
+    send_BI(sdref ref, const void* buf, size_t len, int flags)
     {
-        return verify(aug_send(ref.get(), buf, len, flags));
+        return verify(aug_send_BI(ref.get(), buf, len, flags));
     }
 
     inline aug_rsize
-    sendto(sdref ref, const void* buf, size_t len, int flags,
-           const aug_endpoint& ep)
+    sendto_BI(sdref ref, const void* buf, size_t len, int flags,
+              const aug_endpoint& ep)
     {
-        return verify(aug_sendto(ref.get(), buf, len, flags, &ep));
+        return verify(aug_sendto_BI(ref.get(), buf, len, flags, &ep));
     }
 
     inline aug_rsize
-    read(sdref ref, void* buf, size_t len)
+    read_BI(sdref ref, void* buf, size_t len)
     {
-        return verify(aug_sread(ref.get(), buf, len));
+        return verify(aug_sread_BI(ref.get(), buf, len));
     }
 
     inline aug_rsize
-    readv(sdref ref, const iovec* iov, int size)
+    readv_BI(sdref ref, const iovec* iov, int size)
     {
-        return verify(aug_sreadv(ref.get(), iov, size));
+        return verify(aug_sreadv_BI(ref.get(), iov, size));
     }
 
     inline aug_rsize
-    write(sdref ref, const void* buf, size_t len)
+    write_BI(sdref ref, const void* buf, size_t len)
     {
-        return verify(aug_swrite(ref.get(), buf, len));
+        return verify(aug_swrite_BI(ref.get(), buf, len));
     }
 
     inline aug_rsize
-    writev(sdref ref, const iovec* iov, int size)
+    writev_BI(sdref ref, const iovec* iov, int size)
     {
-        return verify(aug_swritev(ref.get(), iov, size));
+        return verify(aug_swritev_BI(ref.get(), iov, size));
     }
 
     inline void
@@ -172,10 +172,10 @@ namespace aug {
     }
 
     inline autosds
-    socketpair(int domain, int type, int protocol)
+    socketpair_BIN(int domain, int type, int protocol)
     {
         aug_sd sv[2];
-        verify(aug_socketpair(domain, type, protocol, sv));
+        verify(aug_socketpair_BIN(domain, type, protocol, sv));
         return autosds(sv[0], sv[1], close);
     }
 

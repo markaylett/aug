@@ -46,24 +46,24 @@ namespace aug {
      */
 
     inline void
-    setnonblock(fdref ref, bool on)
+    setnonblock_BI(fdref ref, bool on)
     {
-        verify(aug_fsetnonblock(ref.get(), on ? 1 : 0));
+        verify(aug_fsetnonblock_BI(ref.get(), on ? 1 : 0));
     }
 
     inline autofd
-    open(const char* path, int flags)
+    open_N(const char* path, int flags)
     {
-        autofd fd(aug_fopen(path, flags), close);
+        autofd fd(aug_fopen_N(path, flags), close);
         if (null == fd)
             throwexcept();
         return fd;
     }
 
     inline autofd
-    open(const char* path, int flags, mode_t mode)
+    open_N(const char* path, int flags, mode_t mode)
     {
-        autofd fd(aug_fopen(path, flags, mode), close);
+        autofd fd(aug_fopen_N(path, flags, mode), close);
         if (null == fd)
             throwexcept();
         return fd;
@@ -78,15 +78,15 @@ namespace aug {
     }
 
     inline aug_rsize
-    read(fdref ref, void* buf, size_t size)
+    read_BI(fdref ref, void* buf, size_t size)
     {
-        return verify(aug_fread(ref.get(), buf, size));
+        return verify(aug_fread_BI(ref.get(), buf, size));
     }
 
     inline aug_rsize
-    write(fdref ref, const void* buf, size_t size)
+    write_BI(fdref ref, const void* buf, size_t size)
     {
-        return verify(aug_fwrite(ref.get(), buf, size));
+        return verify(aug_fwrite_BI(ref.get(), buf, size));
     }
 
     /**
@@ -98,17 +98,17 @@ namespace aug {
      */
 
     inline size_t
-    fsize(fdref ref)
+    fsize_IN(fdref ref)
     {
         size_t size;
-        verify(aug_fsize(ref.get(), &size));
+        verify(aug_fsize_IN(ref.get(), &size));
         return size;
     }
 
     inline void
-    msleep(unsigned ms)
+    msleep_I(unsigned ms)
     {
-        return aug_msleep(ms);
+        return aug_msleep_I(ms);
     }
 }
 

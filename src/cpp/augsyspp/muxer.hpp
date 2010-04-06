@@ -46,9 +46,9 @@ namespace aug {
      */
 
     inline unsigned
-    waitmdevents(aug_muxer_t muxer, const aug_timeval& timeout)
+    waitmdevents_I(aug_muxer_t muxer, const aug_timeval& timeout)
     {
-        return verify(aug_waitmdevents(muxer, &timeout));
+        return verify(aug_waitmdevents_I(muxer, &timeout));
     }
 
     /**
@@ -56,15 +56,15 @@ namespace aug {
      */
 
     inline unsigned
-    waitmdevents(aug_muxer_t muxer)
+    waitmdevents_I(aug_muxer_t muxer)
     {
-        return verify(aug_waitmdevents(muxer, 0));
+        return verify(aug_waitmdevents_I(muxer, 0));
     }
 
     inline unsigned
-    pollmdevents(aug_muxer_t muxer)
+    pollmdevents_I(aug_muxer_t muxer)
     {
-        return verify(aug_pollmdevents(muxer));
+        return verify(aug_pollmdevents_I(muxer));
     }
 
     inline unsigned short
@@ -132,10 +132,10 @@ namespace aug {
     }
 
     inline automds
-    muxerpipe()
+    muxerpipe_BIN()
     {
         aug_md mds[2];
-        verify(aug_muxerpipe(mds));
+        verify(aug_muxerpipe_BIN(mds));
         return automds(mds[0], mds[1], close);
     }
 }
