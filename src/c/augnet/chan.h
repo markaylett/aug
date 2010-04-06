@@ -40,8 +40,8 @@ struct ssl_ctx_st;
  */
 
 AUGNET_API aug_chan*
-aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, struct ssl_ctx_st* sslctx);
+aug_createclient_BI(aug_mpool* mpool, const char* host, const char* serv,
+                    aug_muxer_t muxer, struct ssl_ctx_st* sslctx);
 
 /**
  * Create a server socket channel.

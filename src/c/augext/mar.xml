@@ -35,7 +35,7 @@
 
     </method>
 
-    <method name="clear_AIN" type="aug_rint" qname="clearfields_AIN">
+    <method name="clear_BIN" type="aug_rint" qname="clearfields_BIN">
 
       Clear all fields within message archive.
 
@@ -43,7 +43,7 @@
 
     </method>
 
-    <method name="deln_AIN" type="aug_result" qname="delfieldn_AIN">
+    <method name="deln_BIN" type="aug_result" qname="delfieldn_BIN">
 
       Delete field (by ordinal) within message archive.
 
@@ -55,7 +55,7 @@
       <param name="n" type="unsigned"/>
     </method>
 
-    <method name="delp_AIN" type="aug_rint" qname="delfieldp_AIN">
+    <method name="delp_BIN" type="aug_rint" qname="delfieldp_BIN">
 
       Delete field (by name) within message archive.
 
@@ -113,7 +113,7 @@
       <param name="field" type="struct aug_field&"/>
     </method>
 
-    <method name="putn_AIN" type="aug_result" qname="putfieldn_AIN">
+    <method name="putn_BIN" type="aug_result" qname="putfieldn_BIN">
 
       Set field value (by ordinal) within message archive.
 
@@ -131,7 +131,7 @@
       <param name="size" type="unsigned"/>
     </method>
 
-    <method name="putp_AIN" type="aug_rint" qname="putfieldp_AIN">
+    <method name="putp_BIN" type="aug_rint" qname="putfieldp_BIN">
 
       Set field value (by name) within message archive.
 
@@ -149,7 +149,7 @@
       <param name="size" type="unsigned"/>
     </method>
 
-    <method name="put_AIN" type="aug_rint" qname="putfield_AIN">
+    <method name="put_BIN" type="aug_rint" qname="putfield_BIN">
 
       Set field within message archive.
 
@@ -196,7 +196,7 @@
 
     </method>
 
-    <method name="insert_AIN" type="aug_result" qname="insertmar_AIN">
+    <method name="insert_BIN" type="aug_result" qname="insertmar_BIN">
 
       Insert file into body content of message archive.
 
@@ -222,7 +222,7 @@
       <param name="whence" type="int"/>
     </method>
 
-    <method name="setcontent_AIN" type="aug_result" qname="setcontent_AIN">
+    <method name="setcontent_BIN" type="aug_result" qname="setcontent_BIN">
 
       Set content within message archive.
 
@@ -240,7 +240,7 @@
       Flush message archive buffers.
     </method>
 
-    <method name="truncate_AIN" type="aug_result" qname="truncatemar_AIN">
+    <method name="truncate_BIN" type="aug_result" qname="truncatemar_BIN">
 
       Truncate content within message archive.
 
@@ -251,7 +251,7 @@
       <param name="size" type="unsigned"/>
     </method>
 
-    <method name="write_AIN" type="aug_rsize" qname="writemar_AIN">
+    <method name="write_BIN" type="aug_rsize" qname="writemar_BIN">
 
       Write content to message archive.
 
@@ -266,7 +266,7 @@
       <param name="len" type="unsigned"/>
     </method>
 
-    <method name="extract_AIN" type="aug_result" qname="extractmar_AIN">
+    <method name="extract_BIN" type="aug_result" qname="extractmar_BIN">
 
       Extract content from message archive into file.
 

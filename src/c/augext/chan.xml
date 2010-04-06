@@ -66,7 +66,7 @@
 
     <method name="close" type="aug_result" qname="closechan"/>
 
-    <method name="process" type="aug_chan" object="true" verify="true" qname="processchan">
+    <method name="process_BI" type="aug_chan" object="true" verify="true" qname="processchan_BI">
       <param name="handler" type="aug_chandler" object="true"/>
       <param name="fork" type="aug_bool&"/>
     </method>

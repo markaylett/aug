@@ -63,7 +63,7 @@ foreground_(const struct aug_options* options)
                          AUG_FALSE) < 0)
         die_("aug_readservconf() failed");
 
-    if (aug_initserv_AIN() < 0)
+    if (aug_initserv_BIN() < 0)
         die_("aug_initserv() failed");
 
     result = aug_runserv();
@@ -75,12 +75,12 @@ foreground_(const struct aug_options* options)
 static aug_bool
 daemonise_(const struct aug_options* options)
 {
-    if (aug_daemonise_AIN(options) < 0) {
+    if (aug_daemonise_BIN(options) < 0) {
 
         if (AUG_EXNONE == aug_getexcept(aug_tlx))
             return AUG_FALSE; /* Want foreground. */
 
-        die_("aug_daemonise_AIN() failed");
+        die_("aug_daemonise_BIN() failed");
     }
 
     return AUG_TRUE;
@@ -90,23 +90,23 @@ daemonise_(const struct aug_options* options)
 static void
 start_(const struct aug_options* options)
 {
-    if (aug_start(options) < 0)
-        die_("aug_start() failed");
+    if (aug_start_N(options) < 0)
+        die_("aug_start_N() failed");
 }
 #endif /* _WIN32 */
 
 static void
 control_(const struct aug_options* options, int sig)
 {
-    if (aug_control(options, sig) < 0)
+    if (aug_control_BIN(options, sig) < 0)
         die_("aug_control() failed");
 }
 
 static void
 install_(const struct aug_options* options)
 {
-    if (aug_install(options) < 0)
-        die_("aug_install() failed");
+    if (aug_install_N(options) < 0)
+        die_("aug_install_N() failed");
 }
 
 static void
@@ -126,8 +126,8 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
 
     aug_setserv_(serv);
 
-    if (aug_readopts(&options, argc, argv) < 0) {
-        aug_perrinfo(aug_tlx, "getreadopts() failed", NULL);
+    if (aug_readopts_N(&options, argc, argv) < 0) {
+        aug_perrinfo(aug_tlx, "getreadopts_N() failed", NULL);
         return EXIT_FAILURE;
     }
 
@@ -141,7 +141,7 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
 
     if (!GetStdHandle(STD_INPUT_HANDLE)) {
 
-        /* Note: aug_readopts() will be called from the main service
+        /* Note: aug_readopts_N() will be called from the main service
            function. */
 
         if (daemonise_(&options))

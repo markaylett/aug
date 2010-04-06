@@ -64,7 +64,7 @@ torw_(int from)
 }
 
 static aug_result
-init_AIN_(aug_seq_t seq, struct aug_info_* info)
+init_BIN_(aug_seq_t seq, struct aug_info_* info)
 {
     static const aug_proto_t PROTO = 3U;
     unsigned size = aug_seqsize_(seq);
@@ -90,7 +90,7 @@ init_AIN_(aug_seq_t seq, struct aug_info_* info)
         char* ptr;
 
         if (aug_setregion_(seq, 0, size) < 0
-            || !(ptr = aug_resizeseq_AIN_(seq, AUG_LEADERSIZE)))
+            || !(ptr = aug_resizeseq_BIN_(seq, AUG_LEADERSIZE)))
             return -1;
 
         memcpy(ptr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
@@ -205,7 +205,7 @@ compact_(aug_mar* obj)
 }
 
 static aug_rint
-clear_AIN_(aug_mar* obj)
+clear_BIN_(aug_mar* obj)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -214,11 +214,11 @@ clear_AIN_(aug_mar* obj)
                         AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_clearfields_AIN_(impl->seq_, &impl->info_);
+    return aug_clearfields_BIN_(impl->seq_, &impl->info_);
 }
 
 static aug_result
-deln_AIN_(aug_mar* obj, unsigned n)
+deln_BIN_(aug_mar* obj, unsigned n)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -227,11 +227,11 @@ deln_AIN_(aug_mar* obj, unsigned n)
                         AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_delfieldn_AIN_(impl->seq_, &impl->info_, n);
+    return aug_delfieldn_BIN_(impl->seq_, &impl->info_, n);
 }
 
 static aug_rint
-delp_AIN_(aug_mar* obj, const char* name)
+delp_BIN_(aug_mar* obj, const char* name)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -240,7 +240,7 @@ delp_AIN_(aug_mar* obj, const char* name)
                         AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_delfieldp_AIN_(impl->seq_, &impl->info_, name);
+    return aug_delfieldp_BIN_(impl->seq_, &impl->info_, name);
 }
 
 static aug_rint
@@ -283,7 +283,7 @@ get_(aug_mar* obj, unsigned n, struct aug_field* field)
 }
 
 static aug_result
-putn_AIN_(aug_mar* obj, unsigned n, const void* value, unsigned size)
+putn_BIN_(aug_mar* obj, unsigned n, const void* value, unsigned size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -292,11 +292,11 @@ putn_AIN_(aug_mar* obj, unsigned n, const void* value, unsigned size)
                         AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_putfieldn_AIN_(impl->seq_, &impl->info_, n, value, size);
+    return aug_putfieldn_BIN_(impl->seq_, &impl->info_, n, value, size);
 }
 
 static aug_rint
-putp_AIN_(aug_mar* obj, const char* name, const void* value, unsigned size)
+putp_BIN_(aug_mar* obj, const char* name, const void* value, unsigned size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -305,11 +305,11 @@ putp_AIN_(aug_mar* obj, const char* name, const void* value, unsigned size)
                         AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_putfieldp_AIN_(impl->seq_, &impl->info_, name, value, size);
+    return aug_putfieldp_BIN_(impl->seq_, &impl->info_, name, value, size);
 }
 
 static aug_rint
-put_AIN_(aug_mar* obj, const struct aug_field* field)
+put_BIN_(aug_mar* obj, const struct aug_field* field)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -318,7 +318,7 @@ put_AIN_(aug_mar* obj, const struct aug_field* field)
                         AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_putfieldp_AIN_(impl->seq_, &impl->info_, field->name_,
+    return aug_putfieldp_BIN_(impl->seq_, &impl->info_, field->name_,
                               field->value_, field->size_);
 }
 
@@ -356,7 +356,7 @@ getcount_(aug_mar* obj)
 }
 
 static aug_result
-insert_AIN_(aug_mar* obj, const char* path)
+insert_BIN_(aug_mar* obj, const char* path)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     aug_mpool* mpool;
@@ -373,14 +373,14 @@ insert_AIN_(aug_mar* obj, const char* path)
 
     if (0 != (size = aug_mfileresvd_(mfile))) {
 
-        if (!(addr = aug_mapmfile_AIN_(mfile, size))
-            || aug_setcontent_AIN(obj, addr, size) < 0) {
-            aug_closemfile_AI_(mfile);
+        if (!(addr = aug_mapmfile_BIN_(mfile, size))
+            || aug_setcontent_BIN(obj, addr, size) < 0) {
+            aug_closemfile_BI_(mfile);
             return -1;
         }
     }
 
-    return aug_closemfile_AI_(mfile);
+    return aug_closemfile_BI_(mfile);
 }
 
 static aug_rsize
@@ -419,7 +419,7 @@ seek_(aug_mar* obj, off_t offset, int whence)
 }
 
 static aug_result
-setcontent_AIN_(aug_mar* obj, const void* cdata, unsigned size)
+setcontent_BIN_(aug_mar* obj, const void* cdata, unsigned size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -428,7 +428,7 @@ setcontent_AIN_(aug_mar* obj, const void* cdata, unsigned size)
                         AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_setcontent_AIN_(impl->seq_, &impl->info_, cdata, size);
+    return aug_setcontent_BIN_(impl->seq_, &impl->info_, cdata, size);
 }
 
 static aug_result
@@ -439,7 +439,7 @@ sync_(aug_mar* obj)
 }
 
 static aug_result
-truncate_AIN_(aug_mar* obj, unsigned size)
+truncate_BIN_(aug_mar* obj, unsigned size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
@@ -452,11 +452,11 @@ truncate_AIN_(aug_mar* obj, unsigned size)
     /* In keeping with the semantics of ftruncate, this function does not
        modify the offset - the equivalent of the file offset. */
 
-    return aug_truncate_AIN_(impl->seq_, &impl->info_, size);
+    return aug_truncate_BIN_(impl->seq_, &impl->info_, size);
 }
 
 static aug_rsize
-write_AIN_(aug_mar* obj, const void* buf, unsigned len)
+write_BIN_(aug_mar* obj, const void* buf, unsigned len)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     aug_rsize rsize;
@@ -476,7 +476,7 @@ write_AIN_(aug_mar* obj, const void* buf, unsigned len)
             return -1;
     }
 
-    if (0 < (rsize = aug_write_AIN_(impl->seq_, &impl->info_,
+    if (0 < (rsize = aug_write_BIN_(impl->seq_, &impl->info_,
                                     impl->offset_, buf, len)))
         impl->offset_ += rsize;
 
@@ -484,7 +484,7 @@ write_AIN_(aug_mar* obj, const void* buf, unsigned len)
 }
 
 static aug_result
-extract_AIN_(aug_mar* obj, const char* path)
+extract_BIN_(aug_mar* obj, const char* path)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     aug_mpool* mpool;
@@ -514,16 +514,16 @@ extract_AIN_(aug_mar* obj, const char* path)
 
     if (size) {
 
-        if (!(dst = aug_mapmfile_AIN_(mfile, size)))
+        if (!(dst = aug_mapmfile_BIN_(mfile, size)))
             goto fail;
 
         memcpy(dst, src, size);
     }
 
-    return aug_closemfile_AI_(mfile);
+    return aug_closemfile_BI_(mfile);
 
  fail:
-    aug_closemfile_AI_(mfile);
+    aug_closemfile_BI_(mfile);
     return -1;
 }
 
@@ -552,25 +552,25 @@ static const struct aug_marvtbl marvtbl_ = {
     mar_retain_,
     mar_release_,
     compact_,
-    clear_AIN_,
-    deln_AIN_,
-    delp_AIN_,
+    clear_BIN_,
+    deln_BIN_,
+    delp_BIN_,
     getn_,
     getp_,
     get_,
-    putn_AIN_,
-    putp_AIN_,
-    put_AIN_,
+    putn_BIN_,
+    putp_BIN_,
+    put_BIN_,
     ntop_,
     pton_,
     getcount_,
-    insert_AIN_,
+    insert_BIN_,
     seek_,
-    setcontent_AIN_,
+    setcontent_BIN_,
     sync_,
-    truncate_AIN_,
-    write_AIN_,
-    extract_AIN_,
+    truncate_BIN_,
+    write_BIN_,
+    extract_BIN_,
     read_,
 };
 
@@ -638,7 +638,7 @@ static const struct aug_blobvtbl blobvtbl_ = {
 };
 
 AUGMAR_API aug_mar*
-aug_createmar_AIN(aug_mpool* mpool)
+aug_createmar_BIN(aug_mpool* mpool)
 {
     aug_seq_t seq;
     struct aug_info_ info;
@@ -647,7 +647,7 @@ aug_createmar_AIN(aug_mpool* mpool)
     if (!(seq = aug_createseq_(mpool, sizeof(struct impl_))))
         return NULL;
 
-    if (init_AIN_(seq, &info) < 0) {
+    if (init_BIN_(seq, &info) < 0) {
         aug_destroyseq_(seq);
         return NULL;
     }
@@ -673,7 +673,7 @@ aug_createmar_AIN(aug_mpool* mpool)
 }
 
 AUGMAR_API aug_mar*
-aug_openmar_AIN(aug_mpool* mpool, const char* path, int flags, ...)
+aug_openmar_BIN(aug_mpool* mpool, const char* path, int flags, ...)
 {
     aug_seq_t seq;
     struct aug_info_ info;
@@ -695,7 +695,7 @@ aug_openmar_AIN(aug_mpool* mpool, const char* path, int flags, ...)
                                 sizeof(struct impl_))))
         return NULL;
 
-    if (init_AIN_(seq, &info) < 0) {
+    if (init_BIN_(seq, &info) < 0) {
         aug_destroyseq_(seq);
         return NULL;
     }
@@ -723,7 +723,7 @@ aug_openmar_AIN(aug_mpool* mpool, const char* path, int flags, ...)
     if (flags & AUG_TRUNC) {
 
         assert(AUG_TRUNC == (flags & AUG_TRUNC));
-        if (aug_truncatemar_AIN(&impl->mar_, 0) < 0) {
+        if (aug_truncatemar_BIN(&impl->mar_, 0) < 0) {
             aug_release(&impl->mar_);
             return NULL;
         }

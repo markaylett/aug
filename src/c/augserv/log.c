@@ -125,7 +125,7 @@ redirectout_I_(int fd)
  done:
     /* SYSCALL: close: EINTR */
 #if !defined(_WIN32)
-    if (close(old) < 0)
+    if (close(old) < 0 && EINTR != errno)
 #else /* _WIN32 */
     if (_close(old) < 0)
 #endif /* _WIN32 */
@@ -155,7 +155,7 @@ aug_openlog_IN(const char* path)
 
     /* SYSCALL: close: EINTR */
 #if !defined(_WIN32)
-    if (close(fd) < 0)
+    if (close(fd) < 0 && EINTR != errno)
 #else /* _WIN32 */
     if (_close(fd) < 0)
 #endif /* _WIN32 */

@@ -176,7 +176,7 @@ destroymmap_(impl_t impl)
 }
 
 AUGSYS_API void
-aug_destroymmap_A(struct aug_mmap* mm)
+aug_destroymmap_B(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     aug_mpool* mpool = impl->mpool_;
@@ -186,7 +186,7 @@ aug_destroymmap_A(struct aug_mmap* mm)
 }
 
 AUGSYS_API struct aug_mmap*
-aug_createmmap_AIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+aug_createmmap_BIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
                    int flags)
 {
     impl_t impl;
@@ -226,7 +226,7 @@ aug_createmmap_AIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
 }
 
 AUGSYS_API aug_result
-aug_remmap_AIN(struct aug_mmap* mm, size_t offset, size_t len)
+aug_remmap_BIN(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;

@@ -20,7 +20,7 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "augsys/uio.h" /* aug_freadv_AI() */
+#include "augsys/uio.h" /* aug_freadv_BI() */
 #include "augsys/unistd.h"
 
 #include "augctx/base.h"
@@ -29,15 +29,15 @@
 #include <string.h>     /* memcpy() */
 
 AUGSYS_API aug_result
-aug_sclose_I(aug_sd sd)
+aug_sclose(aug_sd sd)
 {
-    return aug_fclose_I(sd);
+    return aug_fclose(sd);
 }
 
 AUGSYS_API aug_result
-aug_ssetnonblock_AI(aug_sd sd, aug_bool on)
+aug_ssetnonblock_BI(aug_sd sd, aug_bool on)
 {
-    return aug_fsetnonblock_AI(sd, on);
+    return aug_fsetnonblock_BI(sd, on);
 }
 
 AUGSYS_API int
@@ -53,7 +53,7 @@ aug_socket(int domain, int type, int protocol)
 }
 
 AUGSYS_API aug_sd
-aug_accept_AI(aug_sd sd, struct aug_endpoint* ep)
+aug_accept_BI(aug_sd sd, struct aug_endpoint* ep)
 {
     int fd;
     ep->len_ = AUG_MAXADDRLEN;
@@ -75,7 +75,7 @@ aug_bind_N(aug_sd sd, const struct aug_endpoint* ep)
 }
 
 AUGSYS_API aug_result
-aug_connect_AI(aug_sd sd, const struct aug_endpoint* ep)
+aug_connect_BI(aug_sd sd, const struct aug_endpoint* ep)
 {
     /* SYSCALL: connect: EAGAIN, EINTR */
     if (connect(sd, &ep->un_.sa_, ep->len_) < 0) {
@@ -118,7 +118,7 @@ aug_listen(aug_sd sd, int backlog)
 }
 
 AUGSYS_API aug_rsize
-aug_recv_AI(aug_sd sd, void* buf, size_t len, int flags)
+aug_recv_BI(aug_sd sd, void* buf, size_t len, int flags)
 {
     /* SYSCALL: recv: EAGAIN, EINTR */
     ssize_t ret = recv(sd, buf, len, flags);
@@ -130,7 +130,7 @@ aug_recv_AI(aug_sd sd, void* buf, size_t len, int flags)
 }
 
 AUGSYS_API aug_rsize
-aug_recvfrom_AI(aug_sd sd, void* buf, size_t len, int flags,
+aug_recvfrom_BI(aug_sd sd, void* buf, size_t len, int flags,
                 struct aug_endpoint* ep)
 {
     ssize_t ret;
@@ -144,7 +144,7 @@ aug_recvfrom_AI(aug_sd sd, void* buf, size_t len, int flags,
 }
 
 AUGSYS_API aug_rsize
-aug_send_AI(aug_sd sd, const void* buf, size_t len, int flags)
+aug_send_BI(aug_sd sd, const void* buf, size_t len, int flags)
 {
     /* SYSCALL: send: EAGAIN, EINTR */
     ssize_t ret = send(sd, buf, len, flags);
@@ -156,7 +156,7 @@ aug_send_AI(aug_sd sd, const void* buf, size_t len, int flags)
 }
 
 AUGSYS_API aug_rsize
-aug_sendto_AI(aug_sd sd, const void* buf, size_t len, int flags,
+aug_sendto_BI(aug_sd sd, const void* buf, size_t len, int flags,
               const struct aug_endpoint* ep)
 {
     /* SYSCALL: sendto: EAGAIN, EINTR */
@@ -169,27 +169,27 @@ aug_sendto_AI(aug_sd sd, const void* buf, size_t len, int flags,
 }
 
 AUGSYS_API aug_rsize
-aug_sread_AI(aug_sd sd, void* buf, size_t len)
+aug_sread_BI(aug_sd sd, void* buf, size_t len)
 {
-    return aug_fread_AI(sd, buf, len);
+    return aug_fread_BI(sd, buf, len);
 }
 
 AUGSYS_API aug_rsize
-aug_sreadv_AI(aug_sd sd, const struct iovec* iov, int size)
+aug_sreadv_BI(aug_sd sd, const struct iovec* iov, int size)
 {
-    return aug_freadv_AI(sd, iov, size);
+    return aug_freadv_BI(sd, iov, size);
 }
 
 AUGSYS_API aug_rsize
-aug_swrite_AI(aug_sd sd, const void* buf, size_t len)
+aug_swrite_BI(aug_sd sd, const void* buf, size_t len)
 {
-    return aug_fwrite_AI(sd, buf, len);
+    return aug_fwrite_BI(sd, buf, len);
 }
 
 AUGSYS_API aug_rsize
-aug_swritev_AI(aug_sd sd, const struct iovec* iov, int size)
+aug_swritev_BI(aug_sd sd, const struct iovec* iov, int size)
 {
-    return aug_fwritev_AI(sd, iov, size);
+    return aug_fwritev_BI(sd, iov, size);
 }
 
 AUGSYS_API aug_result

@@ -138,7 +138,7 @@ getsize_(const char* buf, size_t size)
     /* FIXME: Alter the fix parsing logic so that it does not assume a
        static header with a constant begin string value. */
 
-    unsigned value;
+    unsigned value = 0;
     aug_rsize rsize;
 
     /* In order for the buffer to contain the body length, it must be able
@@ -229,7 +229,7 @@ aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size)
 
     /* Return on error or end of file. */
 
-    rsize = aug_xstrread(stream->xstr_, src, size);
+    rsize = aug_xstrread_BI(stream->xstr_, src, size);
     if (rsize < 0)
         return -1;
 

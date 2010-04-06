@@ -49,7 +49,7 @@ createxstr_(size_t size)
 }
 
 static aug_xstr_t
-makepath_(const char* conffile)
+makepath_N_(const char* conffile)
 {
     const char* program;
     char buf[AUG_PATH_MAX + 1];
@@ -64,7 +64,7 @@ makepath_(const char* conffile)
     if (!(s = createxstr_(sizeof(buf))))
         return NULL;
 
-    if (!aug_realpath(program, buf, sizeof(buf)))
+    if (!aug_realpath_N(program, buf, sizeof(buf)))
         goto fail;
 
     if (aug_xstrcatc(s, '"') < 0 || aug_xstrcats(s, buf) < 0
@@ -73,7 +73,7 @@ makepath_(const char* conffile)
 
     if (conffile) {
 
-        if (!aug_realpath(conffile, buf, sizeof(buf)))
+        if (!aug_realpath_N(conffile, buf, sizeof(buf)))
             goto fail;
 
         if (aug_xstrcats(s, " -f \"") < 0 || aug_xstrcats(s, buf) < 0
@@ -89,7 +89,7 @@ makepath_(const char* conffile)
 }
 
 static aug_result
-start_(SC_HANDLE scm, const struct aug_options* options)
+start_N_(SC_HANDLE scm, const struct aug_options* options)
 {
     const char* sname;
     SC_HANDLE serv;
@@ -121,7 +121,7 @@ start_(SC_HANDLE scm, const struct aug_options* options)
         /* Specify absolute path to configuration file. */
 
         char buf[AUG_PATH_MAX + 1];
-        if (!(argv[1] = aug_realpath(argv[1], buf, sizeof(buf))))
+        if (!(argv[1] = aug_realpath_N(argv[1], buf, sizeof(buf))))
             goto done;
 
         b = StartService(serv, 2, argv);
@@ -172,7 +172,7 @@ control_(SC_HANDLE scm, int event)
 }
 
 static aug_result
-install_(SC_HANDLE scm, const struct aug_options* options)
+install_N_(SC_HANDLE scm, const struct aug_options* options)
 {
     const char* sname, * lname;
     aug_xstr_t path;
@@ -191,7 +191,7 @@ install_(SC_HANDLE scm, const struct aug_options* options)
         return -1;
     }
 
-    if (!(path = makepath_(AUG_CONFFILE(options))))
+    if (!(path = makepath_N_(AUG_CONFFILE(options))))
         return -1;
 
     /* An alternative to running as "Local System" (the default), is to run as
@@ -257,7 +257,7 @@ uninstall_(SC_HANDLE scm)
 }
 
 AUGSERV_API aug_result
-aug_start(const struct aug_options* options)
+aug_start_N(const struct aug_options* options)
 {
     SC_HANDLE scm;
     aug_result result;
@@ -267,13 +267,13 @@ aug_start(const struct aug_options* options)
         return -1;
     }
 
-    result = start_(scm, options);
+    result = start_N_(scm, options);
     CloseServiceHandle(scm);
     return result;
 }
 
 AUGSERV_API aug_result
-aug_control(const struct aug_options* options, int event)
+aug_control_BIN(const struct aug_options* options, int event)
 {
     SC_HANDLE scm;
     aug_result result;
@@ -289,7 +289,7 @@ aug_control(const struct aug_options* options, int event)
 }
 
 AUGSERV_API aug_result
-aug_install(const struct aug_options* options)
+aug_install_N(const struct aug_options* options)
 {
     SC_HANDLE scm;
     aug_result result;
@@ -299,7 +299,7 @@ aug_install(const struct aug_options* options)
         return -1;
     }
 
-    result = install_(scm, options);
+    result = install_N_(scm, options);
     CloseServiceHandle(scm);
     return result;
 }

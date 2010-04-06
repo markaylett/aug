@@ -78,31 +78,31 @@ fstream_shutdown_(aug_stream* ob)
 }
 
 static aug_rsize
-fstream_read_AI_(aug_stream* ob, void* buf, size_t size)
+fstream_read_BI_(aug_stream* ob, void* buf, size_t size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
-    return aug_fread_AI(impl->fd_, buf, size);
+    return aug_fread_BI(impl->fd_, buf, size);
 }
 
 static aug_rsize
-fstream_readv_AI_(aug_stream* ob, const struct iovec* iov, int size)
+fstream_readv_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
-    return aug_freadv_AI(impl->fd_, iov, size);
+    return aug_freadv_BI(impl->fd_, iov, size);
 }
 
 static aug_rsize
-fstream_write_AI_(aug_stream* ob, const void* buf, size_t size)
+fstream_write_BI_(aug_stream* ob, const void* buf, size_t size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
-    return aug_fwrite_AI(impl->fd_, buf, size);
+    return aug_fwrite_BI(impl->fd_, buf, size);
 }
 
 static aug_rsize
-fstream_writev_AI_(aug_stream* ob, const struct iovec* iov, int size)
+fstream_writev_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
-    return aug_fwritev_AI(impl->fd_, iov, size);
+    return aug_fwritev_BI(impl->fd_, iov, size);
 }
 
 static const struct aug_streamvtbl fstreamvtbl_ = {
@@ -110,10 +110,10 @@ static const struct aug_streamvtbl fstreamvtbl_ = {
     fstream_retain_,
     fstream_release_,
     fstream_shutdown_,
-    fstream_read_AI_,
-    fstream_readv_AI_,
-    fstream_write_AI_,
-    fstream_writev_AI_
+    fstream_read_BI_,
+    fstream_readv_BI_,
+    fstream_write_BI_,
+    fstream_writev_BI_
 };
 
 struct simpl_ {
@@ -162,31 +162,31 @@ sstream_shutdown_(aug_stream* ob)
 }
 
 static aug_rsize
-sstream_read_AI_(aug_stream* ob, void* buf, size_t size)
+sstream_read_BI_(aug_stream* ob, void* buf, size_t size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);
-    return aug_sread_AI(impl->sd_, buf, size);
+    return aug_sread_BI(impl->sd_, buf, size);
 }
 
 static aug_rsize
-sstream_readv_AI_(aug_stream* ob, const struct iovec* iov, int size)
+sstream_readv_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);
-    return aug_sreadv_AI(impl->sd_, iov, size);
+    return aug_sreadv_BI(impl->sd_, iov, size);
 }
 
 static aug_rsize
-sstream_write_AI_(aug_stream* ob, const void* buf, size_t size)
+sstream_write_BI_(aug_stream* ob, const void* buf, size_t size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);
-    return aug_swrite_AI(impl->sd_, buf, size);
+    return aug_swrite_BI(impl->sd_, buf, size);
 }
 
 static aug_rsize
-sstream_writev_AI_(aug_stream* ob, const struct iovec* iov, int size)
+sstream_writev_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);
-    return aug_swritev_AI(impl->sd_, iov, size);
+    return aug_swritev_BI(impl->sd_, iov, size);
 }
 
 static const struct aug_streamvtbl sstreamvtbl_ = {
@@ -194,10 +194,10 @@ static const struct aug_streamvtbl sstreamvtbl_ = {
     sstream_retain_,
     sstream_release_,
     sstream_shutdown_,
-    sstream_read_AI_,
-    sstream_readv_AI_,
-    sstream_write_AI_,
-    sstream_writev_AI_
+    sstream_read_BI_,
+    sstream_readv_BI_,
+    sstream_write_BI_,
+    sstream_writev_BI_
 };
 
 AUGSYS_API aug_stream*

@@ -231,7 +231,7 @@ aug_findchan(aug_chans_t chans, aug_id id)
 }
 
 AUGNET_API void
-aug_processchans(aug_chans_t chans)
+aug_processchans_BI(aug_chans_t chans)
 {
     struct entry_* it;
 
@@ -269,7 +269,7 @@ aug_processchans(aug_chans_t chans)
            call.  Lock during call. */
 
         aug_retain(it->ob_);
-        ob = aug_processchan(ob, chans->handler_, &fork);
+        ob = aug_processchan_BI(ob, chans->handler_, &fork);
         aug_release(it->ob_);
 
         if (fork) {

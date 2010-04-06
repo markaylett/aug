@@ -31,7 +31,7 @@
       <param name="value" type="const char*"/>
     </method>
 
-    <method name="field" type="aug_result" qname="httpfield">
+    <method name="field_BIN" type="aug_result" qname="httpfield_BIN">
       <param name="name" type="const char*"/>
       <param name="value" type="const char*"/>
     </method>

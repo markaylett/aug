@@ -28,13 +28,13 @@
 struct aug_info_;
 
 AUG_EXTERNC aug_rint
-aug_clearfields_AIN_(aug_seq_t seq, struct aug_info_* info);
+aug_clearfields_BIN_(aug_seq_t seq, struct aug_info_* info);
 
 AUG_EXTERNC aug_result
-aug_delfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n);
+aug_delfieldn_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned n);
 
 AUG_EXTERNC aug_rint
-aug_delfieldp_AIN_(aug_seq_t seq, struct aug_info_* info, const char* name);
+aug_delfieldp_BIN_(aug_seq_t seq, struct aug_info_* info, const char* name);
 
 AUG_EXTERNC aug_rint
 aug_getfieldn_(aug_seq_t seq, const struct aug_info_* info, unsigned n,
@@ -49,11 +49,11 @@ aug_getfield_(aug_seq_t seq, const struct aug_info_* info, unsigned n,
               struct aug_field* field);
 
 AUG_EXTERNC aug_result
-aug_putfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n,
+aug_putfieldn_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned n,
                    const void* value, unsigned size);
 
 AUG_EXTERNC aug_rint
-aug_putfieldp_AIN_(aug_seq_t seq, struct aug_info_* info, const char* name,
+aug_putfieldp_BIN_(aug_seq_t seq, struct aug_info_* info, const char* name,
                    const void* value, unsigned size);
 
 AUG_EXTERNC aug_result

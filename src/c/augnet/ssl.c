@@ -594,7 +594,7 @@ cclose_(aug_chan* ob)
 }
 
 static aug_chan*
-cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
+cprocess_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     unsigned short events;
@@ -632,7 +632,7 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
            readable before issuing an SSL_read(). */
 
         char ch;
-        if (aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK) < 0
+        if (aug_recv_BI(impl->sticky_.md_, &ch, 1, MSG_PEEK) < 0
             && AUG_EXBLOCK == aug_getexcept(aug_tlx)) {
 
             /* If the peek operation would have blocked, then clear the sticky
@@ -736,7 +736,7 @@ static const struct aug_chanvtbl cvtbl_ = {
     cretain_,
     crelease_,
     cclose_,
-    cprocess_,
+    cprocess_BI_,
     csetwantwr_,
     cgetid_,
     cgetname_,

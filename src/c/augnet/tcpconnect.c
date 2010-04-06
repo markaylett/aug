@@ -84,7 +84,7 @@ aug_destroytcpconnect(aug_tcpconnect_t conn)
 }
 
 AUGNET_API aug_sd
-aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
+aug_tryconnect_BI(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 {
     /* FIXME: needs review against assumptions in object.c. */
 
@@ -168,14 +168,14 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
         if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
-        if (aug_ssetnonblock(sd, AUG_TRUE) < 0) {
+        if (aug_ssetnonblock_BI(sd, AUG_TRUE) < 0) {
             aug_sclose(sd);
             return AUG_BADSD;
         }
 
         aug_getendpoint(conn->res_, ep);
 
-        if (0 <= aug_connect(sd, ep)) {
+        if (0 <= aug_connect_BI(sd, ep)) {
 
             /* Immediate establishment. */
 

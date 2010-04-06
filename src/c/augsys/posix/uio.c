@@ -26,7 +26,7 @@
 #include <errno.h>
 
 AUGSYS_API aug_rsize
-aug_freadv_AI(aug_fd fd, const struct iovec* iov, int size)
+aug_freadv_BI(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
     /* SYSCALL: readv: EAGAIN, EINTR */
@@ -38,7 +38,7 @@ aug_freadv_AI(aug_fd fd, const struct iovec* iov, int size)
 }
 
 AUGSYS_API aug_rsize
-aug_fwritev_AI(aug_fd fd, const struct iovec* iov, int size)
+aug_fwritev_BI(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
     /* SYSCALL: writev: EAGAIN, EINTR */

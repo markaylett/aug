@@ -209,7 +209,7 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
     iov->iov_base = (char*)iov->iov_base + writer->part_;
     iov->iov_len -= (int)writer->part_;
 
-    if (0 <= (rsize = aug_writev(stream, iov, size))) {
+    if (0 <= (rsize = aug_writev_BI(stream, iov, size))) {
 
         /* Pop any completed buffers from queue. */
 

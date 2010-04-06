@@ -72,11 +72,11 @@ AUG_RCSID("$Id$");
 static unsigned options_ = 0;
 
 static aug_result
-fileset_(aug_mar* mar, const char* filename)
+fileset_BIN_(aug_mar* mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
 
-        if (aug_streamset_(mar, stdin) < 0)
+        if (aug_streamset_BIN_(mar, stdin) < 0)
             return -1;
 
     } else {
@@ -88,7 +88,7 @@ fileset_(aug_mar* mar, const char* filename)
             return -1;
         }
 
-        if (aug_streamset_(mar, stream) < 0) {
+        if (aug_streamset_BIN_(mar, stream) < 0) {
             fclose(stream);
             return -1;
         }
@@ -108,7 +108,7 @@ clear_(aug_mar* mar)
     if (!FORCE_ && !aug_confirm_(CLEARTEXT_))
         return 0;
 
-    return aug_clearfields(mar);
+    return aug_clearfields_BIN(mar);
 }
 
 static aug_result
@@ -117,7 +117,7 @@ del_(aug_mar* mar, const char* name)
     if (!FORCE_ && !aug_confirm_(DELTEXT_))
         return 0;
 
-    return aug_delfieldp(mar, name);
+    return aug_delfieldp_BIN(mar, name);
 }
 
 static aug_result
@@ -144,7 +144,7 @@ extract_(aug_mar* mar, const char* filename)
 
     } else {
 
-        if (aug_extractmar(mar, filename) < 0)
+        if (aug_extractmar_BIN(mar, filename) < 0)
             return -1;
     }
     return 0;
@@ -195,13 +195,13 @@ help_(void)
 }
 
 static aug_result
-insert_(aug_mar* mar, const char* filename)
+insert_BIN_(aug_mar* mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
-        if (aug_insertstream_(mar, stdin) < 0)
+        if (aug_insertstream_BIN_(mar, stdin) < 0)
             return -1;
     } else {
-        if (aug_insertmar(mar, filename) < 0)
+        if (aug_insertmar_BIN(mar, filename) < 0)
             return -1;
     }
     return 0;
@@ -258,7 +258,7 @@ names_(aug_mar* mar)
 }
 
 static aug_result
-put_(aug_mar* mar, char* src)
+put_BIN_(aug_mar* mar, char* src)
 {
     struct aug_field field;
 
@@ -266,10 +266,10 @@ put_(aug_mar* mar, char* src)
 
         /* Not a pair, so assume file name. */
 
-        return fileset_(mar, src);
+        return fileset_BIN_(mar, src);
     }
 
-    return aug_putfield(mar, &field);
+    return aug_putfield_BIN(mar, &field);
 }
 
 static void
@@ -288,7 +288,7 @@ zero_(aug_mar* mar)
     if (!FORCE_ && !aug_confirm_(ZEROTEXT_))
         return 0;
 
-    return aug_truncatemar(mar, 0);
+    return aug_truncatemar_BIN(mar, 0);
 }
 
 static void
@@ -298,7 +298,7 @@ exit_(void)
 }
 
 static aug_result
-run_(int argc, char* argv[], const char* archivename)
+run_BIN_(int argc, char* argv[], const char* archivename)
 {
     aug_mpool* mpool;
     int flags = 0;
@@ -325,7 +325,7 @@ run_(int argc, char* argv[], const char* archivename)
     }
 
     mpool = aug_getmpool(aug_tlx);
-    mar = aug_openmar(mpool, archivename, flags, mode);
+    mar = aug_openmar_BIN(mpool, archivename, flags, mode);
     aug_release(mpool);
 
     if (!mar) {
@@ -356,7 +356,7 @@ run_(int argc, char* argv[], const char* archivename)
             }
             break;
         case 'i':
-            if (insert_(mar, aug_optarg) < 0) {
+            if (insert_BIN_(mar, aug_optarg) < 0) {
                 aug_perrinfo(aug_tlx, "failed to " INSERTTEXT_, NULL);
                 goto fail;
             }
@@ -377,7 +377,7 @@ run_(int argc, char* argv[], const char* archivename)
             }
             break;
         case 'p':
-            if (put_(mar, aug_optarg) < 0) {
+            if (put_BIN_(mar, aug_optarg) < 0) {
                 aug_perrinfo(aug_tlx, "failed to " PUTTEXT_, NULL);
                 goto fail;
             }
@@ -485,7 +485,7 @@ main(int argc, char* argv[])
     archivename = argv[aug_optind];
     aug_optind = 0;
 
-    return run_(argc, argv, archivename) < 0 ? 1 : 0;
+    return run_BIN_(argc, argv, archivename) < 0 ? 1 : 0;
 
  info:
     fprintf(stderr, ": try 'mar -h' for more information\n");

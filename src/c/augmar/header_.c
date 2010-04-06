@@ -114,14 +114,14 @@ offsetp_(void* begin, const char* name, unsigned* inout)
 }
 
 AUG_EXTERNC aug_rint
-aug_clearfields_AIN_(aug_seq_t seq, struct aug_info_* info)
+aug_clearfields_BIN_(aug_seq_t seq, struct aug_info_* info)
 {
     unsigned orig;
 
     assert(seq && info);
 
     if (aug_setregion_(seq, AUG_HEADER, info->hsize_) < 0
-        || !aug_resizeseq_AIN_(seq, 0))
+        || !aug_resizeseq_BIN_(seq, 0))
         return -1;
 
     orig = info->fields_;
@@ -131,7 +131,7 @@ aug_clearfields_AIN_(aug_seq_t seq, struct aug_info_* info)
 }
 
 AUG_EXTERNC aug_result
-aug_delfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n)
+aug_delfieldn_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned n)
 {
     unsigned offset, orig;
     char* ptr;
@@ -149,7 +149,7 @@ aug_delfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n)
     orig = fieldsize_(ptr + offset);
 
     if (aug_setregion_(seq, AUG_HEADER + offset, orig) < 0
-        || !(ptr = aug_resizeseq_AIN_(seq, 0)))
+        || !(ptr = aug_resizeseq_BIN_(seq, 0)))
         return -1;
 
     --info->fields_;
@@ -159,7 +159,7 @@ aug_delfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n)
 }
 
 AUG_EXTERNC aug_rint
-aug_delfieldp_AIN_(aug_seq_t seq, struct aug_info_* info, const char* name)
+aug_delfieldp_BIN_(aug_seq_t seq, struct aug_info_* info, const char* name)
 {
     unsigned inout, offset, orig;
     char* ptr;
@@ -180,7 +180,7 @@ aug_delfieldp_AIN_(aug_seq_t seq, struct aug_info_* info, const char* name)
     orig = fieldsize_(ptr + offset);
 
     if (aug_setregion_(seq, AUG_HEADER + offset, orig) < 0
-        || !(ptr = aug_resizeseq_AIN_(seq, 0)))
+        || !(ptr = aug_resizeseq_BIN_(seq, 0)))
         return -1;
 
     --info->fields_;
@@ -283,7 +283,7 @@ aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
 }
 
 AUG_EXTERNC aug_result
-aug_putfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n,
+aug_putfieldn_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned n,
                    const void* value, unsigned size)
 {
     unsigned offset, nsize, vsize, orig;
@@ -319,7 +319,7 @@ aug_putfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n,
 
     if (aug_setregion_(seq, AUG_HEADER + offset,
                        AUG_FIELDSIZE(nsize, orig)) < 0
-        || !(ptr = aug_resizeseq_AIN_(seq, AUG_FIELDSIZE(nsize, vsize))))
+        || !(ptr = aug_resizeseq_BIN_(seq, AUG_FIELDSIZE(nsize, vsize))))
         return -1;
 
     /* Set field value. */
@@ -339,7 +339,7 @@ aug_putfieldn_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned n,
 }
 
 AUG_EXTERNC aug_rint
-aug_putfieldp_AIN_(aug_seq_t seq, struct aug_info_* info, const char* name,
+aug_putfieldp_BIN_(aug_seq_t seq, struct aug_info_* info, const char* name,
                    const void* value, unsigned size)
 {
     unsigned nsize, vsize, fsize, inout, offset, orig;
@@ -385,7 +385,7 @@ aug_putfieldp_AIN_(aug_seq_t seq, struct aug_info_* info, const char* name,
     orig = inout == info->fields_ ? 0 : fieldsize_(ptr + offset);
 
     if (aug_setregion_(seq, AUG_HEADER + offset, orig) < 0
-        || !(ptr = aug_resizeseq_AIN_(seq, fsize)))
+        || !(ptr = aug_resizeseq_BIN_(seq, fsize)))
         return -1;
 
     /* Set field name. */

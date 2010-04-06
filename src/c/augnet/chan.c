@@ -238,7 +238,7 @@ cchan_close_(aug_chan* ob)
 }
 
 static aug_chan*
-cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
+cchan_process_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     unsigned short events;
@@ -248,7 +248,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* Added for completeness, although really not a valid case:
            aug_processchan() should not be called on old channel object. */
 
-        return aug_processchan(impl->fwd_, handler, fork);
+        return aug_processchan_BI(impl->fwd_, handler, fork);
     }
 
     /* Channel closed. */
@@ -284,8 +284,8 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
            establish connection. */
 
         if (aug_setmdeventmask(impl->muxer_, impl->sd_, 0) < 0
-            || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->conn_, &ep,
-                                                        &impl->est_))) {
+            || AUG_BADSD == (impl->sd_ = aug_tryconnect_BI(impl->conn_, &ep,
+                                                           &impl->est_))) {
             aug_errorchan(handler, &impl->chan_, aug_tlerr);
             return NULL;
         }
@@ -375,7 +375,7 @@ static const struct aug_chanvtbl cchanvtbl_ = {
     cchan_retain_,
     cchan_release_,
     cchan_close_,
-    cchan_process_,
+    cchan_process_BI_,
     cchan_setwantwr_,
     cchan_getid_,
     cchan_getname_,
@@ -461,7 +461,7 @@ schan_close_(aug_chan* ob)
 }
 
 static aug_chan*
-schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
+schan_process_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     unsigned short events;
@@ -487,7 +487,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         aug_chan* chan;
         aug_id id;
 
-        if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
+        if (AUG_BADSD == (sd = aug_accept_BI(impl->sd_, &ep))) {
 
             if (!aug_acceptagain(aug_tlerr)) {
                 aug_errorchan(handler, &impl->chan_, aug_tlerr);
@@ -505,7 +505,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        if (aug_ssetnonblock(sd, AUG_TRUE) < 0) {
+        if (aug_ssetnonblock_BI(sd, AUG_TRUE) < 0) {
             aug_ctxwarn(aug_tlx, "aug_ssetnonblock() failed: %s",
                         aug_tlerr->desc_);
             aug_sclose(sd);
@@ -597,7 +597,7 @@ static const struct aug_chanvtbl schanvtbl_ = {
     schan_retain_,
     schan_release_,
     schan_close_,
-    schan_process_,
+    schan_process_BI_,
     schan_setwantwr_,
     schan_getid_,
     schan_getname_,
@@ -686,7 +686,7 @@ pchan_close_(aug_chan* ob)
 }
 
 static aug_chan*
-pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
+pchan_process_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     unsigned short events;
@@ -757,7 +757,7 @@ static const struct aug_chanvtbl pchanvtbl_ = {
     pchan_retain_,
     pchan_release_,
     pchan_close_,
-    pchan_process_,
+    pchan_process_BI_,
     pchan_setwantwr_,
     pchan_getid_,
     pchan_getname_,
@@ -793,40 +793,40 @@ pstream_shutdown_(aug_stream* ob)
 }
 
 static aug_rsize
-pstream_read_(aug_stream* ob, void* buf, size_t size)
+pstream_read_BI_(aug_stream* ob, void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    aug_rsize rsize = aug_sread(impl->sticky_.md_, buf, size);
+    aug_rsize rsize = aug_sread_BI(impl->sticky_.md_, buf, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }
 
 static aug_rsize
-pstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
+pstream_readv_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    aug_rsize rsize = aug_sreadv(impl->sticky_.md_, iov, size);
+    aug_rsize rsize = aug_sreadv_BI(impl->sticky_.md_, iov, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }
 
 static aug_rsize
-pstream_write_(aug_stream* ob, const void* buf, size_t size)
+pstream_write_BI_(aug_stream* ob, const void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    aug_rsize rsize = aug_swrite(impl->sticky_.md_, buf, size);
+    aug_rsize rsize = aug_swrite_BI(impl->sticky_.md_, buf, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
 }
 
 static aug_rsize
-pstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
+pstream_writev_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    aug_rsize rsize = aug_swritev(impl->sticky_.md_, iov, size);
+    aug_rsize rsize = aug_swritev_BI(impl->sticky_.md_, iov, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
@@ -837,15 +837,15 @@ static const struct aug_streamvtbl pstreamvtbl_ = {
     pstream_retain_,
     pstream_release_,
     pstream_shutdown_,
-    pstream_read_,
-    pstream_readv_,
-    pstream_write_,
-    pstream_writev_
+    pstream_read_BI_,
+    pstream_readv_BI_,
+    pstream_write_BI_,
+    pstream_writev_BI_
 };
 
 AUGNET_API aug_chan*
-aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, struct ssl_ctx_st* sslctx)
+aug_createclient_BI(aug_mpool* mpool, const char* host, const char* serv,
+                    aug_muxer_t muxer, struct ssl_ctx_st* sslctx)
 {
     aug_tcpconnect_t conn;
     aug_sd sd;
@@ -857,7 +857,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     if (!(conn = aug_createtcpconnect(mpool, host, serv)))
         return NULL;
 
-    if (AUG_BADSD == (sd = aug_tryconnect(conn, &ep, &est)))
+    if (AUG_BADSD == (sd = aug_tryconnect_BI(conn, &ep, &est)))
         goto fail1;
 
     if (!(aug_endpointntop(&ep, name, sizeof(name))))

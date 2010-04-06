@@ -46,7 +46,7 @@
  */
 
 AUGMAR_API aug_mar*
-aug_createmar_AIN(aug_mpool* mpool);
+aug_createmar_BIN(aug_mpool* mpool);
 
 /**
  * Create or open a file-based message archive.
@@ -66,6 +66,6 @@ aug_createmar_AIN(aug_mpool* mpool);
  */
 
 AUGMAR_API aug_mar*
-aug_openmar_AIN(aug_mpool* mpool, const char* path, int flags, ...);
+aug_openmar_BIN(aug_mpool* mpool, const char* path, int flags, ...);
 
 #endif /* AUGMAR_MAR_H */

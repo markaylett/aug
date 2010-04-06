@@ -81,13 +81,13 @@ aug_confirm_(const char* prompt)
 }
 
 AUG_EXTERNC aug_result
-aug_insertstream_(aug_mar* mar, FILE* stream)
+aug_insertstream_BIN_(aug_mar* mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
     do {
         size_t size = fread(buf, 1, sizeof(buf), stdin);
         if (size)
-            if (aug_writemar(mar, buf, (unsigned)size) < 0)
+            if (aug_writemar_BIN(mar, buf, (unsigned)size) < 0)
                 return -1;
 
         if (ferror(stream)) {
@@ -124,7 +124,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
 }
 
 AUG_EXTERNC aug_result
-aug_streamset_(aug_mar* mar, FILE* stream)
+aug_streamset_BIN_(aug_mar* mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
     struct aug_field field;
@@ -142,7 +142,7 @@ aug_streamset_(aug_mar* mar, FILE* stream)
         /* Split name/value. */
 
         if (aug_atofield_(&field, buf) < 0
-            || aug_putfield(mar, &field) < 0)
+            || aug_putfield_BIN(mar, &field) < 0)
             return -1;
     }
 

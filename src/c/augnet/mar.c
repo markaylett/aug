@@ -93,7 +93,7 @@ request_(aug_httphandler* ob, const char* request)
 }
 
 static aug_result
-field_(aug_httphandler* ob, const char* name, const char* value)
+field_BIN_(aug_httphandler* ob, const char* name, const char* value)
 {
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
@@ -107,7 +107,7 @@ field_(aug_httphandler* ob, const char* name, const char* value)
     field.value_ = value;
     field.size_ = (unsigned)strlen(value);
 
-    return aug_putfield(parser->mar_, &field);
+    return aug_putfield_BIN(parser->mar_, &field);
 }
 
 static aug_result
@@ -119,7 +119,7 @@ csize_(aug_httphandler* ob, unsigned csize)
     assert(parser->request_);
     assert(parser->mar_);
 
-    if (aug_truncatemar(parser->mar_, csize) < 0
+    if (aug_truncatemar_BIN(parser->mar_, csize) < 0
         || aug_seekmar(parser->mar_, AUG_SET, 0) < 0)
         return -1;
 
@@ -137,7 +137,7 @@ cdata_(aug_httphandler* ob, const void* buf, unsigned len)
 
     /* Returns aug_rsize. */
 
-    if (aug_writemar(parser->mar_, buf, len) < 0)
+    if (aug_writemar_BIN(parser->mar_, buf, len) < 0)
         return -1;
 
     return 0;
@@ -179,7 +179,7 @@ static const struct aug_httphandlervtbl vtbl_ = {
     retain_,
     release_,
     request_,
-    field_,
+    field_BIN_,
     csize_,
     cdata_,
     end_

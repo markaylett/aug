@@ -46,7 +46,7 @@ AUG_RCSID("$Id$");
 #include <string.h>        /* strchr() */
 
 AUGNET_API aug_sd
-aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep)
+aug_tcpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     aug_sd sd;
     struct addrinfo hints, * res, * save;
@@ -67,7 +67,7 @@ aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (0 <= aug_connect(sd, ep))
+        if (0 <= aug_connect_BI(sd, ep))
             break; /* Success. */
 
         /* Try next if aug_connect() failed. */
@@ -82,7 +82,7 @@ aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep)
 }
 
 AUGNET_API aug_sd
-aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
+aug_tcpserver_NI(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     aug_sd sd;
     struct addrinfo hints, * res, * save;
@@ -105,7 +105,7 @@ aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
         aug_getendpoint(res, ep);
 
         if (0 <= aug_setreuseaddr(sd, AUG_TRUE)
-            && 0 <= aug_bind(sd, ep)
+            && 0 <= aug_bind_N(sd, ep)
             && 0 <= aug_listen(sd, SOMAXCONN))
             break; /* Success. */
 
@@ -121,8 +121,8 @@ aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 }
 
 AUGNET_API aug_sd
-aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
-              aug_bool connect)
+aug_udpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep,
+                 aug_bool connect)
 {
     aug_sd sd;
     struct addrinfo hints, * res, * save;
@@ -143,7 +143,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
 
         aug_getendpoint(res, ep);
 
-        if (!connect || 0 <= aug_connect(sd, ep))
+        if (!connect || 0 <= aug_connect_BI(sd, ep))
             break; /* Success. */
 
         /* Try next if aug_connect() failed. */
@@ -158,7 +158,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
 }
 
 AUGNET_API aug_sd
-aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
+aug_udpserver_NI(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     aug_sd sd;
     struct addrinfo hints, * res, * save;
@@ -180,7 +180,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (0 <= aug_bind(sd, ep))
+        if (0 <= aug_bind_N(sd, ep))
             break; /* Success. */
 
         /* Try next if aug_bind() failed. */

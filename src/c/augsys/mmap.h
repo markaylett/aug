@@ -45,14 +45,14 @@ struct aug_mmap {
 };
 
 AUGSYS_API void
-aug_destroymmap_A(struct aug_mmap* mm);
+aug_destroymmap_B(struct aug_mmap* mm);
 
 AUGSYS_API struct aug_mmap*
-aug_createmmap_AIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+aug_createmmap_BIN(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
                    int flags);
 
 AUGSYS_API aug_result
-aug_remmap_AIN(struct aug_mmap* mm, size_t offset, size_t len);
+aug_remmap_BIN(struct aug_mmap* mm, size_t offset, size_t len);
 
 AUGSYS_API aug_result
 aug_syncmmap(const struct aug_mmap* mm);

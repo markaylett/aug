@@ -110,7 +110,7 @@ digits_(unsigned long n)
 }
 
 static aug_result
-writepid_AI_(int fd)
+writepid_BI_(int fd)
 {
     pid_t pid = getpid();
     size_t len = digits_(pid) + 1; /* One for newline. */
@@ -138,7 +138,7 @@ writepid_AI_(int fd)
 }
 
 static aug_result
-flock_AI_(struct flock* fl, int fd, int cmd, int type)
+flock_BI_(struct flock* fl, int fd, int cmd, int type)
 {
     bzero(fl, sizeof(*fl));
 
@@ -157,7 +157,7 @@ flock_AI_(struct flock* fl, int fd, int cmd, int type)
 }
 
 static aug_result
-lockfile_AIN_(const char* path)
+lockfile_BIN_(const char* path)
 {
     struct flock fl;
     int fd;
@@ -170,7 +170,7 @@ lockfile_AIN_(const char* path)
 
     /* Attempt to obtain exclusive lock. */
 
-    if (flock_AI_(&fl, fd, F_SETLK, F_WRLCK) < 0) {
+    if (flock_BI_(&fl, fd, F_SETLK, F_WRLCK) < 0) {
 
         if (AUG_EXBLOCK == aug_getexcept(aug_tlx)) {
 
@@ -191,7 +191,7 @@ lockfile_AIN_(const char* path)
         goto fail;
     }
 
-    if (writepid_AI_(fd) < 0)
+    if (writepid_BI_(fd) < 0)
         goto fail;
 
     /* Success: do not close the file - this would release the lock. */
@@ -229,7 +229,7 @@ closein_IN_(void)
 }
 
 AUGSERV_API aug_result
-aug_daemonise_AIN_(const struct aug_options* options)
+aug_daemonise_BIN_(const struct aug_options* options)
 {
     const char* pidfile;
     aug_result result;
@@ -248,8 +248,8 @@ aug_daemonise_AIN_(const struct aug_options* options)
         return -1;
     }
 
-    if (daemonise_A_() < 0 || lockfile_AIN_(pidfile) < 0
-        || closein_IN_() < 0 || aug_initserv_AIN() < 0)
+    if (daemonise_A_() < 0 || lockfile_BIN_(pidfile) < 0
+        || closein_IN_() < 0 || aug_initserv_BIN() < 0)
         return -1;
 
     result = aug_runserv();

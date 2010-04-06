@@ -38,7 +38,7 @@
 #include <unistd.h>
 
 static aug_result
-flock_AI_(struct flock* fl, int fd, int cmd, int type)
+flock_BI_(struct flock* fl, int fd, int cmd, int type)
 {
     bzero(fl, sizeof(*fl));
 
@@ -57,7 +57,7 @@ flock_AI_(struct flock* fl, int fd, int cmd, int type)
 }
 
 static aug_result
-send_AI_(int fd, pid_t pid, int event)
+send_BI_(int fd, pid_t pid, int event)
 {
     struct flock fl;
 
@@ -82,7 +82,7 @@ send_AI_(int fd, pid_t pid, int event)
 
         /* Wait for daemon process to release lock. */
 
-        if (flock_AI_(&fl, fd, F_SETLKW, F_RDLCK) < 0)
+        if (flock_BI_(&fl, fd, F_SETLKW, F_RDLCK) < 0)
             return -1;
 
         /* The lock has been obtained; daemon process must have stopped. */
@@ -100,15 +100,15 @@ send_AI_(int fd, pid_t pid, int event)
 }
 
 AUGSERV_API aug_result
-aug_start(const struct aug_options* options)
+aug_start_N(const struct aug_options* options)
 {
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                    AUG_MSG("aug_start() not supported"));
+                    AUG_MSG("aug_start_N() not supported"));
     return -1;
 }
 
 AUGSERV_API aug_result
-aug_control_AIN(const struct aug_options* options, int event)
+aug_control_BIN(const struct aug_options* options, int event)
 {
     const char* pidfile;
     struct flock fl;
@@ -142,12 +142,12 @@ aug_control_AIN(const struct aug_options* options, int event)
 
     /* Attempt to obtain shared lock. */
 
-    if (flock_AI_(&fl, fd, F_SETLK, F_RDLCK) < 0) {
+    if (flock_BI_(&fl, fd, F_SETLK, F_RDLCK) < 0) {
 
         /* As expected, the daemon process has an exclusive lock on the pid
            file.  Use F_GETLK to obtain the pid of the daemon process. */
 
-        if (0 <= flock_AI_(&fl, fd, F_GETLK, F_RDLCK)) {
+        if (0 <= flock_BI_(&fl, fd, F_GETLK, F_RDLCK)) {
 
             /* Although a lock-manager allows locking over NFS, the returned
                pid is probably zero because it could be the pid of a process
@@ -161,7 +161,7 @@ aug_control_AIN(const struct aug_options* options, int event)
                 result = -1;
 
             } else {
-                result = send_AI_(fd, fl.l_pid, event);
+                result = send_BI_(fd, fl.l_pid, event);
             }
         } else
             result -1;

@@ -36,13 +36,13 @@ AUG_EXTERNC aug_bool
 aug_confirm_(const char* prompt);
 
 AUG_EXTERNC aug_result
-aug_insertstream_(aug_mar* mar, FILE* stream);
+aug_insertstream_BIN_(aug_mar* mar, FILE* stream);
 
 AUG_EXTERNC aug_rsize
 aug_readline_(char* buf, size_t size, FILE* stream);
 
 AUG_EXTERNC aug_result
-aug_streamset_(aug_mar* mar, FILE* stream);
+aug_streamset_BIN_(aug_mar* mar, FILE* stream);
 
 AUG_EXTERNC aug_result
 aug_writevalue_(FILE* stream, const void* value, size_t size);

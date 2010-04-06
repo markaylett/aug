@@ -63,6 +63,6 @@ AUGUTIL_API char*
 aug_joinpath(const char* dir, const char* name, char* dst, size_t size);
 
 AUGUTIL_API char*
-aug_realpath(const char* src, char* dst, size_t size);
+aug_realpath_N(const char* src, char* dst, size_t size);
 
 #endif /* AUGUTIL_PATH_H */

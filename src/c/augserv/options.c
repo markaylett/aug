@@ -109,7 +109,7 @@ tocommand_(const char* s)
 }
 
 AUGSERV_API aug_result
-aug_readopts(struct aug_options* options, int argc, char* argv[])
+aug_readopts_N(struct aug_options* options, int argc, char* argv[])
 {
     int ch;
     const char* conffile;
@@ -135,8 +135,8 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
                                 AUG_EINVAL, AUG_MSG("missing path argument"));
                 return -1;
             }
-            if (!aug_realpath(conffile, options->conffile_,
-                              sizeof(options->conffile_))) {
+            if (!aug_realpath_N(conffile, options->conffile_,
+                                sizeof(options->conffile_))) {
                 usage_();
                 return -1;
             }

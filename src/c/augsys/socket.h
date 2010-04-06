@@ -118,16 +118,16 @@ struct aug_inetaddr {
 };
 
 AUGSYS_API aug_result
-aug_sclose_I(aug_sd sd);
+aug_sclose(aug_sd sd);
 
 AUGSYS_API aug_result
-aug_ssetnonblock_AI(aug_sd sd, aug_bool on);
+aug_ssetnonblock_BI(aug_sd sd, aug_bool on);
 
 AUGSYS_API aug_sd
 aug_socket(int domain, int type, int protocol);
 
 AUGSYS_API aug_sd
-aug_accept_AI(aug_sd sd, struct aug_endpoint* ep);
+aug_accept_BI(aug_sd sd, struct aug_endpoint* ep);
 
 AUGSYS_API aug_result
 aug_bind_N(aug_sd sd, const struct aug_endpoint* ep);
@@ -139,7 +139,7 @@ aug_bind_N(aug_sd sd, const struct aug_endpoint* ep);
  */
 
 AUGSYS_API aug_result
-aug_connect_AI(aug_sd sd, const struct aug_endpoint* ep);
+aug_connect_BI(aug_sd sd, const struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
 aug_getpeername(aug_sd sd, struct aug_endpoint* ep);
@@ -151,30 +151,30 @@ AUGSYS_API aug_result
 aug_listen(aug_sd sd, int backlog);
 
 AUGSYS_API aug_rsize
-aug_recv_AI(aug_sd sd, void* buf, size_t len, int flags);
+aug_recv_BI(aug_sd sd, void* buf, size_t len, int flags);
 
 AUGSYS_API aug_rsize
-aug_recvfrom_AI(aug_sd sd, void* buf, size_t len, int flags,
+aug_recvfrom_BI(aug_sd sd, void* buf, size_t len, int flags,
                 struct aug_endpoint* ep);
 
 AUGSYS_API aug_rsize
-aug_send_AI(aug_sd sd, const void* buf, size_t len, int flags);
+aug_send_BI(aug_sd sd, const void* buf, size_t len, int flags);
 
 AUGSYS_API aug_rsize
-aug_sendto_AI(aug_sd sd, const void* buf, size_t len, int flags,
+aug_sendto_BI(aug_sd sd, const void* buf, size_t len, int flags,
               const struct aug_endpoint* ep);
 
 AUGSYS_API aug_rsize
-aug_sread_AI(aug_sd sd, void* buf, size_t len);
+aug_sread_BI(aug_sd sd, void* buf, size_t len);
 
 AUGSYS_API aug_rsize
-aug_sreadv_AI(aug_sd sd, const struct iovec* iov, int size);
+aug_sreadv_BI(aug_sd sd, const struct iovec* iov, int size);
 
 AUGSYS_API aug_rsize
-aug_swrite_AI(aug_sd sd, const void* buf, size_t len);
+aug_swrite_BI(aug_sd sd, const void* buf, size_t len);
 
 AUGSYS_API aug_rsize
-aug_swritev_AI(aug_sd sd, const struct iovec* iov, int size);
+aug_swritev_BI(aug_sd sd, const struct iovec* iov, int size);
 
 /**
  * The Windows version of this function will return the posix-mapped errno for
@@ -205,7 +205,7 @@ AUGSYS_API aug_result
 aug_sshutdown(aug_sd sd, int how);
 
 AUGSYS_API aug_result
-aug_socketpair_AIN(int domain, int type, int protocol, aug_sd sv[2]);
+aug_socketpair_BIN(int domain, int type, int protocol, aug_sd sv[2]);
 
 AUGSYS_API char*
 aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len);

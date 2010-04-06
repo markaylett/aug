@@ -86,8 +86,8 @@ value_(aug_httpparser_t parser)
         }
     }
 
-    return aug_httpfield(parser->handler_, parser->name_,
-                         aug_lexertoken(parser->lexer_));
+    return aug_httpfield_BIN(parser->handler_, parser->name_,
+                             aug_lexertoken(parser->lexer_));
 }
 
 static aug_result

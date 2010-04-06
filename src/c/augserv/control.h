@@ -32,13 +32,13 @@
 struct aug_options;
 
 AUGSERV_API aug_result
-aug_start(const struct aug_options* options);
+aug_start_N(const struct aug_options* options);
 
 AUGSERV_API aug_result
-aug_control_AIN(const struct aug_options* options, int event);
+aug_control_BIN(const struct aug_options* options, int event);
 
 AUGSERV_API aug_result
-aug_install(const struct aug_options* options);
+aug_install_N(const struct aug_options* options);
 
 AUGSERV_API aug_result
 aug_uninstall(const struct aug_options* options);

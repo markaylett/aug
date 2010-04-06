@@ -36,6 +36,6 @@ struct aug_options;
  */
 
 AUGSERV_API aug_result
-aug_daemonise_AIN(const struct aug_options* options);
+aug_daemonise_BIN(const struct aug_options* options);
 
 #endif /* AUGSERV_DAEMON_H */

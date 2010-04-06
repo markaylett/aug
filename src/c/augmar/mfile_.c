@@ -78,7 +78,7 @@ reserve_(unsigned size)
 }
 
 AUG_EXTERNC aug_result
-aug_closemfile_AI_(aug_mfile_t mfile)
+aug_closemfile_BI_(aug_mfile_t mfile)
 {
     aug_mpool* mpool = mfile->mpool_;
     aug_result result;
@@ -86,19 +86,19 @@ aug_closemfile_AI_(aug_mfile_t mfile)
 
     if (mfile->mmap_) {
 
-        aug_destroymmap_A(mfile->mmap_);
+        aug_destroymmap_B(mfile->mmap_);
 
         if (mfile->resvd_ > mfile->size_) {
 
-            if ((result = aug_ftruncate_AI(mfile->fd_,
+            if ((result = aug_ftruncate_BI(mfile->fd_,
                                            (off_t)mfile->size_)) < 0) {
-                aug_fclose_I(mfile->fd_);
+                aug_fclose(mfile->fd_);
                 goto last;
             }
         }
     }
 
-    result = aug_fclose_I(mfile->fd_);
+    result = aug_fclose(mfile->fd_);
 
  last:
     aug_freemem(mpool, mfile);
@@ -147,12 +147,12 @@ aug_openmfile_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
     return mfile;
 
  fail:
-    aug_fclose_I(fd);
+    aug_fclose(fd);
     return NULL;
 }
 
 AUG_EXTERNC void*
-aug_mapmfile_AIN_(aug_mfile_t mfile, unsigned size)
+aug_mapmfile_BIN_(aug_mfile_t mfile, unsigned size)
 {
     assert(mfile);
 
@@ -176,7 +176,7 @@ aug_mapmfile_AIN_(aug_mfile_t mfile, unsigned size)
         }
 
         resvd = reserve_(size);
-        if (aug_ftruncate_AI(mfile->fd_, resvd - mfile->size_) < 0)
+        if (aug_ftruncate_BI(mfile->fd_, resvd - mfile->size_) < 0)
             return NULL;
 
         mfile->resvd_ = resvd;
@@ -184,15 +184,15 @@ aug_mapmfile_AIN_(aug_mfile_t mfile, unsigned size)
 
     if (mfile->mmap_) {
 
-        if (aug_remmap_AIN(mfile->mmap_, 0, size) < 0) {
+        if (aug_remmap_BIN(mfile->mmap_, 0, size) < 0) {
 
-            aug_destroymmap_A(mfile->mmap_);
+            aug_destroymmap_B(mfile->mmap_);
             mfile->mmap_ = NULL;
             return NULL;
         }
     } else {
 
-        mfile->mmap_ = aug_createmmap_AIN(mfile->mpool_, mfile->fd_, 0, size,
+        mfile->mmap_ = aug_createmmap_BIN(mfile->mpool_, mfile->fd_, 0, size,
                                           mfile->flags_);
         if (!mfile->mmap_)
             return NULL;

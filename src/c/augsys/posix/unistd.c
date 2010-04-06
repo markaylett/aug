@@ -29,10 +29,29 @@
 #include <sys/stat.h>
 
 AUGSYS_API aug_result
-aug_fclose_I(aug_fd fd)
+aug_fclose(aug_fd fd)
 {
+    /*
+      Linus Wrote:
+
+      If close() return EINTR, the file descriptor _will_ have been
+      closed. The error return just tells you that soem error happened on the
+      file: for example, in the case of EINTR, the close() may not have
+      flushed all the pending data synchronously.
+
+      Re-doing the close() is the wrong thing to do, since in a threaded
+      environment, something else might have opened another file, gotten the
+      same file descriptor, and you now close _another_ file.
+
+      (Normally, re-doing the close will just return EBADF, of course).
+
+      I'm going to drop this patch, but in case you've ever seen a case where
+      EINTR actually means that the fd didn't get closed, please holler, and
+      we need to fix it.
+    */
+
     /* SYSCALL: close: EINTR */
-    if (close(fd) < 0) {
+    if (close(fd) < 0 && EINTR != errno) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
@@ -40,7 +59,7 @@ aug_fclose_I(aug_fd fd)
 }
 
 AUGSYS_API aug_result
-aug_fsetnonblock_AI(aug_fd fd, aug_bool on)
+aug_fsetnonblock_BI(aug_fd fd, aug_bool on)
 {
     /* SYSCALL: fcntl: EAGAIN, EINTR */
     int flags = fcntl(fd, F_GETFL);
@@ -104,7 +123,7 @@ aug_fpipe(aug_fd fds[2])
 }
 
 AUGSYS_API aug_rsize
-aug_fread_AI(aug_fd fd, void* buf, size_t size)
+aug_fread_BI(aug_fd fd, void* buf, size_t size)
 {
     ssize_t ret;
     /* SYSCALL: read: EAGAIN, EINTR */
@@ -116,7 +135,7 @@ aug_fread_AI(aug_fd fd, void* buf, size_t size)
 }
 
 AUGSYS_API aug_rsize
-aug_fwrite_AI(aug_fd fd, const void* buf, size_t size)
+aug_fwrite_BI(aug_fd fd, const void* buf, size_t size)
 {
     ssize_t ret;
     /* SYSCALL: write: EAGAIN, EINTR */
@@ -138,7 +157,7 @@ aug_fsync(aug_fd fd)
 }
 
 AUGSYS_API aug_result
-aug_ftruncate_AI(aug_fd fd, off_t size)
+aug_ftruncate_BI(aug_fd fd, off_t size)
 {
     /* SYSCALL: ftruncate: EAGAIN, EINTR */
     if (ftruncate(fd, size) < 0) {

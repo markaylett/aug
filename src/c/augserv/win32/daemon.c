@@ -182,7 +182,7 @@ handler_(DWORD code)
         break;
     }
 
-    if (aug_writeevent_A(aug_events(), &event) < 0
+    if (aug_writeevent_B(aug_events(), &event) < 0
         && AUG_EXBLOCK != aug_getexcept(aug_tlx))
         abort();
 }
@@ -268,9 +268,9 @@ service_(DWORD argc, char** argv)
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (aug_initserv_AIN() < 0) {
+    if (aug_initserv_BIN() < 0) {
 
-        aug_perrinfo(aug_tlx, "aug_initserv_AIN() failed", NULL);
+        aug_perrinfo(aug_tlx, "aug_initserv_BIN() failed", NULL);
         setstatus_(SERVICE_STOPPED);
         goto done;
     }
@@ -285,7 +285,7 @@ service_(DWORD argc, char** argv)
     setstatus_(SERVICE_STOPPED);
 
     /* This function will be called on the Service Manager's thread.  Given
-       that aug_initserv_AIN() and aug_runserv() have been called on this
+       that aug_initserv_BIN() and aug_runserv() have been called on this
        thread, aug_termserv() is also called from this thread and not the main
        thread. */
 
@@ -302,7 +302,7 @@ service_(DWORD argc, char** argv)
 }
 
 AUGSERV_API aug_result
-aug_daemonise(const struct aug_options* options)
+aug_daemonise_BIN(const struct aug_options* options)
 {
     const char* sname;
     SERVICE_TABLE_ENTRY table[] = {

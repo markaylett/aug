@@ -33,14 +33,14 @@
 
 #if !defined(_WIN32)
 # include "augsys/unistd.h"
-# define aug_mclose_I aug_fclose_I
-# define aug_mread_AI  aug_fread_AI
-# define aug_mwrite_AI aug_fwrite_AI
+# define aug_mclose aug_fclose
+# define aug_mread_BI  aug_fread_BI
+# define aug_mwrite_BI aug_fwrite_BI
 #else /* _WIN32 */
 # include "augsys/socket.h"
-# define aug_mclose_I aug_sclose_I
-# define aug_mread_AI  aug_sread_AI
-# define aug_mwrite_AI aug_swrite_AI
+# define aug_mclose aug_sclose
+# define aug_mread_BI  aug_sread_BI
+# define aug_mwrite_BI aug_swrite_BI
 #endif /* _WIN32 */
 
 #include "augext/mpool.h"
@@ -154,7 +154,7 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md);
  */
 
 AUGSYS_API aug_result
-aug_muxerpipe_AIN(aug_md mds[2]);
+aug_muxerpipe_BIN(aug_md mds[2]);
 
 /**
  * Get printable string from event mask.

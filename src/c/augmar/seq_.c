@@ -44,7 +44,7 @@ AUG_RCSID("$Id$");
 
 struct impl_ {
     void (*destroy_)(aug_seq_t);
-    void* (*resize_AIN_)(aug_seq_t, unsigned, unsigned);
+    void* (*resize_BIN_)(aug_seq_t, unsigned, unsigned);
     aug_result (*sync_)(aug_seq_t);
     void* (*addr_)(aug_seq_t);
     aug_mpool* (*mpool_)(aug_seq_t);
@@ -165,11 +165,11 @@ static void
 destroymfile_(aug_seq_t seq)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
-    aug_closemfile_AI_(mfileseq->mfile_);
+    aug_closemfile_BI_(mfileseq->mfile_);
 }
 
 static void*
-resizemfile_AIN_(aug_seq_t seq, unsigned size, unsigned tail)
+resizemfile_BIN_(aug_seq_t seq, unsigned size, unsigned tail)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
     unsigned len = aug_mfilesize_(mfileseq->mfile_);
@@ -177,7 +177,7 @@ resizemfile_AIN_(aug_seq_t seq, unsigned size, unsigned tail)
 
     if (size > len) {
 
-        if (!(addr = aug_mapmfile_AIN_(mfileseq->mfile_, size)))
+        if (!(addr = aug_mapmfile_BIN_(mfileseq->mfile_, size)))
             return NULL;
 
         memmove((char*)addr + (size - tail),
@@ -235,7 +235,7 @@ mfiletail_(aug_seq_t seq)
 
 static const struct impl_ mfileimpl_ = {
     destroymfile_,
-    resizemfile_AIN_,
+    resizemfile_BIN_,
     syncmfile_,
     mfileaddr_,
     mfilempool_,
@@ -257,7 +257,7 @@ aug_copyseq_(aug_seq_t src, aug_seq_t dst)
 
     if (aug_setregion_(src, 0, size) < 0
         || aug_setregion_(dst, 0, aug_seqsize_(dst)) < 0
-        || !(addr = aug_resizeseq_AIN_(dst, size)))
+        || !(addr = aug_resizeseq_BIN_(dst, size)))
         return -1;
 
     memcpy(addr, aug_seqaddr_(src), size);
@@ -294,7 +294,7 @@ aug_openseq_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
         return NULL;
 
     size = aug_mfileresvd_(mfile);
-    if (size && !aug_mapmfile_AIN_(mfile, size))
+    if (size && !aug_mapmfile_BIN_(mfile, size))
         goto fail;
 
     mfileseq = (struct mfileseq_*)aug_mfiletail_(mfile);
@@ -306,12 +306,12 @@ aug_openseq_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
     return (aug_seq_t)mfileseq;
 
  fail:
-    aug_closemfile_AI_(mfile);
+    aug_closemfile_BI_(mfile);
     return NULL;
 }
 
 AUG_EXTERNC void*
-aug_resizeseq_AIN_(aug_seq_t seq, unsigned size)
+aug_resizeseq_BIN_(aug_seq_t seq, unsigned size)
 {
     void* addr;
     unsigned total, tail;
@@ -321,7 +321,7 @@ aug_resizeseq_AIN_(aug_seq_t seq, unsigned size)
 
     total += (size - seq->len_);
 
-    if (!(addr = (*seq->impl_->resize_AIN_)(seq, total, tail)))
+    if (!(addr = (*seq->impl_->resize_BIN_)(seq, total, tail)))
         return NULL;
 
     seq->len_ = size;

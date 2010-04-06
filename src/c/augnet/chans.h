@@ -98,13 +98,13 @@ aug_findchan(aug_chans_t chans, aug_id id);
  * Process each channel.
  *
  * Other functions associated with @a chans can be safely called during
- * iteration, including recursive calls to aug_processchans().
+ * iteration, including recursive calls to aug_processchans_BI().
  *
  * @param chans Channel list.
  */
 
 AUGNET_API void
-aug_processchans(aug_chans_t chans);
+aug_processchans_BI(aug_chans_t chans);
 
 AUGNET_API void
 aug_dumpchans(aug_chans_t chans);

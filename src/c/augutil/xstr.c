@@ -250,12 +250,12 @@ aug_xstrcpyc(aug_xstr_t xstr, char ch)
 }
 
 AUGUTIL_API aug_rsize
-aug_xstrread_AI(aug_xstr_t xstr, aug_stream* src, size_t size)
+aug_xstrread_BI(aug_xstr_t xstr, aug_stream* src, size_t size)
 {
     aug_rsize rsize = reserve_(xstr, xstr->len_ + size);
 
     if (rsize < 0
-        || (rsize = aug_read_AI(src, xstr->ptr_ + xstr->len_, size)) < 0)
+        || (rsize = aug_read_BI(src, xstr->ptr_ + xstr->len_, size)) < 0)
         return -1;
 
 	xstr->len_ += rsize;

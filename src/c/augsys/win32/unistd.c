@@ -85,7 +85,7 @@ create_(int flags)
 }
 
 AUGSYS_API aug_result
-aug_fclose_I(aug_fd fd)
+aug_fclose(aug_fd fd)
 {
     if (!CloseHandle(fd)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
@@ -95,7 +95,7 @@ aug_fclose_I(aug_fd fd)
 }
 
 AUGSYS_API aug_result
-aug_fsetnonblock_AI(aug_fd fd, aug_bool on)
+aug_fsetnonblock_BI(aug_fd fd, aug_bool on)
 {
     aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                     AUG_MSG("aug_fsetnonblock() not supported"));
@@ -168,7 +168,7 @@ aug_fpipe(aug_fd fds[2])
 }
 
 AUGSYS_API aug_rsize
-aug_fread_AI(aug_fd fd, void* buf, size_t size)
+aug_fread_BI(aug_fd fd, void* buf, size_t size)
 {
     DWORD ret;
     if (!ReadFile(fd, buf, (DWORD)size, &ret, NULL)) {
@@ -179,7 +179,7 @@ aug_fread_AI(aug_fd fd, void* buf, size_t size)
 }
 
 AUGSYS_API aug_rsize
-aug_fwrite_AI(aug_fd fd, const void* buf, size_t size)
+aug_fwrite_BI(aug_fd fd, const void* buf, size_t size)
 {
     DWORD ret;
     if (!WriteFile(fd, buf, (DWORD)size, &ret, NULL)) {
@@ -200,7 +200,7 @@ aug_fsync(aug_fd fd)
 }
 
 AUGSYS_API aug_result
-aug_ftruncate_AI(aug_fd fd, off_t size)
+aug_ftruncate_BI(aug_fd fd, off_t size)
 {
     LARGE_INTEGER li, orig;
     aug_result result;

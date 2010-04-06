@@ -31,7 +31,7 @@
  * Implementations of the original, classic functions by Richard Stevens.
  *
  * @todo introduce timeout for aug_tcpclient() by implementing in terms of
- * aug_tryconnect().
+ * aug_tryconnect_BI().
  */
 
 #include "augnet/config.h"
@@ -49,17 +49,17 @@ struct aug_hostserv {
 };
 
 AUGNET_API aug_sd
-aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep);
+aug_tcpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep);
 
 AUGNET_API aug_sd
-aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep);
+aug_tcpserver_NI(const char* host, const char* serv, struct aug_endpoint* ep);
 
 AUGNET_API aug_sd
-aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
-              aug_bool connect);
+aug_udpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep,
+                 aug_bool connect);
 
 AUGNET_API aug_sd
-aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep);
+aug_udpserver_NI(const char* host, const char* serv, struct aug_endpoint* ep);
 
 AUGNET_API struct aug_hostserv*
 aug_parsehostserv(const char* src, struct aug_hostserv* dst);

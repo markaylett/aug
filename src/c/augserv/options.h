@@ -48,7 +48,7 @@ struct aug_options {
 };
 
 AUGSERV_API aug_result
-aug_readopts(struct aug_options* options, int argc, char* argv[]);
+aug_readopts_N(struct aug_options* options, int argc, char* argv[]);
 
 #define AUG_CONFFILE(x) (*(x)->conffile_ ? (x)->conffile_ : NULL)
 

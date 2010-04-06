@@ -28,14 +28,14 @@
 struct aug_info_;
 
 AUG_EXTERNC aug_result
-aug_setcontent_AIN_(aug_seq_t seq, struct aug_info_* info, const void* cdata,
+aug_setcontent_BIN_(aug_seq_t seq, struct aug_info_* info, const void* cdata,
                     unsigned size);
 
 AUG_EXTERNC aug_result
-aug_truncate_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned size);
+aug_truncate_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned size);
 
 AUG_EXTERNC aug_rsize
-aug_write_AIN_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
+aug_write_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
                const void* buf, unsigned len);
 
 AUG_EXTERNC const void*
