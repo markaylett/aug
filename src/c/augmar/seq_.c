@@ -177,6 +177,8 @@ resizemfile_BIN_(aug_seq_t seq, unsigned size, unsigned tail)
 
     if (size > len) {
 
+        /* EXCEPT: resizemfile_BIN_ -> aug_mapmfile_BIN_; */
+
         if (!(addr = aug_mapmfile_BIN_(mfileseq->mfile_, size)))
             return NULL;
 
@@ -250,10 +252,12 @@ aug_destroyseq_(aug_seq_t seq)
 }
 
 AUG_EXTERNC aug_result
-aug_copyseq_(aug_seq_t src, aug_seq_t dst)
+aug_copyseq_BIN_(aug_seq_t src, aug_seq_t dst)
 {
     unsigned size = aug_seqsize_(src);
     void* addr;
+
+    /* EXCEPT: aug_copyseq_BIN_ -> aug_resizeseq_BIN_; */
 
     if (aug_setregion_(src, 0, size) < 0
         || aug_setregion_(dst, 0, aug_seqsize_(dst)) < 0
@@ -287,6 +291,9 @@ aug_openseq_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
 {
     unsigned size;
     struct mfileseq_* mfileseq;
+
+    /* EXCEPT: aug_openseq_IN_ -> aug_openmfile_IN_; */
+
     struct aug_mfile_* mfile = aug_openmfile_IN_(mpool, path, flags, mode,
                                                  sizeof(struct mfileseq_)
                                                  + tail);
@@ -294,6 +301,9 @@ aug_openseq_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
         return NULL;
 
     size = aug_mfileresvd_(mfile);
+
+    /* EXCEPT: aug_openseq_IN_ -> aug_mapmfile_BIN_; */
+
     if (size && !aug_mapmfile_BIN_(mfile, size))
         goto fail;
 

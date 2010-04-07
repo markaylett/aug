@@ -90,6 +90,8 @@ aug_closemfile_BI_(aug_mfile_t mfile)
 
         if (mfile->resvd_ > mfile->size_) {
 
+            /* EXCEPT: aug_closemfile_BI_ -> aug_ftruncate_BI; */
+
             if ((result = aug_ftruncate_BI(mfile->fd_,
                                            (off_t)mfile->size_)) < 0) {
                 aug_fclose(mfile->fd_);
@@ -129,8 +131,12 @@ aug_openmfile_IN_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
 
     flags &= ~AUG_APPEND;
 
+    /* EXCEPT: aug_openmfile_IN_ -> aug_fopen_N; */
+
     if (AUG_BADFD == (fd = aug_fopen_N(path, flags, mode)))
         return NULL;
+
+    /* EXCEPT: aug_openmfile_IN_ -> aug_fsize_IN; */
 
     if (aug_fsize_IN(fd, &size) < 0)
         return NULL;
@@ -176,6 +182,9 @@ aug_mapmfile_BIN_(aug_mfile_t mfile, unsigned size)
         }
 
         resvd = reserve_(size);
+
+        /* EXCEPT: aug_mapmfile_BIN_ -> aug_ftruncate_BI; */
+
         if (aug_ftruncate_BI(mfile->fd_, resvd - mfile->size_) < 0)
             return NULL;
 
@@ -184,6 +193,8 @@ aug_mapmfile_BIN_(aug_mfile_t mfile, unsigned size)
 
     if (mfile->mmap_) {
 
+        /* EXCEPT: aug_mapmfile_BIN_ -> aug_remmap_BIN; */
+
         if (aug_remmap_BIN(mfile->mmap_, 0, size) < 0) {
 
             aug_destroymmap_B(mfile->mmap_);
@@ -191,6 +202,8 @@ aug_mapmfile_BIN_(aug_mfile_t mfile, unsigned size)
             return NULL;
         }
     } else {
+
+        /* EXCEPT: aug_mapmfile_BIN_ -> aug_createmmap_BIN; */
 
         mfile->mmap_ = aug_createmmap_BIN(mfile->mpool_, mfile->fd_, 0, size,
                                           mfile->flags_);

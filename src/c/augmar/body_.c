@@ -48,6 +48,8 @@ resize_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned bsize,
     if (info->bsize_ == bsize || (info->bsize_ > bsize && !trunc))
         return aug_seqaddr_(seq);
 
+    /* EXCEPT: resize_BIN_ -> aug_resizeseq_BIN_ */
+
     if (!(addr = aug_resizeseq_BIN_(seq, bsize)))
         return NULL;
 
@@ -62,6 +64,8 @@ AUG_EXTERNC aug_result
 aug_setcontent_BIN_(aug_seq_t seq, struct aug_info_* info, const void* data,
                     unsigned size)
 {
+    /* EXCEPT: aug_setcontent_BIN_ -> resize_BIN_ */
+
     char* addr = resize_BIN_(seq, info, size, AUG_TRUE);
     if (!addr)
         return -1;
@@ -73,6 +77,8 @@ aug_setcontent_BIN_(aug_seq_t seq, struct aug_info_* info, const void* data,
 AUG_EXTERNC aug_result
 aug_truncate_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned size)
 {
+    /* EXCEPT: aug_truncate_BIN_ -> resize_BIN_ */
+
     return resize_BIN_(seq, info, size, AUG_TRUE) ? 0 : -1;
 }
 
@@ -80,6 +86,8 @@ AUG_EXTERNC aug_rsize
 aug_write_BIN_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
                const void* buf, unsigned len)
 {
+    /* EXCEPT: aug_write_BIN_ -> resize_BIN_ */
+
     char* addr = resize_BIN_(seq, info, offset + len, AUG_FALSE);
     if (!addr)
         return -1;
