@@ -36,11 +36,11 @@
       <param name="value" type="const char*"/>
     </method>
 
-    <method name="csize" type="aug_result" qname="httpcsize">
+    <method name="csize_BIN" type="aug_result" qname="httpcsize_BIN">
       <param name="size" type="unsigned"/>
     </method>
 
-    <method name="cdata" type="aug_result" qname="httpcdata">
+    <method name="cdata_BIN" type="aug_result" qname="httpcdata_BIN">
       <param name="buf" type="const void*"/>
       <param name="len" type="unsigned"/>
     </method>

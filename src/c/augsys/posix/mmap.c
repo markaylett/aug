@@ -96,7 +96,8 @@ createmmap_B_(impl_t impl, size_t offset, size_t len)
     if (!len)
         len = impl->size_ - offset;
 
-    /* SYSCALL: mmap: EAGAIN */
+    /* EXCEPT: createmmap_B_ -> mmap; */
+    /* EXCEPT: mmap -> EAGAIN; */
     if (MAP_FAILED == (addr = mmap(NULL, len, impl->prot_, MAP_SHARED,
                                    impl->fd_, (off_t)offset))) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -111,7 +112,8 @@ createmmap_B_(impl_t impl, size_t offset, size_t len)
 static aug_result
 destroymmap_B_(impl_t impl)
 {
-    /* SYSCALL: munmap: EAGAIN */
+    /* EXCEPT: destroymmap_B_ -> munmap; */
+    /* EXCEPT: munmap -> EAGAIN; */
     if (impl->mmap_.addr_
         && munmap(impl->mmap_.addr_, impl->mmap_.len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -168,7 +170,8 @@ aug_remmap_BIN(struct aug_mmap* mm, size_t offset, size_t len)
 
     impl->mmap_.addr_ = NULL;
 
-    /* SYSCALL: munmap: EAGAIN */
+    /* EXCEPT: aug_remmap_BIN -> munmap; */
+    /* EXCEPT: munmap -> EAGAIN; */
     if (addr && munmap(addr, impl->mmap_.len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

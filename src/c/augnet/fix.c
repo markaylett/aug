@@ -221,7 +221,7 @@ aug_destroyfixstream(aug_fixstream_t stream)
 }
 
 AUGNET_API aug_rsize
-aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size)
+aug_readfix_BI(aug_fixstream_t stream, aug_stream* src, size_t size)
 {
     aug_rsize rsize, mlen;
     size_t blen;

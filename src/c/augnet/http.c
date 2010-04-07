@@ -67,7 +67,7 @@ name_(aug_httpparser_t parser)
 }
 
 static aug_result
-value_(aug_httpparser_t parser)
+value_BIN_(aug_httpparser_t parser)
 {
     unsigned csize;
 
@@ -133,7 +133,7 @@ label_(aug_httpparser_t parser)
 }
 
 static aug_result
-word_(aug_httpparser_t parser)
+word_BIN_(aug_httpparser_t parser)
 {
     aug_result result;
     switch (parser->state_) {
@@ -147,7 +147,7 @@ word_(aug_httpparser_t parser)
         result = -1;
         break;
     case VALUE_:
-        if (0 <= (result = value_(parser)))
+        if (0 <= (result = value_BIN_(parser)))
             parser->state_ = NAME_;
         break;
     default:
@@ -158,7 +158,7 @@ word_(aug_httpparser_t parser)
 }
 
 static aug_rsize
-header_(aug_httpparser_t parser, const char* ptr, unsigned size)
+header_BIN_(aug_httpparser_t parser, const char* ptr, unsigned size)
 {
     unsigned i = 0;
     while (i < size) {
@@ -169,11 +169,11 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
                 return -1;
             break;
         case AUG_LEXWORD:
-            if (word_(parser) < 0)
+            if (word_BIN_(parser) < 0)
                 return -1;
             break;
         case AUG_LEXWORD | AUG_LEXPHRASE:
-            if (word_(parser) < 0
+            if (word_BIN_(parser) < 0
                 || phrase_(parser) < 0)
                 return -1;
             goto done;
@@ -256,7 +256,7 @@ aug_destroyhttpparser(aug_httpparser_t parser)
 }
 
 AUGNET_API aug_result
-aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
+aug_appendhttp_BIN(aug_httpparser_t parser, const char* buf, unsigned size)
 {
     aug_result result;
 
@@ -268,7 +268,7 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
 
     for (;;) {
 
-        if ((result = header_(parser, buf, size)) < 0)
+        if ((result = header_BIN_(parser, buf, size)) < 0)
             break;
 
         if (result == size)
@@ -295,7 +295,7 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
 }
 
 AUGNET_API aug_result
-aug_finishhttp(aug_httpparser_t parser)
+aug_finishhttp_BIN(aug_httpparser_t parser)
 {
     aug_result result;
     switch (aug_finishlexer(parser->lexer_)) {
@@ -304,11 +304,11 @@ aug_finishhttp(aug_httpparser_t parser)
             goto fail;
         break;
     case AUG_LEXWORD:
-        if ((result = word_(parser)) < 0)
+        if ((result = word_BIN_(parser)) < 0)
             goto fail;
         break;
     case AUG_LEXWORD | AUG_LEXPHRASE:
-        if ((result = word_(parser)) < 0
+        if ((result = word_BIN_(parser)) < 0
             || (result = phrase_(parser)) < 0)
             goto fail;
         break;

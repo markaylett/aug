@@ -250,8 +250,9 @@ aug_fsize_IN(aug_fd fd, size_t* size)
     return 0;
 }
 
-AUGSYS_API void
+AUGSYS_API aug_result
 aug_msleep_I(unsigned ms)
 {
     Sleep(ms);
+    return 0;
 }

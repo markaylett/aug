@@ -42,7 +42,8 @@ streampair_BIN_(int protocol, aug_sd sv[2])
 	addr.sin_port = 0;
 	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    /* SYSCALL: bind: ENOENT */
+    /* EXCEPT: streampair_BIN_ -> bind; */
+    /* EXCEPT: bind -> ENOENT; */
 	if (SOCKET_ERROR == bind(l, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail2;
 
@@ -56,12 +57,17 @@ streampair_BIN_(int protocol, aug_sd sv[2])
 	if (INVALID_SOCKET == (c = socket(AF_INET, SOCK_STREAM, protocol)))
 		goto fail2;
 
-    /* SYSCALL: connect: EAGAIN, EINTR */
+    /* EXCEPT: streampair_BIN_ -> connect; */
+    /* EXCEPT: connect -> EAGAIN; */
+    /* EXCEPT: connect -> EINTR; */
 	if (SOCKET_ERROR == connect(c, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail3;
 
 	len = sizeof(addr);
-    /* SYSCALL: accept: EAGAIN, EINTR */
+
+    /* EXCEPT: streampair_BIN_ -> accept; */
+    /* EXCEPT: accept -> EAGAIN; */
+    /* EXCEPT: accept -> EINTR; */
 	if (INVALID_SOCKET == (s = accept(l, (struct sockaddr*)&addr, &len)))
 		goto fail3;
 
@@ -93,7 +99,8 @@ dgrampair_BIN_(int protocol, aug_sd sv[2])
 	addr.sin_port = 0;
 	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    /* SYSCALL: bind: ENOENT */
+    /* EXCEPT: dgrampair_BIN_ -> bind; */
+    /* EXCEPT: bind -> ENOENT; */
 	if (SOCKET_ERROR == bind(s, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail2;
 
@@ -104,7 +111,9 @@ dgrampair_BIN_(int protocol, aug_sd sv[2])
 	if (INVALID_SOCKET == (c = socket(AF_INET, SOCK_DGRAM, protocol)))
 		goto fail2;
 
-    /* SYSCALL: connect: EAGAIN, EINTR */
+    /* EXCEPT: dgrampair_BIN_ -> connect; */
+    /* EXCEPT: connect -> EAGAIN; */
+    /* EXCEPT: connect -> EINTR; */
 	if (SOCKET_ERROR == connect(c, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail3;
 
@@ -158,7 +167,9 @@ aug_accept_BI(aug_sd sd, struct aug_endpoint* ep)
 {
     SOCKET h;
     ep->len_ = AUG_MAXADDRLEN;
-    /* SYSCALL: accept: EAGAIN, EINTR */
+    /* EXCEPT: aug_accept_BI -> accept; */
+    /* EXCEPT: accept -> EAGAIN; */
+    /* EXCEPT: accept -> EINTR; */
     if (INVALID_SOCKET == (h = accept(sd, &ep->un_.sa_, &ep->len_)))
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
     return h;
@@ -167,7 +178,8 @@ aug_accept_BI(aug_sd sd, struct aug_endpoint* ep)
 AUGSYS_API aug_result
 aug_bind_N(aug_sd sd, const struct aug_endpoint* ep)
 {
-    /* SYSCALL: bind: ENOENT */
+    /* EXCEPT: aug_bind_N -> bind; */
+    /* EXCEPT: bind -> ENOENT; */
     if (SOCKET_ERROR == bind(sd, &ep->un_.sa_, ep->len_)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
         return -1;
@@ -178,7 +190,9 @@ aug_bind_N(aug_sd sd, const struct aug_endpoint* ep)
 AUGSYS_API aug_result
 aug_connect_BI(aug_sd sd, const struct aug_endpoint* ep)
 {
-    /* SYSCALL: connect: EAGAIN, EINTR */
+    /* EXCEPT: aug_connect_BI -> connect; */
+    /* EXCEPT: connect -> EAGAIN; */
+    /* EXCEPT: connect -> EINTR; */
     if (SOCKET_ERROR == connect(sd, &ep->un_.sa_, ep->len_)) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
         return -1;
@@ -221,7 +235,9 @@ aug_listen(aug_sd sd, int backlog)
 AUGSYS_API aug_rsize
 aug_recv_BI(aug_sd sd, void* buf, size_t len, int flags)
 {
-    /* SYSCALL: recv: EAGAIN, EINTR */
+    /* EXCEPT: aug_recv_BI -> connect; */
+    /* EXCEPT: recv -> EAGAIN; */
+    /* EXCEPT: recv -> EINTR; */
     ssize_t ret = recv(sd, buf, (int)len, flags);
     if (SOCKET_ERROR == ret) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
@@ -237,7 +253,9 @@ aug_recvfrom_BI(aug_sd sd, void* buf, size_t len, int flags,
     ssize_t ret;
     ep->len_ = AUG_MAXADDRLEN;
 
-    /* SYSCALL: recvfrom: EAGAIN, EINTR */
+    /* EXCEPT: aug_recvfrom_BI -> recvfrom; */
+    /* EXCEPT: recvfrom -> EAGAIN; */
+    /* EXCEPT: recvfrom -> EINTR; */
     ret = recvfrom(sd, buf, (int)len, flags, &ep->un_.sa_, &ep->len_);
     if (SOCKET_ERROR == ret) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
@@ -249,7 +267,9 @@ aug_recvfrom_BI(aug_sd sd, void* buf, size_t len, int flags,
 AUGSYS_API aug_rsize
 aug_send_BI(aug_sd sd, const void* buf, size_t len, int flags)
 {
-    /* SYSCALL: send: EAGAIN, EINTR */
+    /* EXCEPT: aug_send_BI -> send; */
+    /* EXCEPT: send -> EAGAIN; */
+    /* EXCEPT: send -> EINTR; */
     ssize_t ret = send(sd, buf, (int)len, flags);
     if (SOCKET_ERROR == ret) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
@@ -262,6 +282,9 @@ AUGSYS_API aug_rsize
 aug_sendto_BI(aug_sd sd, const void* buf, size_t len, int flags,
               const struct aug_endpoint* ep)
 {
+    /* EXCEPT: aug_sendto_BI -> sendto; */
+    /* EXCEPT: sendto -> EAGAIN; */
+    /* EXCEPT: sendto -> EINTR; */
     ssize_t ret = sendto(sd, buf, (int)len, flags, &ep->un_.sa_, ep->len_);
     if (SOCKET_ERROR == ret) {
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());

@@ -70,7 +70,9 @@ aug_basename(const char* path)
 AUGUTIL_API aug_result
 aug_chdir_IN(const char* path)
 {
-    /* SYSCALL: chdir: EINTR, ENOENT */
+    /* EXCEPT: aug_chdir_IN -> chdir; */
+    /* EXCEPT: chdir -> EINTR; */
+    /* EXCEPT: chdir -> ENOENT; */
 #if !defined(_WIN32)
     if (chdir(path) < 0)
 #else /* _WIN32 */
@@ -231,7 +233,8 @@ aug_realpath_N(const char* src, char* dst, size_t size)
         return NULL;
     }
 
-    /* SYSCALL: realpath: ENOENT */
+    /* EXCEPT: aug_realpath_N -> realpath; */
+    /* EXCEPT: realpath -> ENOENT; */
     if (!realpath(src, buf)) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;

@@ -85,7 +85,7 @@ aug_ftruncate_BI(aug_fd fd, off_t size);
 AUGSYS_API aug_result
 aug_fsize_IN(aug_fd fd, size_t* size);
 
-AUGSYS_API void
+AUGSYS_API aug_result
 aug_msleep_I(unsigned ms);
 
 #endif /* AUGSYS_UNISTD_H */

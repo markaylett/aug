@@ -29,7 +29,9 @@ AUGSYS_API aug_rsize
 aug_freadv_BI(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
-    /* SYSCALL: readv: EAGAIN, EINTR */
+    /* EXCEPT: aug_freadv_BI -> readv; */
+    /* EXCEPT: readv -> EAGAIN; */
+    /* EXCEPT: readv -> EINTR; */
     if ((ret = readv(fd, iov, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -41,7 +43,9 @@ AUGSYS_API aug_rsize
 aug_fwritev_BI(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
-    /* SYSCALL: writev: EAGAIN, EINTR */
+    /* EXCEPT: aug_fwritev_BI -> writev; */
+    /* EXCEPT: writev -> EAGAIN; */
+    /* EXCEPT: writev -> EINTR; */
     if ((ret = writev(fd, iov, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;

@@ -32,6 +32,7 @@ write,yes,yes,no
 writev,yes,yes,no
 
 aug_accept_BI
+aug_appendhttp_BIN
 aug_bind_N
 aug_clearfields_BIN
 aug_connect_BI
@@ -45,6 +46,7 @@ aug_delfieldn_BIN
 aug_delfieldp_BIN
 aug_destroymmap_B
 aug_extractmar_BIN
+aug_finishhttp_BIN
 aug_fopen_N
 aug_fread_BI
 aug_freadv_BI
@@ -72,6 +74,7 @@ aug_putfield_BIN
 aug_putfieldn_BIN
 aug_putfieldp_BIN
 aug_read_BI
+aug_readfix_BI
 aug_readopts_N
 aug_readv_BI
 aug_realpath_N
@@ -89,15 +92,16 @@ aug_start_N
 aug_swrite_BI
 aug_swritev_BI
 aug_tcpclient_BI
-aug_tcpserver_NI
+aug_tcpserver_N
 aug_truncatemar_BIN
 aug_tryconnect_BI
 aug_udpclient_BI
-aug_udpserver_NI
+aug_udpserver_N
 aug_vfopen_N
 aug_waitmdevents_I
 aug_write_BI
 aug_writeevent_B
 aug_writemar_BIN
+aug_writesome_BI
 aug_writev_BI
 aug_xstrread_BI

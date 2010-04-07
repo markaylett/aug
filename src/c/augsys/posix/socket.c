@@ -57,7 +57,9 @@ aug_accept_BI(aug_sd sd, struct aug_endpoint* ep)
 {
     int fd;
     ep->len_ = AUG_MAXADDRLEN;
-    /* SYSCALL: accept: EAGAIN, EINTR */
+    /* EXCEPT: aug_accept_BI -> accept; */
+    /* EXCEPT: accept -> EAGAIN; */
+    /* EXCEPT: accept -> EINTR; */
     if ((fd = accept(sd,  &ep->un_.sa_, &ep->len_)) < 0)
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     return fd;
@@ -66,7 +68,8 @@ aug_accept_BI(aug_sd sd, struct aug_endpoint* ep)
 AUGSYS_API aug_result
 aug_bind_N(aug_sd sd, const struct aug_endpoint* ep)
 {
-    /* SYSCALL: bind: ENOENT */
+    /* EXCEPT: aug_bind_N -> bind; */
+    /* EXCEPT: bind -> ENOENT; */
     if (bind(sd, &ep->un_.sa_, ep->len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -77,7 +80,9 @@ aug_bind_N(aug_sd sd, const struct aug_endpoint* ep)
 AUGSYS_API aug_result
 aug_connect_BI(aug_sd sd, const struct aug_endpoint* ep)
 {
-    /* SYSCALL: connect: EAGAIN, EINTR */
+    /* EXCEPT: aug_connect_BI -> connect; */
+    /* EXCEPT: connect -> EAGAIN; */
+    /* EXCEPT: connect -> EINTR; */
     if (connect(sd, &ep->un_.sa_, ep->len_) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -120,7 +125,9 @@ aug_listen(aug_sd sd, int backlog)
 AUGSYS_API aug_rsize
 aug_recv_BI(aug_sd sd, void* buf, size_t len, int flags)
 {
-    /* SYSCALL: recv: EAGAIN, EINTR */
+    /* EXCEPT: aug_recv_BI -> recv; */
+    /* EXCEPT: recv -> EAGAIN; */
+    /* EXCEPT: recv -> EINTR; */
     ssize_t ret = recv(sd, buf, len, flags);
     if (ret < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -135,7 +142,9 @@ aug_recvfrom_BI(aug_sd sd, void* buf, size_t len, int flags,
 {
     ssize_t ret;
     ep->len_ = AUG_MAXADDRLEN;
-    /* SYSCALL: recvfrom: EAGAIN, EINTR */
+    /* EXCEPT: aug_recvfrom_BI -> recvfrom; */
+    /* EXCEPT: recvfrom -> EAGAIN; */
+    /* EXCEPT: recvfrom -> EINTR; */
     if ((ret = recvfrom(sd, buf, len, flags, &ep->un_.sa_, &ep->len_)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -146,7 +155,9 @@ aug_recvfrom_BI(aug_sd sd, void* buf, size_t len, int flags,
 AUGSYS_API aug_rsize
 aug_send_BI(aug_sd sd, const void* buf, size_t len, int flags)
 {
-    /* SYSCALL: send: EAGAIN, EINTR */
+    /* EXCEPT: aug_send_BI -> send; */
+    /* EXCEPT: send -> EAGAIN; */
+    /* EXCEPT: send -> EINTR; */
     ssize_t ret = send(sd, buf, len, flags);
     if (ret < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -159,7 +170,9 @@ AUGSYS_API aug_rsize
 aug_sendto_BI(aug_sd sd, const void* buf, size_t len, int flags,
               const struct aug_endpoint* ep)
 {
-    /* SYSCALL: sendto: EAGAIN, EINTR */
+    /* EXCEPT: aug_sendto_BI -> sendto; */
+    /* EXCEPT: sendto -> EAGAIN; */
+    /* EXCEPT: sendto -> EINTR; */
     ssize_t ret = sendto(sd, buf, len, flags, &ep->un_.sa_, ep->len_);
     if (ret < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);

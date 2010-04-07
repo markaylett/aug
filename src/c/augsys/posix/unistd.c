@@ -50,7 +50,6 @@ aug_fclose(aug_fd fd)
       we need to fix it.
     */
 
-    /* SYSCALL: close: EINTR */
     if (close(fd) < 0 && EINTR != errno) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -61,7 +60,9 @@ aug_fclose(aug_fd fd)
 AUGSYS_API aug_result
 aug_fsetnonblock_BI(aug_fd fd, aug_bool on)
 {
-    /* SYSCALL: fcntl: EAGAIN, EINTR */
+    /* EXCEPT: aug_fsetnonblock_BI -> fcntl; */
+    /* EXCEPT: fcntl -> EAGAIN; */
+    /* EXCEPT: fcntl -> EINTR; */
     int flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
@@ -73,7 +74,9 @@ aug_fsetnonblock_BI(aug_fd fd, aug_bool on)
     else
         flags &= ~O_NONBLOCK;
 
-    /* SYSCALL: fcntl: EAGAIN, EINTR */
+    /* EXCEPT: aug_fsetnonblock_BI -> fcntl; */
+    /* EXCEPT: fcntl -> EAGAIN; */
+    /* EXCEPT: fcntl -> EINTR; */
     if (fcntl(fd, F_SETFL, flags) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -93,7 +96,8 @@ aug_vfopen_N(const char* path, int flags, va_list args)
     else
         mode = 0;
 
-    /* SYSCALL: open: ENOENT */
+    /* EXCEPT: aug_vfopen_N -> open; */
+    /* EXCEPT: open -> ENOENT; */
     if ((fd = open(path, flags, mode)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -126,7 +130,9 @@ AUGSYS_API aug_rsize
 aug_fread_BI(aug_fd fd, void* buf, size_t size)
 {
     ssize_t ret;
-    /* SYSCALL: read: EAGAIN, EINTR */
+    /* EXCEPT: aug_fread_BI -> read; */
+    /* EXCEPT: read -> EAGAIN; */
+    /* EXCEPT: read -> EINTR; */
     if ((ret = read(fd, buf, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -138,7 +144,9 @@ AUGSYS_API aug_rsize
 aug_fwrite_BI(aug_fd fd, const void* buf, size_t size)
 {
     ssize_t ret;
-    /* SYSCALL: write: EAGAIN, EINTR */
+    /* EXCEPT: aug_fwrite_BI -> read; */
+    /* EXCEPT: write -> EAGAIN; */
+    /* EXCEPT: write -> EINTR; */
     if ((ret = write(fd, buf, size)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -159,7 +167,9 @@ aug_fsync(aug_fd fd)
 AUGSYS_API aug_result
 aug_ftruncate_BI(aug_fd fd, off_t size)
 {
-    /* SYSCALL: ftruncate: EAGAIN, EINTR */
+    /* EXCEPT: aug_ftruncate_BI -> ftruncate; */
+    /* EXCEPT: ftruncate -> EAGAIN; */
+    /* EXCEPT: ftruncate -> EINTR; */
     if (ftruncate(fd, size) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -171,7 +181,9 @@ AUGSYS_API aug_result
 aug_fsize_IN(aug_fd fd, size_t* size)
 {
     struct stat s;
-    /* SYSCALL: fstat: EINTR, ENOENT */
+    /* EXCEPT: aug_fsize_IN -> fstat; */
+    /* EXCEPT: fstat -> EINTR; */
+    /* EXCEPT: fstat -> ENOENT; */
     if (fstat(fd, &s) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -181,9 +193,14 @@ aug_fsize_IN(aug_fd fd, size_t* size)
     return 0;
 }
 
-AUGSYS_API void
+AUGSYS_API aug_result
 aug_msleep_I(unsigned ms)
 {
-    /* SYSCALL: usleep: EINTR */
-    usleep(ms * 1000);
+    /* EXCEPT: aug_msleep_I -> usleep; */
+    /* EXCEPT: usleep -> EINTR; */
+    if (usleep(ms * 1000) < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
+    return 0;
 }

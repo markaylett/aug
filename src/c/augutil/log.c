@@ -87,7 +87,6 @@ writeall_(int fd, const char* buf, size_t n)
 
     while (0 != n) {
 
-    /* SYSCALL: write: EAGAIN, EINTR */
 #if !defined(_WIN32)
         int ret = write(fd, buf, n);
 #else /* _WIN32 */

@@ -65,6 +65,6 @@ AUGNET_API aug_rsize
 aug_writersize(aug_writer_t writer);
 
 AUGNET_API aug_rsize
-aug_writesome(aug_writer_t writer, aug_stream* stream);
+aug_writesome_BI(aug_writer_t writer, aug_stream* stream);
 
 #endif /* AUGNET_WRITER_H */

@@ -99,7 +99,7 @@ static void
 control_(const struct aug_options* options, int sig)
 {
     if (aug_control_BIN(options, sig) < 0)
-        die_("aug_control() failed");
+        die_("aug_control_BIN() failed");
 }
 
 static void

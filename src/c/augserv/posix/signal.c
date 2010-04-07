@@ -68,7 +68,8 @@ aug_setsighandler_I(void (*handler)(int))
 
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
         sethandler_(&sa, handlers_[i].dfl_ ? SIG_DFL : handler);
-        /* SYSCALL: sigaction: EINTR */
+        /* EXCEPT: aug_setsighandler_I -> sigaction; */
+        /* EXCEPT: sigaction -> EINTR; */
         if (sigaction(handlers_[i].sig_, &sa, NULL) < 0) {
             aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
             return -1;

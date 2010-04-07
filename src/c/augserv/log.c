@@ -69,7 +69,8 @@ redirectout_I_(int fd)
 
     /* Duplicate stdout descriptor so that it can be restored on failure. */
 
-    /* SYSCALL: dup: EINTR */
+    /* EXCEPT: redirectout_I_ -> dup; */
+    /* EXCEPT: dup -> EINTR; */
 #if !defined(_WIN32)
     if ((old = dup(STDOUT_FILENO)) < 0)
 #else /* _WIN32 */
@@ -87,7 +88,8 @@ redirectout_I_(int fd)
     /* Assumption: If dup2 fails for any reason, the original descriptor's
        state will remain unchanged. */
 
-    /* SYSCALL: dup2: EINTR */
+    /* EXCEPT: redirectout_I_ -> dup2; */
+    /* EXCEPT: dup2 -> EINTR; */
 #if !defined(_WIN32)
     if (dup2(fd, STDOUT_FILENO) < 0) {
 #else /* _WIN32 */
@@ -97,18 +99,17 @@ redirectout_I_(int fd)
         goto done;
     }
 
-    /* SYSCALL: dup2: EINTR */
+    /* EXCEPT: redirectout_I_ -> dup2; */
+    /* EXCEPT: dup2: EINTR */
 #if !defined(_WIN32)
     if (dup2(fd, STDERR_FILENO) < 0) {
 #else /* _WIN32 */
     if (_dup2(fd, STDERR_FILENO) < 0) {
 #endif /* _WIN32 */
-
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
         /* Restore the original descriptor. */
 
-    /* SYSCALL: dup2: EINTR */
 #if !defined(_WIN32)
         if (dup2(old, STDOUT_FILENO) < 0)
 #else /* _WIN32 */
@@ -123,7 +124,6 @@ redirectout_I_(int fd)
     result = 0;
 
  done:
-    /* SYSCALL: close: EINTR */
 #if !defined(_WIN32)
     if (close(old) < 0 && EINTR != errno)
 #else /* _WIN32 */
@@ -140,20 +140,21 @@ aug_openlog_IN(const char* path)
     int fd;
     aug_result result;
 
-    /* SYSCALL: open: ENOENT */
+    /* EXCEPT: aug_openlog_IN -> open; */
+    /* EXCEPT: open -> ENOENT; */
 #if !defined(_WIN32)
     if ((fd = open(path,
 #else /* _WIN32 */
     if ((fd = _open(path,
 #endif /* _WIN32 */
-                          O_APPEND | O_CREAT | O_WRONLY, 0640)) < 0) {
+                    O_APPEND | O_CREAT | O_WRONLY, 0640)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
 
+    /* EXCEPT: aug_openlog_IN -> redirectout_I_; */
     result = redirectout_I_(fd);
 
-    /* SYSCALL: close: EINTR */
 #if !defined(_WIN32)
     if (close(fd) < 0 && EINTR != errno)
 #else /* _WIN32 */

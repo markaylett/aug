@@ -82,7 +82,7 @@ aug_tcpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep)
 }
 
 AUGNET_API aug_sd
-aug_tcpserver_NI(const char* host, const char* serv, struct aug_endpoint* ep)
+aug_tcpserver_N(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     aug_sd sd;
     struct addrinfo hints, * res, * save;
@@ -158,7 +158,7 @@ aug_udpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep,
 }
 
 AUGNET_API aug_sd
-aug_udpserver_NI(const char* host, const char* serv, struct aug_endpoint* ep)
+aug_udpserver_N(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     aug_sd sd;
     struct addrinfo hints, * res, * save;

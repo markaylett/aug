@@ -111,7 +111,7 @@ field_BIN_(aug_httphandler* ob, const char* name, const char* value)
 }
 
 static aug_result
-csize_(aug_httphandler* ob, unsigned csize)
+csize_BIN_(aug_httphandler* ob, unsigned csize)
 {
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
@@ -127,7 +127,7 @@ csize_(aug_httphandler* ob, unsigned csize)
 }
 
 static aug_result
-cdata_(aug_httphandler* ob, const void* buf, unsigned len)
+cdata_BIN_(aug_httphandler* ob, const void* buf, unsigned len)
 {
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
@@ -180,8 +180,8 @@ static const struct aug_httphandlervtbl vtbl_ = {
     release_,
     request_,
     field_BIN_,
-    csize_,
-    cdata_,
+    csize_BIN_,
+    cdata_BIN_,
     end_
 };
 

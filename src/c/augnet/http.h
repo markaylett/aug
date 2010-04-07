@@ -49,9 +49,9 @@ AUGNET_API void
 aug_destroyhttpparser(aug_httpparser_t parser);
 
 AUGNET_API aug_result
-aug_appendhttp(aug_httpparser_t parser, const char*, unsigned size);
+aug_appendhttp_BIN(aug_httpparser_t parser, const char*, unsigned size);
 
 AUGNET_API aug_result
-aug_finishhttp(aug_httpparser_t parser);
+aug_finishhttp_BIN(aug_httpparser_t parser);
 
 #endif /* AUGNET_HTTP_H */

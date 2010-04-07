@@ -47,7 +47,9 @@ flock_BI_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
-    /* SYSCALL: fcntl: EAGAIN, EINTR */
+    /* EXCEPT: flock_BI_ -> fcntl; */
+    /* EXCEPT: fcntl -> EAGAIN; */
+    /* EXCEPT: fcntl -> EINTR; */
     if (fcntl(fd, cmd, fl) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -127,14 +129,14 @@ aug_control_BIN(const struct aug_options* options, int event)
 
     /* Check for existence of file. */
 
-    /* SYSCALL: access: ENOENT */
     if (access(pidfile, F_OK) < 0) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
                         AUG_MSG("pidfile does not exist: %s"), pidfile);
         return -1;
     }
 
-    /* SYSCALL: open: ENOENT */
+    /* EXCEPT: aug_control_BIN -> open; */
+    /* EXCEPT: open -> ENOENT; */
 	if ((fd = open(pidfile, O_RDONLY)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -171,7 +173,8 @@ aug_control_BIN(const struct aug_options* options, int event)
         /* The lock was obtained, therefore, the daemon process cannot be
            running. */
 
-        /* SYSCALL: unlink: ENOENT */
+        /* EXCEPT: aug_control_BIN -> unlink; */
+        /* EXCEPT: unlink -> ENOENT; */
         if (unlink(pidfile) < 0)
             aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         else
@@ -180,7 +183,6 @@ aug_control_BIN(const struct aug_options* options, int event)
         result = -1;
     }
 
-    /* SYSCALL: close: EINTR */
     close(fd);
     return result;
 }

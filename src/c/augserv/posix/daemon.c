@@ -47,15 +47,15 @@ static void
 closeall_(int next)
 {
     int limit = getdtablesize();
-    /* SYSCALL: close: EINTR */
     for (; next <= limit; ++next)
         close(next);
 }
 
 static aug_result
-daemonise_A_(void)
+daemonise_B_(void)
 {
-    /* SYSCALL: fork: EAGAIN */
+    /* EXCEPT: daemonise_B_ -> fork; */
+    /* EXCEPT: fork -> EAGAIN; */
     switch (fork()) {
     case 0:
         break;
@@ -79,7 +79,8 @@ daemonise_A_(void)
     /* Forking again ensures that the daemon process is not a session leader,
        and therefore cannot regain access to a controlling terminal. */
 
-    /* SYSCALL: fork: EAGAIN */
+    /* EXCEPT: daemonise_B_ -> fork; */
+    /* EXCEPT: fork -> EAGAIN; */
     switch (fork()) {
     case 0:
         break;
@@ -128,7 +129,9 @@ writepid_BI_(int fd)
         return -1;
     }
 
-    /* SYSCALL: write: EAGAIN, EINTR */
+    /* EXCEPT: writepid_BI_ -> write; */
+    /* EXCEPT: write -> EAGAIN; */
+    /* EXCEPT: write -> EINTR; */
     if (len != write(fd, str, len) || fsync(fd) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -147,7 +150,9 @@ flock_BI_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
-    /* SYSCALL: fcntl: EAGAIN, EINTR */
+    /* EXCEPT: flock_BI_ -> fcntl; */
+    /* EXCEPT: fcntl -> EAGAIN; */
+    /* EXCEPT: fcntl -> EINTR; */
     if (fcntl(fd, cmd, fl) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -162,7 +167,8 @@ lockfile_BIN_(const char* path)
     struct flock fl;
     int fd;
 
-    /* SYSCALL: open: ENOENT */
+    /* EXCEPT: lockfile_BIN_ -> open; */
+    /* EXCEPT: open -> ENOENT; */
     if ((fd = open(path, O_CREAT | O_WRONLY, 0640)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
@@ -185,7 +191,9 @@ lockfile_BIN_(const char* path)
 
     /* Truncate any existing pid value. */
 
-    /* SYSCALL: ftruncate: EAGAIN, EINTR */
+    /* EXCEPT: lockfile_BIN_ -> ftruncate; */
+    /* EXCEPT: ftruncate -> EAGAIN; */
+    /* EXCEPT: ftruncate -> EINTR; */
     if (ftruncate(fd, 0) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         goto fail;
@@ -199,7 +207,6 @@ lockfile_BIN_(const char* path)
     return 0;
 
  fail:
-    /* SYSCALL: close: EINTR */
     close(fd);
     return -1;
 }
@@ -210,20 +217,21 @@ closein_IN_(void)
     int fd;
     aug_result result;
 
-    /* SYSCALL: open: ENOENT */
+    /* EXCEPT: closein_IN_ -> open; */
+    /* EXCEPT: open -> ENOENT; */
 	if ((fd = open("/dev/null", O_RDONLY)) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
 
-    /* SYSCALL: dup2: EINTR */
+    /* EXCEPT: closein_IN_ -> dup2; */
+    /* EXCEPT: dup2 -> EINTR; */
     if (dup2(fd, STDIN_FILENO) < 0) {
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         result = -1;
     } else
         result = 0;
 
-    /* SYSCALL: close: EINTR */
     close(fd);
     return result;
 }
@@ -248,7 +256,7 @@ aug_daemonise_BIN_(const struct aug_options* options)
         return -1;
     }
 
-    if (daemonise_A_() < 0 || lockfile_BIN_(pidfile) < 0
+    if (daemonise_B_() < 0 || lockfile_BIN_(pidfile) < 0
         || closein_IN_() < 0 || aug_initserv_BIN() < 0)
         return -1;
 

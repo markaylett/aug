@@ -485,6 +485,7 @@ write_BIN_(aug_mar* obj, const void* buf, unsigned len)
 
 static aug_result
 extract_BIN_(aug_mar* obj, const char* path)
+
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     aug_mpool* mpool;
