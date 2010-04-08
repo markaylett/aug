@@ -269,6 +269,9 @@ aug_processchans_BI(aug_chans_t chans)
            call.  Lock during call. */
 
         aug_retain(it->ob_);
+
+        /* EXCEPT: aug_processchans_BI -> aug_processchan_BI; */
+
         ob = aug_processchan_BI(ob, chans->handler_, &fork);
         aug_release(it->ob_);
 

@@ -248,6 +248,8 @@ cchan_process_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* Added for completeness, although really not a valid case:
            aug_processchan() should not be called on old channel object. */
 
+        /* EXCEPT: cchan_process_BI_ -> aug_processchan_BI; */
+
         return aug_processchan_BI(impl->fwd_, handler, fork);
     }
 
@@ -282,6 +284,8 @@ cchan_process_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         /* De-register existing descriptor from multiplexer, and attempt to
            establish connection. */
+
+        /* EXCEPT: cchan_process_BI_ -> aug_tryconnect_BI; */
 
         if (aug_setmdeventmask(impl->muxer_, impl->sd_, 0) < 0
             || AUG_BADSD == (impl->sd_ = aug_tryconnect_BI(impl->conn_, &ep,
@@ -487,6 +491,8 @@ schan_process_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         aug_chan* chan;
         aug_id id;
 
+        /* EXCEPT: schan_process_BI_ -> aug_accept_BI; */
+
         if (AUG_BADSD == (sd = aug_accept_BI(impl->sd_, &ep))) {
 
             if (!aug_acceptagain(aug_tlerr)) {
@@ -504,6 +510,8 @@ schan_process_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             aug_sclose(sd);
             goto done;
         }
+
+        /* EXCEPT: schan_process_BI_ -> aug_ssetnonblock_BI; */
 
         if (aug_ssetnonblock_BI(sd, AUG_TRUE) < 0) {
             aug_ctxwarn(aug_tlx, "aug_ssetnonblock() failed: %s",
@@ -796,6 +804,9 @@ static aug_rsize
 pstream_read_BI_(aug_stream* ob, void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
+
+    /* EXCEPT: pstream_read_BI_ -> aug_sread_BI; */
+
     aug_rsize rsize = aug_sread_BI(impl->sticky_.md_, buf, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
@@ -806,6 +817,9 @@ static aug_rsize
 pstream_readv_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
+
+    /* EXCEPT: pstream_readv_BI_ -> aug_sreadv_BI; */
+
     aug_rsize rsize = aug_sreadv_BI(impl->sticky_.md_, iov, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
@@ -816,6 +830,9 @@ static aug_rsize
 pstream_write_BI_(aug_stream* ob, const void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
+
+    /* EXCEPT: pstream_write_BI_ -> aug_swrite_BI; */
+
     aug_rsize rsize = aug_swrite_BI(impl->sticky_.md_, buf, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
@@ -826,6 +843,9 @@ static aug_rsize
 pstream_writev_BI_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
+
+    /* EXCEPT: pstream_writev_BI_ -> aug_swritev_BI; */
+
     aug_rsize rsize = aug_swritev_BI(impl->sticky_.md_, iov, size);
     if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
@@ -856,6 +876,8 @@ aug_createclient_BI(aug_mpool* mpool, const char* host, const char* serv,
 
     if (!(conn = aug_createtcpconnect(mpool, host, serv)))
         return NULL;
+
+    /* EXCEPT: aug_createclient_BI -> aug_tryconnect_BI; */
 
     if (AUG_BADSD == (sd = aug_tryconnect_BI(conn, &ep, &est)))
         goto fail1;

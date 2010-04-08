@@ -64,6 +64,8 @@ makepath_N_(const char* conffile)
     if (!(s = createxstr_(sizeof(buf))))
         return NULL;
 
+    /* EXCEPT: makepath_N_ -> aug_realpath_N; */
+
     if (!aug_realpath_N(program, buf, sizeof(buf)))
         goto fail;
 
@@ -72,6 +74,8 @@ makepath_N_(const char* conffile)
         goto fail;
 
     if (conffile) {
+
+        /* EXCEPT: makepath_N_ -> aug_realpath_N; */
 
         if (!aug_realpath_N(conffile, buf, sizeof(buf)))
             goto fail;
@@ -121,6 +125,9 @@ start_N_(SC_HANDLE scm, const struct aug_options* options)
         /* Specify absolute path to configuration file. */
 
         char buf[AUG_PATH_MAX + 1];
+
+        /* EXCEPT: start_N_ -> aug_realpath_N; */
+
         if (!(argv[1] = aug_realpath_N(argv[1], buf, sizeof(buf))))
             goto done;
 
@@ -190,6 +197,8 @@ install_N_(SC_HANDLE scm, const struct aug_options* options)
                         AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
         return -1;
     }
+
+    /* EXCEPT: install_N_ -> makepath_N_; */
 
     if (!(path = makepath_N_(AUG_CONFFILE(options))))
         return -1;
@@ -267,6 +276,8 @@ aug_start_N(const struct aug_options* options)
         return -1;
     }
 
+    /* EXCEPT: aug_start_N -> start_N_; */
+
     result = start_N_(scm, options);
     CloseServiceHandle(scm);
     return result;
@@ -298,6 +309,8 @@ aug_install_N(const struct aug_options* options)
         aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         return -1;
     }
+
+    /* EXCEPT: aug_install_N -> install_N_; */
 
     result = install_N_(scm, options);
     CloseServiceHandle(scm);

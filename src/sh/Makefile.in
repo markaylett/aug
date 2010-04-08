@@ -191,6 +191,7 @@ to_host_path_cmd = @to_host_path_cmd@
 EXTRA_DIST = \
 	autoinit \
 	buildcheck \
+	dotexcept \
 	findjunk \
 	mkaugconf \
 	mkimplib \

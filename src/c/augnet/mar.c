@@ -107,6 +107,8 @@ field_BIN_(aug_httphandler* ob, const char* name, const char* value)
     field.value_ = value;
     field.size_ = (unsigned)strlen(value);
 
+    /* EXCEPT: field_BIN_ -> aug_putfield_BIN; */
+
     return aug_putfield_BIN(parser->mar_, &field);
 }
 
@@ -118,6 +120,8 @@ csize_BIN_(aug_httphandler* ob, unsigned csize)
 
     assert(parser->request_);
     assert(parser->mar_);
+
+    /* EXCEPT: csize_BIN_ -> aug_truncatemar_BIN; */
 
     if (aug_truncatemar_BIN(parser->mar_, csize) < 0
         || aug_seekmar(parser->mar_, AUG_SET, 0) < 0)
@@ -136,6 +140,8 @@ cdata_BIN_(aug_httphandler* ob, const void* buf, unsigned len)
     assert(parser->mar_);
 
     /* Returns aug_rsize. */
+
+    /* EXCEPT: cdata_BIN_ -> aug_writemar_BIN; */
 
     if (aug_writemar_BIN(parser->mar_, buf, len) < 0)
         return -1;

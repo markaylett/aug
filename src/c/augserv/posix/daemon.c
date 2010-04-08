@@ -176,6 +176,8 @@ lockfile_BIN_(const char* path)
 
     /* Attempt to obtain exclusive lock. */
 
+    /* EXCEPT: lockfile_BIN_ -> flock_BI_; */
+
     if (flock_BI_(&fl, fd, F_SETLK, F_WRLCK) < 0) {
 
         if (AUG_EXBLOCK == aug_getexcept(aug_tlx)) {
@@ -198,6 +200,8 @@ lockfile_BIN_(const char* path)
         aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         goto fail;
     }
+
+    /* EXCEPT: lockfile_BIN_ -> writepid_BI_; */
 
     if (writepid_BI_(fd) < 0)
         goto fail;
@@ -255,6 +259,11 @@ aug_daemonise_BIN_(const struct aug_options* options)
                         AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
     }
+
+    /* EXCEPT: aug_daemonise_BIN_ -> daemonise_B_; */
+    /* EXCEPT: aug_daemonise_BIN_ -> lockfile_BIN_; */
+    /* EXCEPT: aug_daemonise_BIN_ -> closein_IN_; */
+    /* EXCEPT: aug_daemonise_BIN_ -> aug_initserv_BIN; */
 
     if (daemonise_B_() < 0 || lockfile_BIN_(pidfile) < 0
         || closein_IN_() < 0 || aug_initserv_BIN() < 0)

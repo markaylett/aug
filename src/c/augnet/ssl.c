@@ -632,6 +632,9 @@ cprocess_BI_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
            readable before issuing an SSL_read(). */
 
         char ch;
+
+        /* EXCEPT: cprocess_BI_ -> aug_recv_BI; */
+
         if (aug_recv_BI(impl->sticky_.md_, &ch, 1, MSG_PEEK) < 0
             && AUG_EXBLOCK == aug_getexcept(aug_tlx)) {
 

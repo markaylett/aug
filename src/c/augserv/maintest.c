@@ -100,6 +100,8 @@ getopt_(int opt)
 static aug_result
 readconf_N_(const char* conffile, aug_bool batch, aug_bool daemon)
 {
+    /* EXCEPT: readconf_N_ -> aug_realpath_N; */
+
     if (conffile && !aug_realpath_N(conffile, conffile_, sizeof(conffile_)))
         return -1;
 

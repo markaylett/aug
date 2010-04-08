@@ -100,7 +100,7 @@ redirectout_I_(int fd)
     }
 
     /* EXCEPT: redirectout_I_ -> dup2; */
-    /* EXCEPT: dup2: EINTR */
+    /* EXCEPT: dup2 -> EINTR; */
 #if !defined(_WIN32)
     if (dup2(fd, STDERR_FILENO) < 0) {
 #else /* _WIN32 */

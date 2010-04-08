@@ -36,6 +36,14 @@ dotdepend:
 			| dot -Tgif >$$l.gif; \
 	done
 
+dotexcept:
+	for l in augctx augsys augmar augutil augserv augnet; do \
+		(cd $(top_srcdir)/src/c && ../sh/dotexcept $$l) \
+		| tred \
+		| tee e$$l.dot \
+		| dot -Tgif >e$$l.gif; \
+	done
+
 if WITH_CWEB
 BUILT_SOURCES = \
 	augintro.cpp

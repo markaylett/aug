@@ -84,6 +84,8 @@ send_BI_(int fd, pid_t pid, int event)
 
         /* Wait for daemon process to release lock. */
 
+        /* EXCEPT: send_BI_ -> flock_BI_; */
+
         if (flock_BI_(&fl, fd, F_SETLKW, F_RDLCK) < 0)
             return -1;
 
@@ -144,10 +146,14 @@ aug_control_BIN(const struct aug_options* options, int event)
 
     /* Attempt to obtain shared lock. */
 
+    /* EXCEPT: aug_control_BIN -> flock_BI_; */
+
     if (flock_BI_(&fl, fd, F_SETLK, F_RDLCK) < 0) {
 
         /* As expected, the daemon process has an exclusive lock on the pid
            file.  Use F_GETLK to obtain the pid of the daemon process. */
+
+        /* EXCEPT: aug_control_BIN -> flock_BI_; */
 
         if (0 <= flock_BI_(&fl, fd, F_GETLK, F_RDLCK)) {
 
@@ -163,6 +169,7 @@ aug_control_BIN(const struct aug_options* options, int event)
                 result = -1;
 
             } else {
+                /* EXCEPT: aug_control_BIN -> send_BI_; */
                 result = send_BI_(fd, fl.l_pid, event);
             }
         } else

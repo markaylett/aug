@@ -331,6 +331,8 @@ aug_resizeseq_BIN_(aug_seq_t seq, unsigned size)
 
     total += (size - seq->len_);
 
+    /* EXCEPT: aug_resizeseq_BIN_ -> resize_BIN_; */
+
     if (!(addr = (*seq->impl_->resize_BIN_)(seq, total, tail)))
         return NULL;
 

@@ -67,6 +67,8 @@ aug_tcpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
+        /* EXCEPT: aug_tcpclient_BI -> aug_connect_BI; */
+
         if (0 <= aug_connect_BI(sd, ep))
             break; /* Success. */
 
@@ -103,6 +105,8 @@ aug_tcpserver_N(const char* host, const char* serv, struct aug_endpoint* ep)
             continue; /* Error, try next. */
 
         aug_getendpoint(res, ep);
+
+        /* EXCEPT: aug_tcpserver_N -> aug_bind_N; */
 
         if (0 <= aug_setreuseaddr(sd, AUG_TRUE)
             && 0 <= aug_bind_N(sd, ep)
@@ -143,6 +147,8 @@ aug_udpclient_BI(const char* host, const char* serv, struct aug_endpoint* ep,
 
         aug_getendpoint(res, ep);
 
+        /* EXCEPT: aug_udpclient_BI -> aug_connect_BI; */
+
         if (!connect || 0 <= aug_connect_BI(sd, ep))
             break; /* Success. */
 
@@ -179,6 +185,8 @@ aug_udpserver_N(const char* host, const char* serv, struct aug_endpoint* ep)
             continue; /* Error, try next. */
 
         aug_getendpoint(res, ep);
+
+        /* EXCEPT: aug_udpserver_N -> aug_bind_N; */
 
         if (0 <= aug_bind_N(sd, ep))
             break; /* Success. */

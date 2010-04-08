@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "digraph G {"
+find $1 \( -name "*.[ch]" -o -name "*.[ch]pp" \) -exec egrep -o '[/][*] EXCEPT: [^*]+[*][/]' {} \; | awk '{ print $3, $4, $5 }' | sort | uniq
+echo "}"

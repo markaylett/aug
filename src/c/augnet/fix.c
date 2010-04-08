@@ -229,6 +229,8 @@ aug_readfix_BI(aug_fixstream_t stream, aug_stream* src, size_t size)
 
     /* Return on error or end of file. */
 
+    /* EXCEPT: aug_readfix_BI -> aug_xstrread_BI; */
+
     rsize = aug_xstrread_BI(stream->xstr_, src, size);
     if (rsize < 0)
         return -1;

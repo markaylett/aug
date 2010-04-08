@@ -86,6 +86,8 @@ value_BIN_(aug_httpparser_t parser)
         }
     }
 
+    /* EXCEPT: value_BIN_ -> aug_httpfield_BIN; */
+
     return aug_httpfield_BIN(parser->handler_, parser->name_,
                              aug_lexertoken(parser->lexer_));
 }
@@ -147,6 +149,7 @@ word_BIN_(aug_httpparser_t parser)
         result = -1;
         break;
     case VALUE_:
+        /* EXCEPT: word_BIN_ -> value_BIN_; */
         if (0 <= (result = value_BIN_(parser)))
             parser->state_ = NAME_;
         break;
@@ -169,10 +172,12 @@ header_BIN_(aug_httpparser_t parser, const char* ptr, unsigned size)
                 return -1;
             break;
         case AUG_LEXWORD:
+            /* EXCEPT: header_BIN_ -> word_BIN_; */
             if (word_BIN_(parser) < 0)
                 return -1;
             break;
         case AUG_LEXWORD | AUG_LEXPHRASE:
+            /* EXCEPT: header_BIN_ -> word_BIN_; */
             if (word_BIN_(parser) < 0
                 || phrase_(parser) < 0)
                 return -1;
@@ -268,6 +273,7 @@ aug_appendhttp_BIN(aug_httpparser_t parser, const char* buf, unsigned size)
 
     for (;;) {
 
+        /* EXCEPT: aug_appendhttp_BIN -> header_BIN_; */
         if ((result = header_BIN_(parser, buf, size)) < 0)
             break;
 
@@ -304,6 +310,7 @@ aug_finishhttp_BIN(aug_httpparser_t parser)
             goto fail;
         break;
     case AUG_LEXWORD:
+        /* EXCEPT: aug_finishhttp_BIN -> word_BIN_; */
         if ((result = word_BIN_(parser)) < 0)
             goto fail;
         break;

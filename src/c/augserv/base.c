@@ -79,6 +79,7 @@ static void
 sighandler_(int sig)
 {
     struct aug_event event;
+
     aug_result result = aug_writeevent_B(events_,
                                          aug_sigtoevent(sig, &event));
 
@@ -111,6 +112,9 @@ createevents_BIN(void)
     assert(!events_);
 
     mpool = aug_getmpool(aug_tlx);
+
+    /* EXCEPT: createevents_BIN -> aug_createevents_BIN; */
+
     events_ = aug_createevents_BIN(mpool);
     aug_release(mpool);
 
@@ -153,6 +157,8 @@ aug_initserv_BIN(void)
 {
     assert(serv_.create_);
     assert(!task_);
+
+    /* EXCEPT: aug_initserv_BIN -> createevents_BIN; */
 
     if (createevents_BIN() < 0)
         return -1;

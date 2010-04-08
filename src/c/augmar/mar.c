@@ -89,7 +89,7 @@ init_BIN_(aug_seq_t seq, struct aug_info_* info)
 
         char* ptr;
 
-        /* EXCEPT: init_BIN_ -> aug_resizeseq_BIN_ */
+        /* EXCEPT: init_BIN_ -> aug_resizeseq_BIN_; */
 
         if (aug_setregion_(seq, 0, size) < 0
             || !(ptr = aug_resizeseq_BIN_(seq, AUG_LEADERSIZE)))
@@ -217,7 +217,7 @@ clear_BIN_(aug_mar* obj)
         return -1;
     }
 
-    /* EXCEPT: clear_BIN_ -> aug_clearfields_BIN_ */
+    /* EXCEPT: clear_BIN_ -> aug_clearfields_BIN_; */
 
     return aug_clearfields_BIN_(impl->seq_, &impl->info_);
 }
@@ -233,7 +233,7 @@ deln_BIN_(aug_mar* obj, unsigned n)
         return -1;
     }
 
-    /* EXCEPT: deln_BIN_ -> aug_delfieldn_BIN_ */
+    /* EXCEPT: deln_BIN_ -> aug_delfieldn_BIN_; */
 
     return aug_delfieldn_BIN_(impl->seq_, &impl->info_, n);
 }
@@ -249,7 +249,7 @@ delp_BIN_(aug_mar* obj, const char* name)
         return -1;
     }
 
-    /* EXCEPT: delp_BIN_ -> aug_delfieldp_BIN_ */
+    /* EXCEPT: delp_BIN_ -> aug_delfieldp_BIN_; */
 
     return aug_delfieldp_BIN_(impl->seq_, &impl->info_, name);
 }
@@ -304,7 +304,7 @@ putn_BIN_(aug_mar* obj, unsigned n, const void* value, unsigned size)
         return -1;
     }
 
-    /* EXCEPT: putn_BIN_ -> aug_putfieldn_BIN_ */
+    /* EXCEPT: putn_BIN_ -> aug_putfieldn_BIN_; */
 
     return aug_putfieldn_BIN_(impl->seq_, &impl->info_, n, value, size);
 }
@@ -320,7 +320,7 @@ putp_BIN_(aug_mar* obj, const char* name, const void* value, unsigned size)
         return -1;
     }
 
-    /* EXCEPT: putp_BIN_ -> aug_putfieldp_BIN_ */
+    /* EXCEPT: putp_BIN_ -> aug_putfieldp_BIN_; */
 
     return aug_putfieldp_BIN_(impl->seq_, &impl->info_, name, value, size);
 }
@@ -336,7 +336,7 @@ put_BIN_(aug_mar* obj, const struct aug_field* field)
         return -1;
     }
 
-    /* EXCEPT: put_BIN_ -> aug_putfieldp_BIN_ */
+    /* EXCEPT: put_BIN_ -> aug_putfieldp_BIN_; */
 
     return aug_putfieldp_BIN_(impl->seq_, &impl->info_, field->name_,
                               field->value_, field->size_);
@@ -386,7 +386,7 @@ insert_BIN_(aug_mar* obj, const char* path)
 
     mpool = aug_seqmpool_(impl->seq_);
 
-    /* EXCEPT: insert_BIN_ -> aug_openmfile_IN_ */
+    /* EXCEPT: insert_BIN_ -> aug_openmfile_IN_; */
 
     mfile = aug_openmfile_IN_(mpool, path, AUG_RDONLY, 0, 0);
     aug_release(mpool);
@@ -396,8 +396,8 @@ insert_BIN_(aug_mar* obj, const char* path)
 
     if (0 != (size = aug_mfileresvd_(mfile))) {
 
-        /* EXCEPT: insert_BIN_ -> aug_mapmfile_BIN_ */
-        /* EXCEPT: insert_BIN_ -> aug_setcontent_BIN_ */
+        /* EXCEPT: insert_BIN_ -> aug_mapmfile_BIN_; */
+        /* EXCEPT: insert_BIN_ -> aug_setcontent_BIN; */
 
         if (!(addr = aug_mapmfile_BIN_(mfile, size))
             || aug_setcontent_BIN(obj, addr, size) < 0) {
@@ -457,7 +457,7 @@ setcontent_BIN_(aug_mar* obj, const void* cdata, unsigned size)
         return -1;
     }
 
-    /* EXCEPT: setcontent_BIN_ -> aug_setcontent_BIN_ */
+    /* EXCEPT: setcontent_BIN_ -> aug_setcontent_BIN_; */
 
     return aug_setcontent_BIN_(impl->seq_, &impl->info_, cdata, size);
 }
@@ -483,7 +483,7 @@ truncate_BIN_(aug_mar* obj, unsigned size)
     /* In keeping with the semantics of ftruncate, this function does not
        modify the offset - the equivalent of the file offset. */
 
-    /* EXCEPT: truncate_BIN_ -> aug_truncate_BIN_ */
+    /* EXCEPT: truncate_BIN_ -> aug_truncate_BIN_; */
 
     return aug_truncate_BIN_(impl->seq_, &impl->info_, size);
 }
@@ -509,7 +509,7 @@ write_BIN_(aug_mar* obj, const void* buf, unsigned len)
             return -1;
     }
 
-    /* EXCEPT: write_BIN_ -> aug_write_BIN_ */
+    /* EXCEPT: write_BIN_ -> aug_write_BIN_; */
 
     if (0 < (rsize = aug_write_BIN_(impl->seq_, &impl->info_,
                                     impl->offset_, buf, len)))
@@ -542,7 +542,7 @@ extract_BIN_(aug_mar* obj, const char* path)
 
     mpool = aug_seqmpool_(impl->seq_);
 
-    /* EXCEPT: extract_BIN_ -> aug_openmfile_IN_ */
+    /* EXCEPT: extract_BIN_ -> aug_openmfile_IN_; */
 
     mfile = aug_openmfile_IN_(mpool, path, AUG_WRONLY | AUG_CREAT | AUG_TRUNC,
                               0666, 0);
@@ -553,7 +553,7 @@ extract_BIN_(aug_mar* obj, const char* path)
 
     if (size) {
 
-        /* EXCEPT: extract_BIN_ -> aug_mapmfile_BIN_ */
+        /* EXCEPT: extract_BIN_ -> aug_mapmfile_BIN_; */
 
         if (!(dst = aug_mapmfile_BIN_(mfile, size)))
             goto fail;
@@ -561,7 +561,7 @@ extract_BIN_(aug_mar* obj, const char* path)
         memcpy(dst, src, size);
     }
 
-    /* EXCEPT: extract_BIN_ -> aug_closemfile_BI_ */
+    /* EXCEPT: extract_BIN_ -> aug_closemfile_BI_; */
 
     return aug_closemfile_BI_(mfile);
 
@@ -690,6 +690,8 @@ aug_createmar_BIN(aug_mpool* mpool)
     if (!(seq = aug_createseq_(mpool, sizeof(struct impl_))))
         return NULL;
 
+    /* EXCEPT: aug_createmar_BIN -> init_BIN_; */
+
     if (init_BIN_(seq, &info) < 0) {
         aug_destroyseq_(seq);
         return NULL;
@@ -734,11 +736,13 @@ aug_openmar_BIN(aug_mpool* mpool, const char* path, int flags, ...)
     } else
         mode = 0;
 
-    /* EXCEPT: aug_openmar_BIN -> aug_openseq_IN_ */
+    /* EXCEPT: aug_openmar_BIN -> aug_openseq_IN_; */
 
     if (!(seq = aug_openseq_IN_(mpool, path, flags & ~AUG_TRUNC, mode,
                                 sizeof(struct impl_))))
         return NULL;
+
+    /* EXCEPT: aug_openmar_BIN -> init_BIN_; */
 
     if (init_BIN_(seq, &info) < 0) {
         aug_destroyseq_(seq);
@@ -768,6 +772,9 @@ aug_openmar_BIN(aug_mpool* mpool, const char* path, int flags, ...)
     if (flags & AUG_TRUNC) {
 
         assert(AUG_TRUNC == (flags & AUG_TRUNC));
+
+        /* EXCEPT: aug_openmar_BIN -> aug_truncatemar_BIN; */
+
         if (aug_truncatemar_BIN(&impl->mar_, 0) < 0) {
             aug_release(&impl->mar_);
             return NULL;

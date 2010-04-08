@@ -168,12 +168,16 @@ aug_tryconnect_BI(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
         if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
+        /* EXCEPT: aug_tryconnect_BI -> aug_ssetnonblock_BI; */
+
         if (aug_ssetnonblock_BI(sd, AUG_TRUE) < 0) {
             aug_sclose(sd);
             return AUG_BADSD;
         }
 
         aug_getendpoint(conn->res_, ep);
+
+        /* EXCEPT: aug_tryconnect_BI -> aug_connect_BI; */
 
         if (0 <= aug_connect_BI(sd, ep)) {
 
