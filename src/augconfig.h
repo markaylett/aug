@@ -93,7 +93,7 @@
 typedef int mode_t;
 typedef int pid_t;
 typedef int ssize_t;
-typedef void* caddr_t;
+typedef char* caddr_t;
 
 typedef __int8 int8_t;
 typedef unsigned __int8 uint8_t;
