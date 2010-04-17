@@ -10,4 +10,5 @@ SUBDIRS = \
 EXTRA_DIST = \
 	config.pl \
 	syscall.csv \
+	README \
 	TODO
