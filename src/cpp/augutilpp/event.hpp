@@ -48,16 +48,16 @@ namespace aug {
     }
 
     inline void
-    writeevent(aug_events_t events, const aug_event& event)
+    writeevent_B(aug_events_t events, const aug_event& event)
     {
-        verify(aug_writeevent(events, &event));
+        verify(aug_writeevent_B(events, &event));
     }
 
     inline void
-    writeevent(aug_events_t events, int type, objectref ob)
+    writeevent_B(aug_events_t events, int type, objectref ob)
     {
         aug_event event = { type, ob.get() };
-        writeevent(events, event);
+        writeevent_B(events, event);
     }
 
     inline mdref
@@ -89,7 +89,7 @@ namespace aug {
 
         explicit
         events(mpoolref mpool)
-            : events_(aug_createevents(mpool.get()))
+            : events_(aug_createevents_BIN(mpool.get()))
         {
             verify(events_);
         }

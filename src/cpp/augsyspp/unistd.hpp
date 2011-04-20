@@ -108,7 +108,7 @@ namespace aug {
     inline void
     msleep_I(unsigned ms)
     {
-        return aug_msleep_I(ms);
+        aug_msleep_I(ms);
     }
 }
 

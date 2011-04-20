@@ -35,9 +35,9 @@
 namespace aug {
 
     inline autosd
-    tcpclient(const char* host, const char* serv, aug_endpoint& ep)
+    tcpclient_BI(const char* host, const char* serv, aug_endpoint& ep)
     {
-        autosd sd(aug_tcpclient(host, serv, &ep), close);
+        autosd sd(aug_tcpclient_BI(host, serv, &ep), close);
         if (null == sd)
             throwexcept();
 
@@ -45,9 +45,9 @@ namespace aug {
     }
 
     inline autosd
-    tcpserver(const char* host, const char* serv, aug_endpoint& ep)
+    tcpserver_N(const char* host, const char* serv, aug_endpoint& ep)
     {
-        autosd sd(aug_tcpserver(host, serv, &ep), close);
+        autosd sd(aug_tcpserver_N(host, serv, &ep), close);
         if (null == sd)
             throwexcept();
 
@@ -58,8 +58,8 @@ namespace aug {
     udpclient(const char* host, const char* serv, aug_endpoint& ep,
               bool connect)
     {
-        autosd sd(aug_udpclient(host, serv, &ep,
-                                connect ? AUG_TRUE : AUG_FALSE), close);
+        autosd sd(aug_udpclient_BI(host, serv, &ep,
+                                   connect ? AUG_TRUE : AUG_FALSE), close);
         if (null == sd)
             throwexcept();
 
@@ -67,9 +67,9 @@ namespace aug {
     }
 
     inline autosd
-    udpserver(const char* host, const char* serv, aug_endpoint& ep)
+    udpserver_N(const char* host, const char* serv, aug_endpoint& ep)
     {
-        autosd sd(aug_udpserver(host, serv, &ep), close);
+        autosd sd(aug_udpserver_N(host, serv, &ep), close);
         if (null == sd)
             throwexcept();
 

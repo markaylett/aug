@@ -49,39 +49,39 @@ namespace aug {
         {
         }
         void
-        clearfields()
+        clearfields_BIN()
         {
-            aug::clearfields(mar_);
+            aug::clearfields_BIN(mar_);
         }
         const_iterator
-        putfield(const aug_field& f)
+        putfield_BIN(const aug_field& f)
         {
-            return const_iterator(mar_, aug::putfield(mar_, f));
+            return const_iterator(mar_, aug::putfield_BIN(mar_, f));
         }
         const_iterator
-        putfield(const const_iterator& it, const void* cdata, unsigned n)
+        putfield_BIN(const const_iterator& it, const void* cdata, unsigned n)
         {
-            aug::putfieldn(mar_, distance(it), cdata, n);
+            aug::putfieldn_BIN(mar_, distance(it), cdata, n);
             return it;
         }
         const_iterator
-        putfield(const const_iterator& it, const char* cdata)
+        putfield_BIN(const const_iterator& it, const char* cdata)
         {
-            aug::putfieldn(mar_, distance(it), cdata,
-                           static_cast<unsigned>(strlen(cdata)));
+            aug::putfieldn_BIN(mar_, distance(it), cdata,
+                               static_cast<unsigned>(strlen(cdata)));
             return it;
         }
         const_iterator
-        putfield(const const_iterator& it, const std::string& cdata)
+        putfield_BIN(const const_iterator& it, const std::string& cdata)
         {
-            aug::putfieldn(mar_, distance(it), cdata.data(),
-                           static_cast<unsigned>(cdata.size()));
+            aug::putfieldn_BIN(mar_, distance(it), cdata.data(),
+                               static_cast<unsigned>(cdata.size()));
             return it;
         }
         const_iterator
-        delfield(const const_iterator& it)
+        delfield_BIN(const const_iterator& it)
         {
-            aug::delfieldn(mar_, distance(it));
+            aug::delfieldn_BIN(mar_, distance(it));
             return it;
         }
         const void*

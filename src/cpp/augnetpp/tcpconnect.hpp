@@ -38,10 +38,10 @@
 namespace aug {
 
     inline autosd
-    tryconnect(aug_tcpconnect_t conn, aug_endpoint& ep, bool& est)
+    tryconnect_BI(aug_tcpconnect_t conn, aug_endpoint& ep, bool& est)
     {
         int local;
-        sdref ref(aug_tryconnect(conn, &ep, &local));
+        sdref ref(aug_tryconnect_BI(conn, &ep, &local));
         if (null == ref)
             throwexcept();
 

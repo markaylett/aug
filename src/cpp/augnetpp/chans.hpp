@@ -49,9 +49,9 @@ namespace aug {
     }
 
     inline void
-    processchans(aug_chans_t chans)
+    processchans_BI(aug_chans_t chans)
     {
-        aug_processchans(chans);
+        aug_processchans_BI(chans);
     }
 
     inline void

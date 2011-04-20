@@ -87,16 +87,16 @@ namespace aug {
     }
 
     inline char*
-    realpath(const char* src, char* dst, size_t size)
+    realpath_N(const char* src, char* dst, size_t size)
     {
-        return verify(aug_realpath(src, dst, size));
+        return verify(aug_realpath_N(src, dst, size));
     }
 
     inline std::string
-    realpath(const char* path)
+    realpath_N(const char* path)
     {
         char buf[AUG_PATH_MAX + 1];
-        return realpath(path, buf, sizeof(buf));
+        return realpath_N(path, buf, sizeof(buf));
     }
 }
 

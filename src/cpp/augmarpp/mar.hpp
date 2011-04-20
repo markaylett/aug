@@ -32,52 +32,52 @@
 namespace aug {
 
     inline marptr
-    createmar(mpoolref mpool)
+    createmar_BIN(mpoolref mpool)
     {
-        return object_attach<aug_mar>(verify(aug_createmar(mpool.get())));
+        return object_attach<aug_mar>(verify(aug_createmar_BIN(mpool.get())));
     }
     inline marptr
-    openmar(mpoolref mpool, const char* path, int flags)
+    openmar_BIN(mpoolref mpool, const char* path, int flags)
     {
         return object_attach<aug_mar>
-            (verify(aug_openmar(mpool.get(), path, flags)));
+            (verify(aug_openmar_BIN(mpool.get(), path, flags)));
     }
     inline marptr
-    openmar(mpoolref mpool, const char* path, int flags, mode_t mode)
+    openmar_BIN(mpoolref mpool, const char* path, int flags, mode_t mode)
     {
         return object_attach<aug_mar>
-            (verify(aug_openmar(mpool.get(), path, flags, mode)));
+            (verify(aug_openmar_BIN(mpool.get(), path, flags, mode)));
     }
     inline void
-    putfieldn(marref ref, unsigned n, const char* cdata)
+    putfieldn_BIN(marref ref, unsigned n, const char* cdata)
     {
-        putfieldn(ref, n, cdata, static_cast<unsigned>(strlen(cdata)));
+        putfieldn_BIN(ref, n, cdata, static_cast<unsigned>(strlen(cdata)));
     }
     inline void
-    putfieldn(marref ref, unsigned n, const std::string& cdata)
+    putfieldn_BIN(marref ref, unsigned n, const std::string& cdata)
     {
-        putfieldn(ref, n, cdata.data(), static_cast<unsigned>(cdata.size()));
+        putfieldn_BIN(ref, n, cdata.data(), static_cast<unsigned>(cdata.size()));
     }
     inline void
-    putfieldp(marref ref, const char* name, const char* cdata)
+    putfieldp_BIN(marref ref, const char* name, const char* cdata)
     {
-        putfieldp(ref, name, cdata, static_cast<unsigned>(strlen(cdata)));
+        putfieldp_BIN(ref, name, cdata, static_cast<unsigned>(strlen(cdata)));
     }
     inline void
-    putfieldp(marref ref, const char* name, const std::string& cdata)
+    putfieldp_BIN(marref ref, const char* name, const std::string& cdata)
     {
-        putfieldp(ref, name, cdata.data(),
-                  static_cast<unsigned>(cdata.size()));
+        putfieldp_BIN(ref, name, cdata.data(),
+                      static_cast<unsigned>(cdata.size()));
     }
     inline void
-    setcontent(marref ref, const char* data)
+    setcontent_BIN(marref ref, const char* data)
     {
-        setcontent(ref, data, static_cast<unsigned>(strlen(data)));
+        setcontent_BIN(ref, data, static_cast<unsigned>(strlen(data)));
     }
     inline void
-    setcontent(marref ref, const std::string& data)
+    setcontent_BIN(marref ref, const std::string& data)
     {
-        setcontent(ref, data.data(), static_cast<unsigned>(data.size()));
+        setcontent_BIN(ref, data.data(), static_cast<unsigned>(data.size()));
     }
 }
 

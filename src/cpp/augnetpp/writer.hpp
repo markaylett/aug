@@ -37,9 +37,9 @@ namespace aug {
     }
 
     inline aug_rsize
-    writesome(aug_writer_t writer, streamref ref)
+    writesome_BI(aug_writer_t writer, streamref ref)
     {
-        return verify(aug_writesome(writer, ref.get()));
+        return verify(aug_writesome_BI(writer, ref.get()));
     }
 
     inline bool

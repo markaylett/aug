@@ -32,9 +32,9 @@
 namespace aug {
 
     inline void
-    openlog(const char* path)
+    openlog_IN(const char* path)
     {
-        verify(aug_openlog(path));
+        verify(aug_openlog_IN(path));
     }
 
     inline void

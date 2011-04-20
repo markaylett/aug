@@ -136,7 +136,7 @@ namespace aug {
          */
 
         size_t
-        writesome(streamref ref);
+        writesome_BI(streamref ref);
 
         bool
         empty() const

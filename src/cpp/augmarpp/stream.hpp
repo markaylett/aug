@@ -59,7 +59,7 @@ namespace aug {
                          int flags = AUG_RDONLY, mode_t mode = 0444,
                          std::streamsize size = AUG_MAXLINE)
             : base_type(0),
-              streambuf_(aug_openmar(mpool.get(), path, flags, mode),
+              streambuf_(aug_openmar_BIN(mpool.get(), path, flags, mode),
                          std::ios_base::in, size)
         {
             rdbuf(&streambuf_);
@@ -108,7 +108,7 @@ namespace aug {
                          mode_t mode = 0664,
                          std::streamsize size = AUG_MAXLINE)
             : base_type(0),
-              streambuf_(aug_openmar(mpool.get(), path, flags, mode),
+              streambuf_(aug_openmar_BIN(mpool.get(), path, flags, mode),
                          std::ios_base::out, size)
         {
             rdbuf(&streambuf_);
@@ -146,7 +146,7 @@ namespace aug {
         basic_iomarstream(mpoolref mpool, const memory_&,
                           std::streamsize size = AUG_MAXLINE)
             : base_type(0),
-              streambuf_(aug_createmar(mpool.get()), std::ios_base::in
+              streambuf_(aug_createmar_BIN(mpool.get()), std::ios_base::in
                          | std::ios_base::out, size)
         {
             rdbuf(&streambuf_);
@@ -158,7 +158,7 @@ namespace aug {
                           mode_t mode = 0664,
                           std::streamsize size = AUG_MAXLINE)
             : base_type(0),
-              streambuf_(aug_openmar(mpool.get(), path, flags, mode),
+              streambuf_(aug_openmar_BIN(mpool.get(), path, flags, mode),
                          std::ios_base::in | std::ios_base::out, size)
         {
             rdbuf(&streambuf_);

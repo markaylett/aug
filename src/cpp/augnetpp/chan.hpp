@@ -39,12 +39,12 @@
 namespace aug {
 
     inline chanptr
-    createclient(mpoolref mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, ssl_ctx_st* sslctx = 0)
+    createclient_BI(mpoolref mpool, const char* host, const char* serv,
+                    aug_muxer_t muxer, ssl_ctx_st* sslctx = 0)
     {
         return object_attach<aug_chan>
-            (verify(aug_createclient(mpool.get(), host, serv, muxer,
-                                     sslctx)));
+            (verify(aug_createclient_BI(mpool.get(), host, serv, muxer,
+                                        sslctx)));
     }
 
     inline chanptr

@@ -34,15 +34,15 @@ namespace aug {
 
 
     inline void
-    appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
+    appendhttp_BIN(aug_httpparser_t parser, const char* buf, unsigned size)
     {
-        verify(aug_appendhttp(parser, buf, size));
+        verify(aug_appendhttp_BIN(parser, buf, size));
     }
 
     inline void
-    finishhttp(aug_httpparser_t parser)
+    finishhttp_BIN(aug_httpparser_t parser)
     {
-        verify(aug_finishhttp(parser));
+        verify(aug_finishhttp_BIN(parser));
     }
 
     class httpparser : public mpool_ops {

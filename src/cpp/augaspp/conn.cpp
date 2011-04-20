@@ -208,7 +208,7 @@ connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
 
         try {
             char buf[AUG_BUFSIZE];
-            size_t size(read(stream, buf, sizeof(buf)));
+            size_t size(read_BI(stream, buf, sizeof(buf)));
             if (0 == size) {
 
                 // Connection closed.
@@ -236,7 +236,7 @@ connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
         AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%d]",
                       static_cast<int>(sock_.id_));
 
-        size_t n(buffer_.writesome(stream));
+        size_t n(buffer_.writesome_BI(stream));
 
         // Data has been written: reset write timer.
 

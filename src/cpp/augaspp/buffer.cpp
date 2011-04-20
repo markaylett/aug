@@ -83,9 +83,9 @@ buffer::append(const void* buf, size_t len)
 }
 
 size_t
-buffer::writesome(streamref ref)
+buffer::writesome_BI(streamref ref)
 {
-    size_t size(aug::writesome(writer_, ref));
+    size_t size(aug::writesome_BI(writer_, ref));
 
     // Once appended, external blobs must not mutate.  AUG_MIN is used here as
     // a defensive measure.
