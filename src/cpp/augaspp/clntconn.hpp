@@ -77,8 +77,8 @@ namespace aug {
         do_auth(const char* subject, const char* issuer);
 
         void
-        do_process(chanref chan, unsigned short events,
-                   const aug_timeval& now);
+        do_process_BI(chanref chan, unsigned short events,
+                      const aug_timeval& now);
 
         void
         do_teardown(const aug_timeval& now);

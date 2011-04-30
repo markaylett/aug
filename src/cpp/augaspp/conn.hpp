@@ -61,8 +61,8 @@ namespace aug {
          */
 
         virtual void
-        do_process(chanref chan, unsigned short events,
-                   const aug_timeval& now) = 0;
+        do_process_BI(chanref chan, unsigned short events,
+                      const aug_timeval& now) = 0;
 
         /**
          * Initiate application-level teardown.
@@ -104,9 +104,9 @@ namespace aug {
             return do_auth(subject, issuer);
         }
         void
-        process(chanref chan, unsigned short events, const aug_timeval& now)
+        process_BI(chanref chan, unsigned short events, const aug_timeval& now)
         {
-            do_process(chan, events, now);
+            do_process_BI(chan, events, now);
         }
         void
         teardown(const aug_timeval& now)
@@ -178,7 +178,7 @@ namespace aug {
         auth(const char* subject, const char* issuer);
 
         void
-        process(chanref chan, unsigned short events, const aug_timeval& now);
+        process_BI(chanref chan, unsigned short events, const aug_timeval& now);
 
         void
         error(const char* desc);

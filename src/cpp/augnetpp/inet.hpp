@@ -55,8 +55,8 @@ namespace aug {
     }
 
     inline autosd
-    udpclient(const char* host, const char* serv, aug_endpoint& ep,
-              bool connect)
+    udpclient_BI(const char* host, const char* serv, aug_endpoint& ep,
+                 bool connect)
     {
         autosd sd(aug_udpclient_BI(host, serv, &ep,
                                    connect ? AUG_TRUE : AUG_FALSE), close);

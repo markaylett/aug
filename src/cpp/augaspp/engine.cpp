@@ -54,14 +54,14 @@ using namespace std;
 namespace {
 
     size_t
-    sendall(sdref ref, const char* buf, size_t len, int flags,
-            const aug_endpoint& ep)
+    sendall_BI(sdref ref, const char* buf, size_t len, int flags,
+               const aug_endpoint& ep)
     {
         // Giveup after three attempts.
 
         size_t n(0);
         for (unsigned i(0); i < 3; ++i) {
-            n += aug::sendto(ref, buf + n, len - n, 0, ep);
+            n += aug::sendto_BI(ref, buf + n, len - n, 0, ep);
             if (n == len)
                 break;
         }
@@ -182,8 +182,8 @@ namespace aug {
                 seqno_ = 0;
             }
             void
-            emit(sdref ref, unsigned short type, const void* data,
-                 unsigned size, const endpoint& ep)
+            emit_BI(sdref ref, unsigned short type, const void* data,
+                    unsigned size, const endpoint& ep)
             {
                 // Gap messages are reserved for internal use only.
 
@@ -200,7 +200,7 @@ namespace aug {
                 char buf[AUG_PACKETSIZE];
                 aug_encodepacket(&pkt, buf);
 
-                const size_t n(sendall(ref, buf, sizeof(buf), 0, ep));
+                const size_t n(sendall_BI(ref, buf, sizeof(buf), 0, ep));
 
                 if (n < sizeof(buf))
                     aug_ctxwarn(aug_tlx, "partial packet send: bytes=[%u]",
@@ -418,12 +418,12 @@ namespace aug {
 
                 bool threw = true;
                 try {
-                    conn->process(chan, events, now_);
+                    conn->process_BI(chan, events, now_);
                     threw = false;
                 } AUG_PERRINFOCATCH;
 
                 // If an exception was thrown, "threw" will still have its
-                // original value of false.
+                // original value of true.
 
                 if (threw) {
 
@@ -446,7 +446,7 @@ namespace aug {
                 return aug::findchan(chans_, id);
             }
             void
-            teardown()
+            teardown_BI()
             {
                 if (STARTED == state_) {
 
@@ -466,11 +466,11 @@ namespace aug {
                         wrtimer_.cancel();
                     }
 #endif // ENABLE_MULTICAST
-                    emit(AUG_PKTDOWN, 0, 0);
+                    emit_BI(AUG_PKTDOWN, 0, 0);
                 }
             }
             void
-            readevent()
+            readevent_BI()
             {
                 AUG_CTXDEBUG2(aug_tlx, "reading event");
 
@@ -489,7 +489,7 @@ namespace aug {
                     break;
                 case AUG_EVENTSTOP:
                     AUG_CTXDEBUG2(aug_tlx, "received AUG_EVENTSTOP");
-                    teardown();
+                    teardown_BI();
                     break;
                 case AUG_EVENTSIGNAL:
                     AUG_CTXDEBUG2(aug_tlx, "received AUG_EVENTSIGNAL");
@@ -519,7 +519,7 @@ namespace aug {
                 }
             }
             void
-            timercb(idref id, unsigned& ms)
+            timercb_BI(idref id, unsigned& ms)
             {
 #if ENABLE_MULTICAST
                 if (id == rdtimer_.id()) {
@@ -535,7 +535,7 @@ namespace aug {
 
                     if (null != mcastsd_) {
                         // Only send heartbeat if node is not shutting down.
-                        packet_.emit(mcastsd_, AUG_PKTHBEAT, 0, 0, mcastep_);
+                        packet_.emit_BI(mcastsd_, AUG_PKTHBEAT, 0, 0, mcastep_);
                         ms = hbint_;
                     }
 
@@ -566,11 +566,11 @@ namespace aug {
                 state_ = STOPPED;
             }
             void
-            emit(unsigned short type, const void* buf, size_t len)
+            emit_BI(unsigned short type, const void* buf, size_t len)
             {
 #if ENABLE_MULTICAST
                 if (null != mcastsd_) {
-                    packet_.emit(mcastsd_, type, buf, len, mcastep_);
+                    packet_.emit_BI(mcastsd_, type, buf, len, mcastep_);
                     // Any write supplants heartbeat.
                     if (STARTED == state_)
                         wrtimer_.reset(hbint_);
@@ -624,11 +624,11 @@ namespace aug {
 # endif // LOGCLUSTER_
             }
             void
-            mrecv()
+            mrecv_BI()
             {
                 char buf[AUG_PACKETSIZE];
                 endpoint from(null);
-                const size_t n(recvfrom(mcastsd_, buf, sizeof(buf), 0, from));
+                const size_t n(recvfrom_BI(mcastsd_, buf, sizeof(buf), 0, from));
                 if (n == sizeof(buf)) {
                     aug_packet pkt;
                     verify(aug_decodepacket(buf, &pkt));
@@ -643,11 +643,11 @@ namespace aug {
                                 static_cast<unsigned>(n));
             }
             void
-            mprocess()
+            mprocess_I()
             {
                 try {
                     for (;;)
-                        mrecv();
+                        mrecv_BI();
                 } catch (const block_exception&) {
                 }
                 mflush();
@@ -690,15 +690,15 @@ engine::clear()
 }
 
 AUGASPP_API void
-engine::join(const char* addr, unsigned short port, int ttl,
-             const char* ifname)
+engine::join_BIN(const char* addr, unsigned short port, int ttl,
+                 const char* ifname)
 {
 #if ENABLE_MULTICAST
 
     inetaddr in(addr);
 
     autosd sd(aug::socket(family(in), SOCK_DGRAM));
-    setnonblock(sd, true);
+    setnonblock_BI(sd, true);
     // Reuse port.
     setreuseaddr(sd, true);
     // Loopback.
@@ -712,7 +712,7 @@ engine::join(const char* addr, unsigned short port, int ttl,
         setmcastif(sd, ifname);
 
     const endpoint any(inetany(family(in)), htons(port));
-    aug::bind(sd, any);
+    aug::bind_N(sd, any);
 
     joinmcast(sd, in, ifname);
 
@@ -728,7 +728,7 @@ engine::join(const char* addr, unsigned short port, int ttl,
 
 #endif // ENABLE_MULTICAST
 
-    impl_->emit(AUG_PKTUP, 0, 0);
+    impl_->emit_BI(AUG_PKTUP, 0, 0);
 }
 
 AUGASPP_API void
@@ -782,21 +782,21 @@ engine::run(bool stoponerr)
 
                     // Some are ready so don't block.
 
-                    pollmdevents(impl_->muxer_);
+                    pollmdevents_I(impl_->muxer_);
 
                 } else if (aug_timersempty(impl_->timers_)) {
 
                     // No timers so wait indefinitely.
 
                     scoped_sigunblock unblock;
-                    ready = waitmdevents(impl_->muxer_);
+                    ready = waitmdevents_I(impl_->muxer_);
 
                 } else {
 
                     // Wait upto next timer expiry.
 
                     scoped_sigunblock unblock;
-                    ready = waitmdevents(impl_->muxer_, tv);
+                    ready = waitmdevents_I(impl_->muxer_, tv);
                 }
 
             } catch (const intr_exception&) {
@@ -814,7 +814,7 @@ engine::run(bool stoponerr)
                 AUG_CTXDEBUG2(aug_tlx, "processing multicast");
 
                 if (getmdevents(impl_->muxer_, impl_->mcastsd_))
-                    impl_->mprocess();
+                    impl_->mprocess_I();
             }
 #endif // ENABLE_MULTICAST
 
@@ -826,14 +826,14 @@ engine::run(bool stoponerr)
                     // Read events until operation would block.
 
                     for (;;)
-                        impl_->readevent();
+                        impl_->readevent_BI();
 
                 } catch (const block_exception&) {
                 }
 
             AUG_CTXDEBUG2(aug_tlx, "processing files");
 
-            processchans(impl_->chans_);
+            processchans_BI(impl_->chans_);
             continue;
 
         } AUG_PERRINFOCATCH;
@@ -846,12 +846,12 @@ engine::run(bool stoponerr)
 }
 
 AUGASPP_API void
-engine::reconfall()
+engine::reconfall_B()
 {
     // Thread-safe.
 
     aug_event e = { AUG_EVENTRECONF, 0 };
-    writeevent(impl_->events_, e);
+    writeevent_B(impl_->events_, e);
 }
 
 AUGASPP_API void

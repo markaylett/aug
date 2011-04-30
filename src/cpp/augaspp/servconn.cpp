@@ -97,10 +97,10 @@ servconn::do_auth(const char* subject, const char* issuer)
 }
 
 void
-servconn::do_process(chanref chan, unsigned short events,
-                     const aug_timeval& now)
+servconn::do_process_BI(chanref chan, unsigned short events,
+                        const aug_timeval& now)
 {
-    impl_.process(chan, events, now);
+    impl_.process_BI(chan, events, now);
 }
 
 void

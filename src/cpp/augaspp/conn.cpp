@@ -197,7 +197,7 @@ connimpl::auth(const char* subject, const char* issuer)
 }
 
 void
-connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
+connimpl::process_BI(chanref chan, unsigned short events, const aug_timeval& now)
 {
     streamptr stream(object_cast<aug_stream>(chan));
 
